@@ -62,14 +62,14 @@ class AsyncAPI3(BaseModel):
     #     exclude_if=is_null,
     #     description="Provides connection details of servers.",
     # )
-    # default_content_type: str | None = Field(
-    #     default=None,
-    #     exclude_if=is_null,
-    #     alias="defaultContentType",
-    #     description=(
-    #         "Default content type to use when encoding/decoding a message's payload."
-    #     ),
-    # )
+    default_content_type: str | None = Field(
+        default=None,
+        exclude_if=is_null,
+        alias="defaultContentType",
+        description=(
+            "Default content type to use when encoding/decoding a message's payload."
+        ),
+    )
     # channels: Channels | None = Field(
     #     default=None,
     #     exclude_if=is_null,
