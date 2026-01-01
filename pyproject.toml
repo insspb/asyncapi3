@@ -4,7 +4,9 @@ dynamic = ["version"]
 description = "Python AsyncAPI 3.0 object model"
 readme = "README.md"
 requires-python = ">=3.10"
-dependencies = []
+dependencies = [
+    "pydantic>=2.12.5",
+]
 license = { text = "MIT" }
 authors = [
     { name = "Andrey Shpak" },
