@@ -5,6 +5,7 @@ __all__ = ["AsyncAPI3"]
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from asyncapi3._models import Servers
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.info import Info
 
@@ -57,11 +58,14 @@ class AsyncAPI3(BaseModel):
             "if needed."
         ),
     )
-    # servers: Servers | None = Field(
-    #     default=None,
-    #     exclude_if=is_null,
-    #     description="Provides connection details of servers.",
-    # )
+    servers: Servers | None = Field(
+        default=None,
+        exclude_if=is_null,
+        description=(
+            "The Servers Object is a map of Server Objects. Provides connection "
+            "details of servers."
+        ),
+    )
     default_content_type: str | None = Field(
         default=None,
         exclude_if=is_null,
