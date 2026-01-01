@@ -2,8 +2,10 @@
 
 __all__ = ["AsyncAPI3"]
 
-from pydantic import BaseModel, Field
 
+from pydantic import BaseModel, ConfigDict, Field
+
+from asyncapi3.models.helpers import is_null
 from asyncapi3.models.info import Info
 
 
@@ -17,9 +19,14 @@ class AsyncAPI3(BaseModel):
     This object MAY be extended with Specification Extensions.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     asyncapi: str = Field(
+        default="3.0.0",
         description=(
             "Specifies the AsyncAPI Specification version being used. It can be used "
             "by tooling Specifications and clients to interpret the version. "
@@ -33,6 +40,7 @@ class AsyncAPI3(BaseModel):
     )
     id: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "Identifier of the application the AsyncAPI document is defining. "
             "This field represents a unique universal identifier of the application "
@@ -43,6 +51,7 @@ class AsyncAPI3(BaseModel):
         ),
     )
     info: Info = Field(
+        default_factory=Info,
         description=(
             "Provides metadata about the API. The metadata can be used by the clients "
             "if needed."
@@ -50,10 +59,12 @@ class AsyncAPI3(BaseModel):
     )
     # servers: Servers | None = Field(
     #     default=None,
+    #     exclude_if=is_null,
     #     description="Provides connection details of servers.",
     # )
     # default_content_type: str | None = Field(
     #     default=None,
+    #     exclude_if=is_null,
     #     alias="defaultContentType",
     #     description=(
     #         "Default content type to use when encoding/decoding a message's payload."
@@ -61,14 +72,17 @@ class AsyncAPI3(BaseModel):
     # )
     # channels: Channels | None = Field(
     #     default=None,
+    #     exclude_if=is_null,
     #     description="The channels used by this application.",
     # )
     # operations: Operations | None = Field(
     #     default=None,
+    #     exclude_if=is_null,
     #     description="The operations this application MUST implement.",
     # )
     # components: Components | None = Field(
     #     default=None,
+    #     exclude_if=is_null,
     #     description=(
     #         "An element to hold various reusable objects for the specification. "
     #         "Everything that is defined inside this object represents a resource "

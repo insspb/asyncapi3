@@ -2,9 +2,10 @@
 
 __all__ = ["Contact", "Info", "License"]
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.helpers import is_null
 
 
 class Contact(BaseModel):
@@ -14,14 +15,20 @@ class Contact(BaseModel):
     Contact information for the exposed API.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     name: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description="The identifying name of the contact person/organization.",
     )
     url: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "The URL pointing to the contact information. This MUST be in the form "
             "of an absolute URL."
@@ -29,6 +36,7 @@ class Contact(BaseModel):
     )
     email: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "The email address of the contact person/organization. MUST be in the "
             "format of an email address."
@@ -43,13 +51,18 @@ class License(BaseModel):
     License information for the exposed API.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     name: str = Field(
         description="The license name used for the API.",
     )
     url: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "A URL to the license used for the API. This MUST be in the form of an "
             "absolute URL."
@@ -65,10 +78,18 @@ class Info(BaseModel):
     The metadata can be used by the clients if needed.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
-    title: str = Field(description="The title of the application.")
+    title: str = Field(
+        default="AsyncAPI Sample App",
+        description="The title of the application.",
+    )
     version: str = Field(
+        default="0.0.1",
         description=(
             "Provides the version of the application API (not to be confused with "
             "the specification version)."
@@ -76,6 +97,7 @@ class Info(BaseModel):
     )
     description: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "A short description of the application. CommonMark syntax can be used "
             "for rich text representation."
@@ -83,6 +105,7 @@ class Info(BaseModel):
     )
     terms_of_service: str | None = Field(
         default=None,
+        exclude_if=is_null,
         alias="termsOfService",
         description=(
             "A URL to the Terms of Service for the API. This MUST be in the form "
@@ -91,14 +114,17 @@ class Info(BaseModel):
     )
     contact: Contact | None = Field(
         default=None,
+        exclude_if=is_null,
         description="The contact information for the exposed API.",
     )
     license: License | None = Field(
         default=None,
+        exclude_if=is_null,
         description="The license information for the exposed API.",
     )
     tags: Tags | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "A list of tags for application API documentation control. Tags can be "
             "used for logical grouping of applications."
@@ -106,6 +132,7 @@ class Info(BaseModel):
     )
     external_docs: ExternalDocumentation | Reference | None = Field(
         default=None,
+        exclude_if=is_null,
         alias="externalDocs",
         description="Additional external documentation of the exposed API.",
     )

@@ -2,7 +2,9 @@
 
 __all__ = ["ExternalDocumentation", "Reference", "Tag", "Tags"]
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+from asyncapi3.models.helpers import is_null
 
 
 class Reference(BaseModel):
@@ -23,7 +25,11 @@ class Reference(BaseModel):
     Reference specification and not by the JSON Schema specification.
     """
 
-    model_config = {"extra": "forbid"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     ref: str = Field(
         alias="$ref",
@@ -38,7 +44,11 @@ class ExternalDocumentation(BaseModel):
     Allows referencing an external resource for extended documentation.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     url: str = Field(
         description=(
@@ -48,6 +58,7 @@ class ExternalDocumentation(BaseModel):
     )
     description: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "A short description of the target documentation. CommonMark syntax can "
             "be used for rich text representation."
@@ -62,13 +73,18 @@ class Tag(BaseModel):
     Allows adding meta data to a single tag.
     """
 
-    model_config = {"extra": "allow"}
+    model_config = ConfigDict(
+        extra="allow",
+        revalidate_instances="always",
+        validate_assignment=True,
+    )
 
     name: str = Field(
         description="The name of the tag.",
     )
     description: str | None = Field(
         default=None,
+        exclude_if=is_null,
         description=(
             "A short description for the tag. CommonMark syntax can be used for rich "
             "text representation."
@@ -76,6 +92,7 @@ class Tag(BaseModel):
     )
     external_docs: ExternalDocumentation | Reference | None = Field(
         default=None,
+        exclude_if=is_null,
         alias="externalDocs",
         description="Additional external documentation for this tag.",
     )
