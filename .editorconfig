@@ -1,0 +1,22 @@
+root = true
+
+[*]
+end_of_line = lf
+insert_final_newline = true
+charset = utf-8
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
+
+[*.md]
+indent_size = 2
+max_line_length = 88
+
+[**.{js,json,jsx,ts,tsx,yml,yaml,css,scss,html}]
+indent_size = 2
+
+[**.go]
+indent_style = tab
+
+[Makefile]
+indent_style = tab
