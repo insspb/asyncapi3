@@ -79,6 +79,7 @@ exclude = [
 [tool.ruff.lint]
 # @formatter:off Комментарий необходим, чтобы pycharm не калечил форматирование списка
 ignore = [
+    "ANN401",  # Dynamically typed expressions (typing.Any) are disallowed in {name}
     "COM812",  # Conflict with RUFF Formatter
     "RUF015",  # Prefer next({iterable}) over single element slice
     "RUF059",  # Unpacked variable {name} is never used
@@ -90,7 +91,7 @@ ignore = [
 select = [
     "A",        # flake8-builtins
     "AIR",      # Airflow
-#    "ANN",     # flake8-annotations
+    "ANN",      # flake8-annotations
 #    "ARG",     # flake8-unused-arguments
     "ASYNC",    # flake8-async
     "B",        # flake8-bugbear
@@ -132,8 +133,8 @@ select = [
 #    "PLE",     # Error
 #    "PLR",     # Refactor
 #    "PLW",     # Warning
-#    "PT",      # flake8-pytest-style
-#    "PTH",     # flake8-use-pathlib
+    "PT",       # flake8-pytest-style
+    "PTH",      # flake8-use-pathlib
 #    "PYI",     # flake8-pyi
     "Q",        # flake8-quotes
     "RET",      # flake8-return
@@ -147,7 +148,7 @@ select = [
     "T20",      # flake8-print
 #    "TC",      # flake8-type-checking
 #    "TD",      # flake8-todos
-#    "TID",     # flake8-tidy-imports
+    "TID",      # flake8-tidy-imports
 #    "TRY",     # tryceratops
     "UP",       # pyupgrade
     "W",        # pycodestyle warnings
@@ -156,7 +157,6 @@ select = [
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = [
-    "I001",     # unsorted-imports	Import block is un-sorted or un-formatted
     "F401",     # unused import
     "F403",     # undefined name
 ]
