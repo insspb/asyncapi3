@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from asyncapi3.models.channel import Channels
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.info import Info
+from asyncapi3.models.operation import Operations
 from asyncapi3.models.server import Servers
 
 
@@ -80,11 +81,11 @@ class AsyncAPI3(BaseModel):
         exclude_if=is_null,
         description="The channels used by this application.",
     )
-    # operations: Operations | None = Field(
-    #     default=None,
-    #     exclude_if=is_null,
-    #     description="The operations this application MUST implement.",
-    # )
+    operations: Operations | None = Field(
+        default=None,
+        exclude_if=is_null,
+        description="The operations this application MUST implement.",
+    )
     # components: Components | None = Field(
     #     default=None,
     #     exclude_if=is_null,
