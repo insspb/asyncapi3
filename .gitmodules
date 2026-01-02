@@ -1,0 +1,6 @@
+[submodule "spec/bindings"]
+	path = spec/bindings
+	url = git@github.com:asyncapi/bindings.git
+[submodule "spec/asyncapi"]
+	path = spec/asyncapi
+	url = git@github.com:asyncapi/spec.git

@@ -13,6 +13,9 @@ specifications.
 
 This SDK focused only on AsyncAPI 3 specification, no other versions are supported.
 
+Current implemented AsyncAPI 3 and bindings specification (and its hash) can be
+found in [spec](spec) folder.
+
 ## Features
 
 - [ ] Pydantic models for AsyncAPI 3 specification. Complete specification coverage.
