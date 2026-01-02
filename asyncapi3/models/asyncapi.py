@@ -5,9 +5,10 @@ __all__ = ["AsyncAPI3"]
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from asyncapi3._models import Servers
+from asyncapi3.models.channel import Channels
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.info import Info
+from asyncapi3.models.server import Servers
 
 
 class AsyncAPI3(BaseModel):
@@ -74,11 +75,11 @@ class AsyncAPI3(BaseModel):
             "Default content type to use when encoding/decoding a message's payload."
         ),
     )
-    # channels: Channels | None = Field(
-    #     default=None,
-    #     exclude_if=is_null,
-    #     description="The channels used by this application.",
-    # )
+    channels: Channels | None = Field(
+        default=None,
+        exclude_if=is_null,
+        description="The channels used by this application.",
+    )
     # operations: Operations | None = Field(
     #     default=None,
     #     exclude_if=is_null,
