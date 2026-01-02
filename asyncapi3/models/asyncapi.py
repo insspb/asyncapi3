@@ -6,6 +6,7 @@ __all__ = ["AsyncAPI3"]
 from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.channel import Channels
+from asyncapi3.models.components import Components
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.info import Info
 from asyncapi3.models.operation import Operations
@@ -86,13 +87,13 @@ class AsyncAPI3(BaseModel):
         exclude_if=is_null,
         description="The operations this application MUST implement.",
     )
-    # components: Components | None = Field(
-    #     default=None,
-    #     exclude_if=is_null,
-    #     description=(
-    #         "An element to hold various reusable objects for the specification. "
-    #         "Everything that is defined inside this object represents a resource "
-    #         "that MAY or MAY NOT be used in the rest of the document and MAY or "
-    #         "MAY NOT be used by the implemented Application."
-    #     ),
-    # )
+    components: Components | None = Field(
+        default=None,
+        exclude_if=is_null,
+        description=(
+            "An element to hold various reusable objects for the specification. "
+            "Everything that is defined inside this object represents a resource "
+            "that MAY or MAY NOT be used in the rest of the document and MAY or "
+            "MAY NOT be used by the implemented Application."
+        ),
+    )
