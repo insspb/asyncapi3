@@ -69,7 +69,7 @@ class WebSocketsChannelBindings(BaseModel):
         ),
     )
     binding_version: str = Field(
-        default="latest",
+        default="0.1.0",
         alias="bindingVersion",
         description="The version of this binding. If omitted, 'latest' MUST be assumed",
     )
