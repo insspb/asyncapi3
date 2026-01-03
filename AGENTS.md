@@ -222,6 +222,26 @@ When creating Pydantic models based on the AsyncAPI 3 specification:
   Python field names (snake_case)
 - Configure Pydantic models to parse and write JSON correctly using `ConfigDict`
 
+#### Bindings Naming Rules
+
+**CRITICAL**: For bindings models, additional helper classes (classes that are not
+the main Server/Channel/Operation/Message bindings) **MUST** be prefixed with the
+protocol name to avoid naming conflicts between different protocols.
+
+Examples:
+
+- `Queue` → `SQSQueue`, `AMQPQueue`, `SolaceQueue`
+- `Policy` → `SNSPolicy`, `SQSPolicy`
+- `Statement` → `SNSStatement`, `SQSStatement`
+- `Destination` → `SolaceDestination`
+- `Identifier` → `SNSIdentifier`, `SQSIdentifier`
+- `TopicConfiguration` → `KafkaTopicConfiguration`
+- `LastWill` → `MQTTLastWill`
+
+This rule applies to all helper classes defined within binding modules, except for
+the four main binding classes (ServerBindings, ChannelBindings, OperationBindings,
+MessageBindings) which already have the protocol prefix.
+
 ### Model Configuration
 
 All Pydantic models should use the following standard configuration:
