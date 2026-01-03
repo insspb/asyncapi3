@@ -312,9 +312,8 @@ class SQSChannelBindings(BaseModel):
             "A definition of the queue that will be used for un-processable messages."
         ),
     )
-    binding_version: str | None = Field(
-        default=None,
-        exclude_if=is_null,
+    binding_version: str = Field(
+        default="0.3.0",
         alias="bindingVersion",
         description="The version of this binding. Optional, defaults to latest.",
     )
@@ -347,9 +346,8 @@ class SQSOperationBindings(BaseModel):
             "Object."
         ),
     )
-    binding_version: str | None = Field(
-        default=None,
-        exclude_if=is_null,
+    binding_version: str = Field(
+        default="0.3.0",
         alias="bindingVersion",
         description="The version of this binding. Optional, defaults to latest.",
     )
