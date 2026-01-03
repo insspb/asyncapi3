@@ -2,47 +2,34 @@ asyncapi: 3.0.0
 info:
   title: Streetlights Kafka API
   version: 1.0.0
-  description: |-
-    The Smartylighting Streetlights API allows you to remotely manage the city
-    lights.
-    ### Check out its awesome features:
-
-    * Turn a specific streetlight on/off 🌃
-    * Dim a specific streetlight 😎
-    * Receive real-time information about environmental lighting conditions 📈
+  description: "The Smartylighting Streetlights API allows you to remotely manage the city lights.\n\n### Check out its awesome features:\n\n* Turn a specific streetlight on/off \U0001F303\n* Dim a specific streetlight \U0001F60E\n* Receive real-time information about environmental lighting conditions \U0001F4C8\n"
   license:
     name: Apache 2.0
     url: 'https://www.apache.org/licenses/LICENSE-2.0'
 defaultContentType: application/json
 servers:
-  scram-connections:
-    host: 'test.mykafkacluster.org:18092'
+  test:
+    host: 'test.mykafkacluster.org:8092'
     protocol: kafka-secure
-    description: Test broker secured with scramSha256
+    description: Test broker
     security:
       - $ref: '#/components/securitySchemes/saslScram'
-    tags:
-      - name: 'env:test-scram'
-        description: >-
-          This environment is meant for running internal tests through
-          scramSha256
-      - name: 'kind:remote'
-        description: This server is a remote server. Not exposed by the application
-      - name: 'visibility:private'
-        description: This resource is private and only available to certain users
-  mtls-connections:
-    host: 'test.mykafkacluster.org:28092'
+  test_oauth:
+    host: 'test.mykafkacluster.org:8093'
     protocol: kafka-secure
-    description: Test broker secured with X509
+    description: Test port for oauth
     security:
-      - $ref: '#/components/securitySchemes/certs'
-    tags:
-      - name: 'env:test-mtls'
-        description: This environment is meant for running internal tests through mtls
-      - name: 'kind:remote'
-        description: This server is a remote server. Not exposed by the application
-      - name: 'visibility:private'
-        description: This resource is private and only available to certain users
+      - type: oauth2
+        description: The oauth security descriptions
+        flows:
+          clientCredentials:
+            tokenUrl: 'https://example.com/api/oauth/dialog'
+            availableScopes:
+              'streetlights:read': Scope required for subscribing to channel
+              'streetlights:write': Scope required for publishing to channel
+        scopes:
+          - 'streetlights:write'
+          - 'streetlights:read'
 channels:
   lightingMeasured:
     address: 'smartylighting.streetlights.1.0.event.{streetlightId}.lighting.measured'
@@ -50,6 +37,8 @@ channels:
       lightMeasured:
         $ref: '#/components/messages/lightMeasured'
     description: The topic on which measured values may be produced and consumed.
+    servers:
+      - $ref: '#/servers/test'
     parameters:
       streetlightId:
         $ref: '#/components/parameters/streetlightId'
@@ -58,6 +47,8 @@ channels:
     messages:
       turnOn:
         $ref: '#/components/messages/turnOnOff'
+    servers:
+      - $ref: '#/servers/test_oauth'
     parameters:
       streetlightId:
         $ref: '#/components/parameters/streetlightId'
@@ -66,6 +57,8 @@ channels:
     messages:
       turnOff:
         $ref: '#/components/messages/turnOnOff'
+    servers:
+      - $ref: '#/servers/test_oauth'
     parameters:
       streetlightId:
         $ref: '#/components/parameters/streetlightId'
@@ -74,6 +67,8 @@ channels:
     messages:
       dimLight:
         $ref: '#/components/messages/dimLight'
+    servers:
+      - $ref: '#/servers/test_oauth'
     parameters:
       streetlightId:
         $ref: '#/components/parameters/streetlightId'
@@ -93,6 +88,17 @@ operations:
     action: send
     channel:
       $ref: '#/channels/lightTurnOn'
+    security:
+      - type: oauth2
+        description: The oauth security descriptions
+        flows:
+          clientCredentials:
+            tokenUrl: 'https://example.com/api/oauth/dialog'
+            availableScopes:
+              'streetlights:read': Scope required for subscribing to channel
+              'streetlights:write': Scope required for publishing to channel
+        scopes:
+          - 'streetlights:read'
     traits:
       - $ref: '#/components/operationTraits/kafka'
     messages:
@@ -101,6 +107,17 @@ operations:
     action: send
     channel:
       $ref: '#/channels/lightTurnOff'
+    security:
+      - type: oauth2
+        description: The oauth security descriptions
+        flows:
+          clientCredentials:
+            tokenUrl: 'https://example.com/api/oauth/dialog'
+            availableScopes:
+              'streetlights:read': Scope required for subscribing to channel
+              'streetlights:write': Scope required for publishing to channel
+        scopes:
+          - 'streetlights:read'
     traits:
       - $ref: '#/components/operationTraits/kafka'
     messages:
@@ -109,6 +126,17 @@ operations:
     action: send
     channel:
       $ref: '#/channels/lightsDim'
+    security:
+      - type: oauth2
+        description: The oauth security descriptions
+        flows:
+          clientCredentials:
+            tokenUrl: 'https://example.com/api/oauth/dialog'
+            availableScopes:
+              'streetlights:read': Scope required for subscribing to channel
+              'streetlights:write': Scope required for publishing to channel
+        scopes:
+          - 'streetlights:read'
     traits:
       - $ref: '#/components/operationTraits/kafka'
     messages:
@@ -181,9 +209,15 @@ components:
     saslScram:
       type: scramSha256
       description: Provide your username and password for SASL/SCRAM authentication
-    certs:
-      type: X509
-      description: Download the certificate files from service provider
+    streetlights_auth:
+      type: oauth2
+      description: The oauth security descriptions
+      flows:
+        clientCredentials:
+          tokenUrl: 'https://example.com/api/oauth/dialog'
+          availableScopes:
+            'streetlights:read': Scope required for subscribing to channel
+            'streetlights:write': Scope required for publishing to channel
   parameters:
     streetlightId:
       description: The ID of the streetlight.
