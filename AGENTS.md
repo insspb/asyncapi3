@@ -207,6 +207,36 @@ When creating Pydantic models based on the AsyncAPI 3 specification:
 - Use `alias` parameter when the JSON field name differs from Python variable name (
   e.g., `externalDocs` → `external_docs`)
 
+### Binding Version Fields
+
+**CRITICAL**: When working with binding models, the `binding_version` field **MUST**
+have a default value that matches the current version of the binding specification.
+
+- When updating binding specifications, **ALWAYS** update the `default` value of
+  `binding_version` fields in the corresponding binding model files
+- The default value should match the version declared in the binding specification's
+  README.md file (e.g., `spec/bindings/mqtt/README.md` declares version `0.2.0`)
+- The `binding_version` field should be typed as `str` (not `str | None`) and have a
+  default value set to the current binding version
+- Do not use `exclude_if=is_null` for `binding_version` fields since they always have
+  a default value
+
+**Example:**
+
+```python
+binding_version: str = Field(
+    default="0.2.0",  # Must match the version in spec/bindings/mqtt/README.md
+    alias="bindingVersion",
+    description="The version of this binding. If omitted, 'latest' MUST be assumed",
+)
+```
+
+When updating a binding specification:
+
+1. Check the version in `spec/bindings/{binding_name}/README.md`
+2. Update all `binding_version` fields in `asyncapi3/models/bindings/{binding_name}.py`
+3. Ensure the default value matches the specification version
+
 ### Model Docstrings
 
 - **ALL** Pydantic model docstrings **MUST** match the corresponding object description
