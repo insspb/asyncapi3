@@ -53,7 +53,7 @@ class SQSStatement(BaseModel):
     )
     action: str | list[str] = Field(
         description=(
-            "Required. The SNS permission being allowed or denied e.g. sns:Publish."
+            "Required. The SQS permission being allowed or denied e.g. sqs:SendMessage."
         ),
     )
     resource: str | list[str] | None = Field(
@@ -178,7 +178,7 @@ class SQSQueue(BaseModel):
         alias="fifoQueue",
         description="Required. Is this a FIFO queue?",
     )
-    deduplication_scope: str | None = Field(
+    deduplication_scope: Literal["messageGroup", "queue"] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="deduplicationScope",
@@ -188,7 +188,7 @@ class SQSQueue(BaseModel):
             "applies only to high throughput for FIFO queues."
         ),
     )
-    fifo_throughput_limit: str | None = Field(
+    fifo_throughput_limit: Literal["perQueue", "perMessageGroupId"] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="fifoThroughputLimit",
