@@ -45,7 +45,9 @@ class WebSocketsChannelBindings(BaseModel):
         validate_assignment=True,
     )
 
-    method: Literal["GET", "POST"] = Field(
+    method: Literal["GET", "POST"] | None = Field(
+        default=None,
+        exclude_if=is_null,
         description=(
             "The HTTP method to use when establishing the connection. Its value "
             "MUST be either GET or POST."
