@@ -167,6 +167,281 @@ def test_parse_valid_spec(path: Path) -> None:
   assert AsyncAPI3.model_validate_json(path.read_text()) is not None
 ```
 
+### Testing Based on Specification Examples
+
+When writing tests for models based on examples from specification documentation,
+follow these guidelines:
+
+#### Source of Examples
+
+Examples can be found in:
+
+- **Main specification**: `spec/asyncapi/spec/asyncapi.md` - contains examples for
+  AsyncAPI 3.0 objects
+- **Binding specifications**: `spec/bindings/{binding_name}/README.md` - contains
+  examples for specific binding types (e.g., MQTT, Kafka, etc.)
+- **Full specification files**: Developer may provide complete specification files
+  (YAML/JSON) for extracting examples of specific objects
+
+#### Test Organization
+
+**CRITICAL**: Organize tests in **classes** grouped by model type to allow running
+specific test groups:
+
+```python
+class TestMQTTServerBindings:
+    """Tests for MQTTServerBindings model."""
+    # ... tests for server bindings ...
+
+class TestMQTTOperationBindings:
+    """Tests for MQTTOperationBindings model."""
+    # ... tests for operation bindings ...
+```
+
+This allows developers to run tests for specific bindings:
+
+```bash
+pytest tests/models/bindings/test_mqtt.py::TestMQTTServerBindings -v
+```
+
+#### Using pytest-cases for Test Data
+
+Use `pytest-cases` library to store test data (YAML, JSON, or any other format):
+
+1. **CRITICAL**: Store case functions **in the same file** as the tests (not in separate
+   files)
+
+2. **Create case functions** with `case_` prefix (no `@case` decorator needed if id
+   matches function name without prefix):
+
+```python
+from pytest_cases import parametrize_with_cases
+import yaml
+
+def case_server_binding_full() -> str:
+    """Server binding with all fields."""
+    return """
+    mqtt:
+      clientId: guest
+      cleanSession: true
+      bindingVersion: 0.2.0
+    """
+```
+
+1. **Use `parametrize_with_cases`** to parametrize test methods:
+
+```python
+class TestMQTTServerBindings:
+    @parametrize_with_cases(
+        "yaml_data",
+        cases=[case_server_binding_full, case_server_binding_with_schema],
+    )
+    def test_mqtt_server_bindings(self, yaml_data: str) -> None:
+        """Test MQTTServerBindings model validation."""
+        data = yaml.safe_load(yaml_data)
+        mqtt_binding = MQTTServerBindings.model_validate(data["mqtt"])
+        assert mqtt_binding is not None
+        assert mqtt_binding.binding_version == "0.2.0"
+```
+
+#### Extracting Examples from Documentation
+
+When extracting examples from specification files:
+
+1. **From binding specifications**: Extract only the relevant binding object from YAML
+   examples. For example, if the spec shows:
+   ```yaml
+   servers:
+     production:
+       bindings:
+         mqtt:
+           clientId: guest
+   ```
+   Extract only the `mqtt` object:
+   ```yaml
+   mqtt:
+     clientId: guest
+   ```
+
+2. **From full specification files**: If developer provides a complete specification
+   file, extract only the relevant objects you're testing. For example, if testing
+   `MQTTServerBindings`, extract only the `mqtt` binding object from the server
+   bindings section.
+
+3. **Multiple examples**: Include all valid examples from the specification to ensure
+   comprehensive coverage.
+
+#### Complete Test Example
+
+```python
+"""Tests for MQTT bindings models."""
+
+import yaml
+
+from pytest_cases import parametrize_with_cases
+
+from asyncapi3.models.bindings.mqtt import (
+    MQTTServerBindings,
+    MQTTOperationBindings,
+)
+from asyncapi3.models.schema import Schema
+
+
+# Case functions for pytest-cases
+def case_server_binding_full() -> str:
+    """Server binding with all fields."""
+    return """
+    mqtt:
+      clientId: guest
+      cleanSession: true
+      bindingVersion: 0.2.0
+    """
+
+
+def case_server_binding_with_schema() -> str:
+    """Server binding with Schema objects."""
+    return """
+    mqtt:
+      sessionExpiryInterval:
+        type: integer
+        minimum: 30
+        maximum: 1200
+      bindingVersion: 0.2.0
+    """
+
+
+class TestMQTTServerBindings:
+    """Tests for MQTTServerBindings model."""
+
+    @parametrize_with_cases(
+        "yaml_data",
+        cases=[case_server_binding_full, case_server_binding_with_schema],
+    )
+    def test_mqtt_server_bindings(self, yaml_data: str) -> None:
+        """Test MQTTServerBindings model validation."""
+        data = yaml.safe_load(yaml_data)
+        mqtt_binding = MQTTServerBindings.model_validate(data["mqtt"])
+        assert mqtt_binding is not None
+        assert mqtt_binding.binding_version == "0.2.0"
+
+    def test_mqtt_server_binding_session_expiry_interval_schema(self) -> None:
+        """Test MQTTServerBindings with sessionExpiryInterval as Schema."""
+        yaml_data = """
+        mqtt:
+          sessionExpiryInterval:
+            type: integer
+            minimum: 30
+            maximum: 1200
+          bindingVersion: 0.2.0
+        """
+        data = yaml.safe_load(yaml_data)
+        mqtt_binding = MQTTServerBindings.model_validate(data["mqtt"])
+        assert mqtt_binding.session_expiry_interval is not None
+        assert isinstance(mqtt_binding.session_expiry_interval, Schema)
+        assert mqtt_binding.session_expiry_interval.type == "integer"
+```
+
+#### Testing Serialization (model_dump/model_dump_json)
+
+When testing models based on examples from documentation, create tests that verify
+serialization:
+
+1. **Create Python object** from example data
+2. **Serialize to JSON** using `model_dump()` or `model_dump_json()`
+3. **Verify the resulting JSON** matches expected structure
+
+```python
+def test_mqtt_server_binding_serialization(self) -> None:
+    """Test MQTTServerBindings serialization to JSON."""
+    yaml_data = """
+    mqtt:
+      clientId: guest
+      cleanSession: true
+      bindingVersion: 0.2.0
+    """
+    data = yaml.safe_load(yaml_data)
+    mqtt_binding = MQTTServerBindings.model_validate(data["mqtt"])
+
+    # Serialize to dict and verify all fields
+    dumped = mqtt_binding.model_dump(by_alias=True, exclude_none=True)
+    assert dumped["clientId"] == "guest"
+    assert dumped["cleanSession"] is True
+    assert dumped["bindingVersion"] == "0.2.0"
+
+    # Or serialize to JSON string
+    json_str = mqtt_binding.model_dump_json(by_alias=True, exclude_none=True)
+    assert "guest" in json_str
+```
+
+#### Testing Static Objects
+
+When testing with static objects (not parametrized), verify **all fields** in the
+resulting object:
+
+```python
+def test_mqtt_server_binding_last_will(self) -> None:
+    """Test MQTTServerBindings with lastWill object."""
+    yaml_data = """
+    mqtt:
+      lastWill:
+        topic: /last-wills
+        qos: 2
+        message: Guest gone offline.
+        retain: false
+      bindingVersion: 0.2.0
+    """
+    data = yaml.safe_load(yaml_data)
+    mqtt_binding = MQTTServerBindings.model_validate(data["mqtt"])
+
+    # Verify all fields
+    assert mqtt_binding.last_will is not None
+    assert isinstance(mqtt_binding.last_will, MQTTLastWill)
+    assert mqtt_binding.last_will.topic == "/last-wills"
+    assert mqtt_binding.last_will.qos == 2
+    assert mqtt_binding.last_will.message == "Guest gone offline."
+    assert mqtt_binding.last_will.retain is False
+    assert mqtt_binding.binding_version == "0.2.0"
+```
+
+#### Testing Empty Objects with Default Values
+
+If a model has all optional fields or fields with default values, test empty object
+initialization and verify default values are dumped:
+
+```python
+def test_mqtt_channel_binding_empty(self) -> None:
+    """Test MQTTChannelBindings empty object initialization."""
+    # Empty object initialization
+    mqtt_binding = MQTTChannelBindings()
+
+    # Verify it can be serialized
+    dumped = mqtt_binding.model_dump(by_alias=True, exclude_none=True)
+    assert dumped == {}
+
+    # If model has default values, verify they are included
+    # Example for models with binding_version default:
+    server_binding = MQTTServerBindings()
+    dumped = server_binding.model_dump(by_alias=True, exclude_none=True)
+    assert dumped["bindingVersion"] == "0.2.0"  # Default value
+```
+
+#### Key Points
+
+- **Always use `model_validate`** with parsed YAML/JSON data (via `yaml.safe_load()` or
+  `json.loads()`)
+- **Extract only relevant objects** from examples (e.g., only `mqtt` binding object,
+  not the entire server structure)
+- **Group tests in classes** by model type for better organization
+- **Use pytest-cases** for parametrized tests with multiple examples (YAML, JSON, or
+  any test data)
+- **Store case functions in the same file** as tests
+- **Include all valid examples** from the specification for comprehensive coverage
+- **Test serialization** using `model_dump()`/`model_dump_json()` to verify round-trip
+  compatibility
+- **Verify all fields** when testing static objects
+- **Test empty initialization** for models with optional/default fields
+- **Add additional tests** for edge cases (e.g., Schema objects, optional fields)
+
 ## Type Checking
 
 The project uses **MyPy** for type checking:
@@ -527,6 +802,13 @@ Before submitting code, ensure:
 - [ ] Code follows snake_case naming (variables/functions) and CamelCase (classes)
 - [ ] All comments and documentation are in English
 - [ ] Tests are in `tests/` directory using pytest
+- [ ] (If required) Add tests in `tests/`:
+  - [ ] Tests are organized in classes grouped by model type
+  - [ ] Tests use examples from specification documentation
+  - [ ] Use `pytest-cases` for parametrized tests with YAML examples
+  - [ ] Extract only relevant objects from examples (e.g., only binding object, not
+    full spec)
+  - [ ] Use `model_validate` with parsed YAML data
+  - [ ] Include all valid examples from specification
 - [ ] Code/Markdown files passes pre-commit hooks (`uv run pre-commit run --all-files`)
 - [ ] EditorConfig rules are followed
-- [ ] (If required) Add tests in `tests/`.
