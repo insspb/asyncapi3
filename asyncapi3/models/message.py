@@ -12,6 +12,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.bindings import MessageBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import MultiFormatSchema, Schema
 from asyncapi3.models.security import CorrelationID
@@ -145,8 +146,7 @@ class MessageTrait(BaseModel):
         alias="externalDocs",
         description="Additional external documentation for this message.",
     )
-    # TODO: Message and Channel Bindings will be defined later
-    bindings: dict[str, Any] | Reference | None = Field(
+    bindings: MessageBindingsObject | Reference | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -252,8 +252,7 @@ class Message(BaseModel):
         alias="externalDocs",
         description="Additional external documentation for this message.",
     )
-    # TODO: Message and Channel Bindings will be defined later
-    bindings: dict[str, Any] | Reference | None = Field(
+    bindings: MessageBindingsObject | Reference | None = Field(
         default=None,
         exclude_if=is_null,
         description=(

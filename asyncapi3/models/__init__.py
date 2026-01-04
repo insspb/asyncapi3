@@ -3,6 +3,7 @@
 __all__ = [
     "AsyncAPI3",
     "Channel",
+    "ChannelBindingsObject",
     "Channels",
     "Components",
     "Contact",
@@ -11,12 +12,14 @@ __all__ = [
     "Info",
     "License",
     "Message",
+    "MessageBindingsObject",
     "MessageExample",
     "MessageTrait",
     "MultiFormatSchema",
     "OAuthFlow",
     "OAuthFlows",
     "Operation",
+    "OperationBindingsObject",
     "OperationReply",
     "OperationReplyAddress",
     "OperationTrait",
@@ -27,6 +30,7 @@ __all__ = [
     "Schema",
     "SecurityScheme",
     "Server",
+    "ServerBindingsObject",
     "ServerVariable",
     "Servers",
     "Tag",
@@ -35,6 +39,12 @@ __all__ = [
 
 from asyncapi3.models.asyncapi import AsyncAPI3
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tag, Tags
+from asyncapi3.models.bindings import (
+    ChannelBindingsObject,
+    MessageBindingsObject,
+    OperationBindingsObject,
+    ServerBindingsObject,
+)
 from asyncapi3.models.channel import Channel, Channels, Parameter, Parameters
 from asyncapi3.models.components import Components
 from asyncapi3.models.info import Contact, Info, License

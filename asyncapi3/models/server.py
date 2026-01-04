@@ -11,6 +11,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.bindings import ServerBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
 
@@ -157,8 +158,7 @@ class Server(BaseModel):
         alias="externalDocs",
         description="Additional external documentation for this server.",
     )
-    # TODO: Server Bindings will be defined later, using Any for now
-    bindings: dict[str, Any] | Reference | None = Field(
+    bindings: ServerBindingsObject | Reference | None = Field(
         default=None,
         exclude_if=is_null,
         description=(

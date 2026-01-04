@@ -8,11 +8,12 @@ __all__ = [
     "Operations",
 ]
 
-from typing import Any, Literal
+from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.bindings import OperationBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
 
@@ -175,8 +176,7 @@ class OperationTrait(BaseModel):
         alias="externalDocs",
         description="Additional external documentation for this operation.",
     )
-    # TODO: Operation Bindings will be defined later
-    bindings: dict[str, Any] | Reference | None = Field(
+    bindings: OperationBindingsObject | Reference | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -264,8 +264,7 @@ class Operation(BaseModel):
         alias="externalDocs",
         description="Additional external documentation for this operation.",
     )
-    # TODO: Operation Bindings will be defined later
-    bindings: dict[str, Any] | Reference | None = Field(
+    bindings: OperationBindingsObject | Reference | None = Field(
         default=None,
         exclude_if=is_null,
         description=(

@@ -2,11 +2,15 @@
 
 __all__ = ["Components"]
 
-from typing import Any
-
 from pydantic import BaseModel, ConfigDict, Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tag
+from asyncapi3.models.bindings import (
+    ChannelBindingsObject,
+    MessageBindingsObject,
+    OperationBindingsObject,
+    ServerBindingsObject,
+)
 from asyncapi3.models.channel import Channel, Parameter
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.message import Message, MessageTrait
@@ -126,29 +130,25 @@ class Components(BaseModel):
         alias="messageTraits",
         description="An object to hold reusable Message Trait Objects.",
     )
-    # TODO: Server Bindings will be defined later, using Any for now
-    server_bindings: dict[str, dict[str, Any] | Reference] | None = Field(
+    server_bindings: dict[str, ServerBindingsObject | Reference] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="serverBindings",
         description="An object to hold reusable Server Bindings Objects.",
     )
-    # TODO: Channel Bindings will be defined later, using Any for now
-    channel_bindings: dict[str, dict[str, Any] | Reference] | None = Field(
+    channel_bindings: dict[str, ChannelBindingsObject | Reference] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="channelBindings",
         description="An object to hold reusable Channel Bindings Objects.",
     )
-    # TODO: Operation Bindings will be defined later, using Any for now
-    operation_bindings: dict[str, dict[str, Any] | Reference] | None = Field(
+    operation_bindings: dict[str, OperationBindingsObject | Reference] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="operationBindings",
         description="An object to hold reusable Operation Bindings Objects.",
     )
-    # TODO: Message Bindings will be defined later, using Any for now
-    message_bindings: dict[str, dict[str, Any] | Reference] | None = Field(
+    message_bindings: dict[str, MessageBindingsObject | Reference] | None = Field(
         default=None,
         exclude_if=is_null,
         alias="messageBindings",
