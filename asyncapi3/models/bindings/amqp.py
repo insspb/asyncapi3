@@ -84,7 +84,9 @@ class AMQPQueue(BaseModel):
         validate_assignment=True,
     )
 
-    name: str = Field(
+    name: str | None = Field(
+        default=None,
+        exclude_if=is_null,
         max_length=255,
         description="The name of the queue. It MUST NOT exceed 255 characters long.",
     )
