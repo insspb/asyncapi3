@@ -63,6 +63,27 @@ vendor-specific extensions (e.g., `x-key.subject.name.strategy`,
 
 - `tests/fixtures/yaml_specs/valid/single_file/adeo-kafka-request-reply-asyncapi.yml`
 
+### Pydantic Field Name Shadowing Warnings
+
+When using the library, you may encounter `UserWarning` messages about field names
+shadowing attributes in parent `BaseModel`:
+
+```console
+UserWarning: Field name "schema" in "MultiFormatSchema" shadows an attribute in parent "BaseModel"
+UserWarning: Field name "schema" in "GooglePubSubMessageBindings" shadows an attribute in parent "BaseModel"
+```
+
+**Affected classes:**
+
+- `MultiFormatSchema` in `asyncapi3/models/schema.py`
+- `GooglePubSubMessageBindings` in `asyncapi3/models/bindings/googlepubsub.py`
+
+**Note:** These warnings are related to the `schema` attribute being deprecated in
+the current version of Pydantic. The field name `schema` is required by the AsyncAPI
+specification and cannot be changed. These warnings are harmless and will disappear
+automatically as Pydantic removes the deprecated `schema` attribute in future
+versions.
+
 ## Usage
 
 ### Parse schema file to python object
