@@ -41,6 +41,28 @@ This ensures that binding version information is always present in serialized ou
 making it clear which version of the binding specification is being used, even when
 the version was not explicitly provided in the input.
 
+## Known Issues
+
+### Kafka Bindings - Specification Extensions Support
+
+The `KafkaChannelBindings` and `KafkaOperationBindings` classes allow extra fields
+(Specification Extensions) via `extra="allow"`, which does not strictly conform to
+the Kafka binding specification that states "This object MUST contain only the
+properties defined below."
+
+This deviation was made to support real-world specifications that include
+vendor-specific extensions (e.g., `x-key.subject.name.strategy`,
+`x-value.subject.name.strategy`).
+
+**Affected files:**
+
+- `asyncapi3/models/bindings/kafka.py` - `KafkaChannelBindings` and
+  `KafkaOperationBindings` classes
+
+**Example specification using extensions:**
+
+- `tests/fixtures/yaml_specs/valid/single_file/adeo-kafka-request-reply-asyncapi.yml`
+
 ## Usage
 
 ### Parse schema file to python object

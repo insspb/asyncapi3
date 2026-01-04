@@ -153,11 +153,21 @@ class KafkaChannelBindings(BaseModel):
     This object contains information about the channel representation in Kafka (eg. a
     Kafka topic).
 
-    This object MUST contain only the properties defined below.
+    This object MAY be extended with Specification Extensions.
+
+    .. note::
+        **Known Issue**: This implementation allows extra fields (Specification
+        Extensions) via ``extra="allow"``, which does not strictly conform to the
+        Kafka binding specification that states "This object MUST contain only the
+        properties defined below." This deviation was made to support real-world
+        specifications that include vendor-specific extensions (e.g.,
+        ``x-key.subject.name.strategy``). See
+        ``tests/fixtures/yaml_specs/valid/single_file/adeo-kafka-request-reply-asyncapi.yml``
+        for an example.
     """
 
     model_config = ConfigDict(
-        extra="forbid",
+        extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
     )
@@ -200,11 +210,21 @@ class KafkaOperationBindings(BaseModel):
     This object contains information about the operation representation in Kafka
     (eg. the way to consume messages).
 
-    This object MUST contain only the properties defined below.
+    This object MAY be extended with Specification Extensions.
+
+    .. note::
+        **Known Issue**: This implementation allows extra fields (Specification
+        Extensions) via ``extra="allow"``, which does not strictly conform to the
+        Kafka binding specification that states "This object MUST contain only the
+        properties defined below." This deviation was made to support real-world
+        specifications that include vendor-specific extensions (e.g.,
+        ``x-value.subject.name.strategy``). See
+        ``tests/fixtures/yaml_specs/valid/single_file/adeo-kafka-request-reply-asyncapi.yml``
+        for an example.
     """
 
     model_config = ConfigDict(
-        extra="forbid",
+        extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
     )
