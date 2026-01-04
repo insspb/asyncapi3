@@ -47,6 +47,10 @@ disable_error_code = ["import-untyped"]
 [[tool.mypy.overrides]]
 module = ["asyncapi3"]
 
+[[tool.mypy.overrides]]
+module = ["tests.*"]
+disable_error_code = ["attr-defined"]
+
 
 [tool.pytest.ini_options]
 addopts = """
@@ -158,6 +162,7 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"asyncapi3/models/bindings/__init__.py" = ["RUF022"]
 "__init__.py" = [
     "F401",     # unused import
     "F403",     # undefined name
