@@ -23,7 +23,12 @@ class AnypointMQServerBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class AnypointMQChannelBindings(BaseModel):
@@ -38,6 +43,9 @@ class AnypointMQChannelBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     destination: str | None = Field(
@@ -75,7 +83,12 @@ class AnypointMQOperationBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class AnypointMQMessageBindings(BaseModel):
@@ -89,6 +102,9 @@ class AnypointMQMessageBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     headers: Schema | Reference | None = Field(

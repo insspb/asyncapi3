@@ -32,6 +32,9 @@ class MessageExample(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     headers: dict[str, Any] | None = Field(
@@ -78,6 +81,9 @@ class MessageTrait(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     headers: MultiFormatSchema | Schema | Reference | None = Field(
@@ -174,6 +180,9 @@ class Message(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     headers: MultiFormatSchema | Schema | Reference | None = Field(

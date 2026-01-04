@@ -27,6 +27,9 @@ class MQTT5ServerBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     session_expiry_interval: int | Schema | Reference | None = Field(
@@ -52,7 +55,12 @@ class MQTT5ChannelBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MQTT5OperationBindings(BaseModel):
@@ -62,7 +70,12 @@ class MQTT5OperationBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MQTT5MessageBindings(BaseModel):
@@ -72,4 +85,9 @@ class MQTT5MessageBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )

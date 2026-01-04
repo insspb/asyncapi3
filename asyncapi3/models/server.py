@@ -29,6 +29,9 @@ class ServerVariable(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     enum: list[str] | None = Field(
@@ -78,6 +81,9 @@ class Server(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     # TODO: Supports Server Variables?!

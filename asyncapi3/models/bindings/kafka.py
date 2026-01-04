@@ -28,6 +28,9 @@ class KafkaServerBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     schema_registry_url: str | None = Field(
@@ -71,6 +74,9 @@ class KafkaTopicConfiguration(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     cleanup_policy: list[Literal["delete", "compact"]] | None = Field(
@@ -170,6 +176,9 @@ class KafkaChannelBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     topic: str | None = Field(
@@ -227,6 +236,9 @@ class KafkaOperationBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     group_id: Schema | Reference | None = Field(
@@ -261,6 +273,9 @@ class KafkaMessageBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     # TODO: Think about AVRO Schema

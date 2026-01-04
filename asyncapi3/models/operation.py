@@ -34,6 +34,9 @@ class OperationReplyAddress(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     location: str = Field(
@@ -67,6 +70,9 @@ class OperationReply(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     address: OperationReplyAddress | Reference | None = Field(
@@ -133,6 +139,9 @@ class OperationTrait(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     title: str | None = Field(
@@ -199,6 +208,9 @@ class Operation(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     action: Literal["send", "receive"] = Field(

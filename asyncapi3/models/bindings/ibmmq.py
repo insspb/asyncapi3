@@ -31,6 +31,9 @@ class IBMMQServerBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     group_id: str | None = Field(
@@ -109,6 +112,9 @@ class IBMMQQueue(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     object_name: str = Field(
@@ -151,6 +157,9 @@ class IBMMQTopic(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     string: str | None = Field(
@@ -206,6 +215,9 @@ class IBMMQChannelBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     destination_type: Literal["topic", "queue"] = Field(
@@ -259,7 +271,12 @@ class IBMMQOperationBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 # TODO: Has cross-fields constraints
@@ -276,6 +293,9 @@ class IBMMQMessageBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     type: Literal["string", "jms", "binary"] = Field(

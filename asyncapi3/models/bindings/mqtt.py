@@ -29,6 +29,9 @@ class MQTTLastWill(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     topic: str = Field(
@@ -64,6 +67,9 @@ class MQTTServerBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     client_id: str | None = Field(
@@ -129,7 +135,12 @@ class MQTTChannelBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MQTTOperationBindings(BaseModel):
@@ -145,6 +156,9 @@ class MQTTOperationBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     qos: Literal[0, 1, 2] | None = Field(
@@ -190,6 +204,9 @@ class MQTTMessageBindings(BaseModel):
         extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     payload_format_indicator: Literal[0, 1] | None = Field(

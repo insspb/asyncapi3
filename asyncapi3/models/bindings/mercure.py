@@ -17,7 +17,12 @@ class MercureServerBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MercureChannelBindings(BaseModel):
@@ -27,7 +32,12 @@ class MercureChannelBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MercureOperationBindings(BaseModel):
@@ -37,7 +47,12 @@ class MercureOperationBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class MercureMessageBindings(BaseModel):
@@ -47,4 +62,9 @@ class MercureMessageBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )

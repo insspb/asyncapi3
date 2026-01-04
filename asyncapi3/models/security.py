@@ -32,6 +32,9 @@ class CorrelationID(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     description: str | None = Field(
@@ -63,6 +66,9 @@ class OAuthFlow(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     # TODO: Make complete validation for spec rules (required for dependency)
@@ -119,6 +125,9 @@ class OAuthFlows(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     implicit: OAuthFlow | None = Field(
@@ -170,6 +179,9 @@ class SecurityScheme(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     type_: Literal[

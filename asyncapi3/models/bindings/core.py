@@ -139,6 +139,9 @@ class ServerBindingsObject(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     http: HTTPServerBindings | None = Field(
@@ -251,6 +254,9 @@ class ChannelBindingsObject(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     http: HTTPChannelBindings | None = Field(
@@ -363,6 +369,9 @@ class OperationBindingsObject(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     http: HTTPOperationBindings | None = Field(
@@ -477,6 +486,9 @@ class MessageBindingsObject(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     http: HTTPMessageBindings | None = Field(

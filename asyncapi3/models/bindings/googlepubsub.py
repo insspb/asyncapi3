@@ -24,7 +24,12 @@ class GooglePubSubServerBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class GooglePubSubMessageStoragePolicy(BaseModel):
@@ -39,6 +44,9 @@ class GooglePubSubMessageStoragePolicy(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     allowed_persistence_regions: list[str] | None = Field(
@@ -63,6 +71,9 @@ class GooglePubSubSchemaSettings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     encoding: (
@@ -117,6 +128,9 @@ class GooglePubSubChannelBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     binding_version: str = Field(
@@ -165,7 +179,12 @@ class GooglePubSubOperationBindings(BaseModel):
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(
+        extra="forbid",
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
 
 
 class GooglePubSubSchemaDefinition(BaseModel):
@@ -179,6 +198,9 @@ class GooglePubSubSchemaDefinition(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     name: str | None = Field(
@@ -201,6 +223,9 @@ class GooglePubSubMessageBindings(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     binding_version: str = Field(

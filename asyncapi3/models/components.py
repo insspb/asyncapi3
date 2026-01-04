@@ -41,6 +41,9 @@ class Components(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     schemas: dict[str, MultiFormatSchema | Schema | Reference] | None = Field(

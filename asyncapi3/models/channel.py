@@ -28,6 +28,9 @@ class Parameter(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     enum: list[str] | None = Field(
@@ -85,6 +88,9 @@ class Channel(BaseModel):
         extra="allow",
         revalidate_instances="always",
         validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
     )
 
     # TODO: What is 'unknown' mean?
