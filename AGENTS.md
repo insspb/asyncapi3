@@ -549,15 +549,30 @@ MessageBindings) which already have the protocol prefix.
 
 ### Model Configuration
 
-All Pydantic models should use the following standard configuration:
+**CRITICAL**: All Pydantic models **MUST** use the following standard configuration
+with required parameters:
 
 ```python
 model_config = ConfigDict(
   extra="allow",
   revalidate_instances="always",
   validate_assignment=True,
+  serialize_by_alias=True,
+  validate_by_name=True,
+  validate_by_alias=True,
 )
 ```
+
+**Required Parameters:**
+
+- `serialize_by_alias=True` - Ensures serialization uses field aliases (camelCase)
+  instead of Python field names (snake_case)
+- `validate_by_name=True` - Allows validation using Python field names
+- `validate_by_alias=True` - Allows validation using JSON field aliases
+
+**Note:** Some models may use `extra="forbid"` instead of `extra="allow"` based on
+specification requirements (e.g., binding helper classes), but all three validation
+and serialization parameters **MUST** always be present.
 
 ### Type Safety
 
@@ -585,6 +600,9 @@ class ExampleModel(BaseModel):
     extra="allow",
     revalidate_instances="always",
     validate_assignment=True,
+    serialize_by_alias=True,
+    validate_by_name=True,
+    validate_by_alias=True,
   )
 
   field_name: str | None = Field(
