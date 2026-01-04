@@ -61,9 +61,8 @@ class AnypointMQChannelBindings(BaseModel):
             "this channel. Optional, defaults to queue."
         ),
     )
-    binding_version: str | None = Field(
+    binding_version: str = Field(
         default="0.1.0",
-        exclude_if=is_null,
         alias="bindingVersion",
         description="The version of this binding. Optional, defaults to latest.",
     )
