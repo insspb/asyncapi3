@@ -144,7 +144,7 @@ class AMQPChannelBindings(BaseModel):
         validate_by_alias=True,
     )
 
-    is_field: Literal["queue", "routingKey"] = Field(
+    is_: Literal["queue", "routingKey"] = Field(
         alias="is",
         description=(
             "Defines what type of channel is it. Can be either queue or routingKey "
