@@ -49,7 +49,7 @@ module = ["asyncapi3"]
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disable_error_code = ["attr-defined"]
+disable_error_code = ["attr-defined", "union-attr"]
 
 
 [tool.pytest.ini_options]
@@ -60,6 +60,9 @@ addopts = """
     --cov-report=term-missing:skip-covered
     -vvv
 """
+filterwarnings = [
+    'ignore:Field name.*shadows.*:UserWarning',
+]
 junit_duration_report = "total"
 
 [tool.ruff]
@@ -169,6 +172,7 @@ select = [
 ]
 "test_*.py" = [
     "S101",     # Use of `assert`
+    "S106",     # Possible hardcoded password
     "E501",     # line-too-long
 ]
 
