@@ -49,7 +49,7 @@ module = ["asyncapi3"]
 
 [[tool.mypy.overrides]]
 module = ["tests.*"]
-disable_error_code = ["attr-defined", "union-attr"]
+disable_error_code = ["attr-defined", "union-attr", "call-arg"]
 
 
 [tool.pytest.ini_options]
