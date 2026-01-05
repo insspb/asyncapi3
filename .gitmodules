@@ -4,3 +4,6 @@
 [submodule "spec/asyncapi"]
 	path = spec/asyncapi
 	url = git@github.com:asyncapi/spec.git
+[submodule "spec/asyncapi-json-schema"]
+	path = spec/asyncapi-json-schema
+	url = git@github.com:asyncapi/spec-json-schemas.git
