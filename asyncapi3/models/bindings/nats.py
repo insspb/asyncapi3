@@ -50,7 +50,7 @@ class NATSOperationBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
