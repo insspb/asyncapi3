@@ -33,6 +33,77 @@ submodules:
   documentation for a specific binding type)
 - **Examples and scripts**: `spec/asyncapi/examples/` directory
 
+## JSON Schema Validation
+
+The project includes official JSON Schema files for AsyncAPI 3.0 specification validation
+as a git submodule (`spec/asyncapi-json-schema/`). These schemas can be used to validate
+AsyncAPI documents, but with important caveats.
+
+### JSON Schema Locations
+
+**CRITICAL**: When working with JSON schemas, **prefer using definitions** over bundled
+schemas, as definitions are the source of truth and bundled schemas are automatically
+generated.
+
+- **Binding schemas**: `spec/asyncapi-json-schema/bindings/` - contains JSON schemas for
+  all binding types (MQTT, Kafka, HTTP, etc.)
+- **Object definitions**: `spec/asyncapi-json-schema/definitions/3.0.0/` - contains
+  individual JSON schema definitions for all AsyncAPI 3.0 objects (channels, messages,
+  operations, servers, etc.)
+- **Valid examples**: `spec/asyncapi-json-schema/examples/3.0.0/` - contains valid JSON
+  examples for individual definitions that can be used for testing
+- **Bundled schema**: `spec/asyncapi-json-schema/schemas/3.0.0.json` - complete bundled
+  schema (automatically generated, **do not edit manually**)
+- **Repository documentation**: `spec/asyncapi-json-schema/README.md` - contains
+  important information about JSON schemas, their limitations, and usage guidelines
+
+### Important Limitations
+
+**CRITICAL**: JSON schemas have important limitations that must be understood:
+
+1. **Not 1:1 with specification**: JSON Schema files do not reflect 1:1 the specification
+   and shouldn't be treated as specification itself but rather as a tool (e.g., for
+   validation).
+
+2. **Incomplete validation**: These JSON Schema files shouldn't be used as the **only**
+   tool for validating AsyncAPI documents because some rules described in the AsyncAPI
+   specification can't be described with JSON Schema.
+
+3. **Two schema types**: There are two types of JSON Schema files, with and without `$id`
+   feature. Some tools require `$id`, others don't understand it. The project uses
+   schemas without `$id` by default.
+
+4. **Auto-generated bundled schemas**: Schemas in `spec/asyncapi-json-schema/schemas/`
+   are automatically generated from definitions in `spec/asyncapi-json-schema/definitions/`.
+   **Never edit bundled schemas manually** - always edit definitions instead.
+
+### Usage Guidelines
+
+When using JSON schemas for validation or reference:
+
+1. **Use definitions for reference**: When checking field structures, types, or required
+   fields, refer to individual definition files in `spec/asyncapi-json-schema/definitions/3.0.0/`
+   rather than the bundled schema.
+
+2. **Use examples for testing**: The `spec/asyncapi-json-schema/examples/3.0.0/` directory
+   contains valid examples that can be used as test fixtures or validation references.
+
+3. **Cross-reference with specification**: Always cross-reference JSON schema definitions
+   with the actual specification in `spec/asyncapi/spec/asyncapi.md` to ensure accuracy.
+
+4. **Validate model implementation**: Use JSON schemas to verify that Pydantic models
+   correctly implement the specification, but remember that JSON Schema validation alone
+   is not sufficient.
+
+5. **Check binding schemas**: When implementing binding models, refer to corresponding
+   JSON schemas in `spec/asyncapi-json-schema/bindings/{binding_name}/` to understand the
+   expected structure.
+
+### Additional Information
+
+For more details about JSON schemas, their structure, limitations, and usage, refer to
+`spec/asyncapi-json-schema/README.md`.
+
 ## Language and Documentation Rules
 
 **CRITICAL**: All comments, documentation, docstrings, and code-related text in the
@@ -937,14 +1008,18 @@ Models exported via `__all__` should also be imported and re-exported in
 
 1. **Read the specification**: Always refer to `spec/asyncapi/spec/asyncapi.md` when
    creating models
-2. **Check existing models**: Review similar models in `asyncapi3/models/` for
+2. **Check JSON schemas** (optional): Cross-reference with JSON schema definitions in
+   `spec/asyncapi-json-schema/definitions/3.0.0/` to verify field structures, types, and
+   required fields. Remember that JSON schemas are not 1:1 with specification and have
+   limitations.
+3. **Check existing models**: Review similar models in `asyncapi3/models/` for
    consistency
-3. **Follow naming conventions**: Use snake_case for Python, camelCase aliases for JSON
-4. **Add descriptions**: Copy field descriptions exactly from the specification
-5. **Write tests**: Create tests in `tests/` directory if requested
-6. **Run linting**: Run `uv run pre-commit run --all-files` before committing
-7. **Run checks**: Ensure code passes Ruff, MyPy, and pre-commit hooks
-8. **Document**: Add appropriate docstrings and comments (in English)
+4. **Follow naming conventions**: Use snake_case for Python, camelCase aliases for JSON
+5. **Add descriptions**: Copy field descriptions exactly from the specification
+6. **Write tests**: Create tests in `tests/` directory if requested
+7. **Run linting**: Run `uv run pre-commit run --all-files` before committing
+8. **Run checks**: Ensure code passes Ruff, MyPy, and pre-commit hooks
+9. **Document**: Add appropriate docstrings and comments (in English)
 
 ## Tool Usage
 
@@ -1006,6 +1081,10 @@ When working on the project, ask clarifying questions about:
 Before submitting code, ensure:
 
 - [ ] Read the relevant section in `spec/asyncapi/spec/asyncapi.md`
+- [ ] (Optional) Cross-reference with JSON schema definitions in
+  `spec/asyncapi-json-schema/definitions/3.0.0/` to verify field structures and types
+- [ ] (Optional) Check JSON schema examples in `spec/asyncapi-json-schema/examples/3.0.0/`
+  for valid test cases
 - [ ] Implement the Pydantic model in `asyncapi3/models/`
 - [ ] Add `description` from spec to `Field()`
 - [ ] All Pydantic fields use `Field` with descriptions from spec
