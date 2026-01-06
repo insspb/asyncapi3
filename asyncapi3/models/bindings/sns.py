@@ -152,7 +152,7 @@ class SNSChannelBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -450,7 +450,6 @@ class SNSConsumer(BaseModel):
     )
 
 
-# TODO: has cross-fields constraints
 class SNSOperationBindings(BaseModel):
     """
     SNS Operation Binding Object.
@@ -478,7 +477,7 @@ class SNSOperationBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -495,9 +494,7 @@ class SNSOperationBindings(BaseModel):
             "not the channel name in the AsyncAPI document."
         ),
     )
-    consumers: list[SNSConsumer] | None = Field(
-        default=None,
-        exclude_if=is_null,
+    consumers: list[SNSConsumer] = Field(
         description=(
             "Required. The protocols that listen to this topic and their endpoints. "
             "Required for receive operations."

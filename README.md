@@ -147,6 +147,20 @@ are not valid according to the Kafka binding json-schema version 0.5.0, which
 requires `additionalProperties: false` for channel and operation bindings
 (`spec/asyncapi-json-schema/bindings/kafka/0.5.0`).
 
+### SNS Binding Implementation Issues
+
+The SNS binding implementation (`asyncapi3/models/bindings/sns.py`) may contain errors
+because there is no up-to-date JSON schema for this binding object, and the initial
+specification contains errors. The implementation follows best guess approach with
+changes made to address identified issues.
+
+**Known issues:**
+
+- Version mismatch: Code and [sns binding] uses `1.0.0` but JSON schemas only
+  provide `0.1.0` and `0.2.0`.
+
+[sns binding]: https://github.com/asyncapi/bindings/blob/master/sns/3.0.0/README.md
+
 ### Pydantic Field Name Shadowing Warnings
 
 When using the library, you may encounter `UserWarning` messages about field names
