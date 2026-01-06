@@ -19,10 +19,105 @@ found in [spec](spec) folder.
 ## Features
 
 - [ ] Pydantic models for AsyncAPI 3 specification. Complete specification coverage.
-- [ ] snake_case internals, following PEP8 as in normal python application.
-- [ ] Type safety and validation provided by pydantic models.
+- [x] Always valid AsyncAPI3 instance (check:
+  [Model Validation Behavior](#model-validation-behavior))
+- [x] snake_case internals, following PEP8 as in normal python application.
 - [ ] CLI support for input AsyncAPI 3 files validation. JSON/YAML format supported.
 - [ ] Heavy tested
+
+### Model Validation Behavior
+
+All AsyncAPI 3 models in this library use special Pydantic configuration settings
+that ensure data integrity and validation at all times:
+
+- **`validate_assignment=True`**: Validates field assignments after model instantiation,
+  preventing invalid data from being stored in model instances
+- **`revalidate_instances="always"`**: Revalidates all model instances during
+  validation, ensuring nested models remain consistent
+
+These settings guarantee that your AsyncAPI specification objects always contain
+valid data, regardless of how they are modified after creation.
+
+#### Example: Field Assignment Validation
+
+```python
+from asyncapi3.models.bindings.anypointmq import AnypointMQChannelBindings
+from pydantic import ValidationError
+
+# Create a valid channel binding
+binding = AnypointMQChannelBindings(destination_type="queue")
+print("Initial destination_type:", binding.destination_type)
+
+# Valid assignment
+binding.destination_type = "exchange"
+print("Changed to:", binding.destination_type)
+
+# Invalid assignment will raise ValidationError
+try:
+    binding.destination_type = "invalid-type"
+except ValidationError as e:
+    print("ValidationError: Invalid destination_type value")
+```
+
+#### Example: Instance Revalidation
+
+```python
+from asyncapi3.models.schema import Schema
+from asyncapi3.models.asyncapi import AsyncAPI3
+from asyncapi3.models.info import Info
+from pydantic import ValidationError
+
+# Create a schema with boolean field
+schema = Schema(deprecated=False)
+print("Initial deprecated value:", schema.deprecated)
+
+# Modify the field (this would normally bypass validation in other libraries)
+schema.deprecated = True  # Valid boolean
+print("Changed deprecated to:", schema.deprecated)
+
+# Invalid assignment will be caught
+try:
+    schema.deprecated = "not-a-boolean"
+except ValidationError as e:
+    print("ValidationError: deprecated must be boolean")
+
+# Create AsyncAPI spec with nested schema
+spec = AsyncAPI3(
+    info=Info(title="My API", version="1.0.0")
+)
+spec.info.description = "API description"  # Valid string
+print("Description set successfully")
+
+# Invalid type assignment will fail
+try:
+    spec.info.version = 123  # Should be string
+except ValidationError as e:
+    print("ValidationError: version must be string")
+```
+
+#### Example: Serialization Consistency
+
+```python
+from asyncapi3.models.bindings.anypointmq import AnypointMQChannelBindings
+
+# Create binding with default values
+binding = AnypointMQChannelBindings()
+print("Default destination_type:", binding.destination_type)  # queue
+
+# Change to valid value
+binding.destination_type = "exchange"
+print("Changed destination_type:", binding.destination_type)  # exchange
+
+# Invalid assignment will fail
+try:
+    binding.destination_type = "invalid-type"
+except ValidationError as e:
+    print("ValidationError:", e)
+```
+
+These validation behaviors ensure that AsyncAPI specification objects maintain
+their integrity throughout their lifecycle, providing reliable and type-safe
+data structures for your applications.
 
 ### Binding Version Behavior
 
@@ -90,7 +185,6 @@ versions.
 
 ```python
 from asyncapi3 import AsyncAPI3
-
 
 with open("/path/to/asyncapi3.json") as fileobj:
     spec = AsyncAPI3.model_validate_json(fileobj)
