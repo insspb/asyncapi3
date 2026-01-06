@@ -660,6 +660,74 @@ are reserved for future use (e.g., AMQP1 bindings), create **4 tests** to fix th
 **CRITICAL**: For empty models, store test data **directly in the test methods**,
 not in separate case functions.
 
+#### Testing Custom Model Validators
+
+For custom model validators that check model integrity and are written by us (not built-in
+Pydantic validations), create comprehensive tests using `pytest-cases`:
+
+1. **Test all error scenarios** with exact error messages
+2. **Use `pytest-cases`** for parametrized tests
+3. **Return `tuple[str, str]`** from case functions (YAML data, expected error message)
+4. **Use exact message matching** with `pytest.raises(ValueError, match=expected_error)`
+
+**Example for custom validator testing (AMQPChannelBindings validator):**
+
+```python
+"""Tests for AMQP bindings models."""
+
+import pytest
+import yaml
+from pydantic import ValidationError
+
+from pytest_cases import parametrize_with_cases
+from asyncapi3.models.bindings.amqp import AMQPChannelBindings
+
+
+# Validation error test cases for AMQPChannelBindings validator
+def case_amqp_channel_binding_validator_routing_key_without_exchange() -> tuple[str, str]:
+    """RoutingKey without exchange - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: routingKey
+      bindingVersion: 0.3.0
+    """
+    expected_error = "exchange must be provided when is='routingKey'"
+    return yaml_data, expected_error
+
+
+def case_amqp_channel_binding_validator_routing_key_with_queue() -> tuple[str, str]:
+    """RoutingKey with queue - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: routingKey
+      exchange:
+        name: myExchange
+        type: topic
+      queue:
+        name: myQueue
+      bindingVersion: 0.3.0
+    """
+    expected_error = "queue must not be provided when is='routingKey'"
+    return yaml_data, expected_error
+
+
+class TestAMQPChannelBindingsValidator:
+    """Tests for AMQPChannelBindings model validator."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_amqp_channel_binding_validator_routing_key_without_exchange,
+            case_amqp_channel_binding_validator_routing_key_with_queue,
+        ],
+    )
+    def test_amqp_channel_bindings_validator_errors(self, yaml_data: str, expected_error: str) -> None:
+        """Test AMQPChannelBindings validator errors for invalid field combinations."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            AMQPChannelBindings.model_validate(data["amqp"])
+```
+
 **Example for empty model testing:**
 
 ```python
@@ -1105,6 +1173,16 @@ Before submitting code, ensure:
   - [ ] Use separate case functions for validation (return `str`) and serialization
     (return `tuple[Model, dict]`)
   - [ ] Include all valid examples from specification
+- [ ] **Add tests fixing validation error behavior** for models with `extra="forbid"`
+  or other validation constraints:
+  - [ ] Python validation error test (invalid arguments raise ValidationError)
+  - [ ] YAML validation error test (invalid fields raise ValidationError)
+- [ ] **Add tests for custom model validators** that check model integrity and are written
+  by us (not built-in Pydantic validations):
+  - [ ] Test all error scenarios with exact error messages
+  - [ ] Use `pytest-cases` for parametrized tests
+  - [ ] Return `tuple[str, str]` from case functions (YAML data, expected error message)
+  - [ ] Use `pytest.raises(ValueError, match=expected_error)` for exact message matching
   - [ ] **For empty models** (without fields, `extra="forbid"`), create 4 tests fixing behavior:
     - [ ] Serialization test (empty dict)
     - [ ] Python validation error test (any arguments raise ValidationError)
