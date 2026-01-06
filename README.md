@@ -147,6 +147,19 @@ are not valid according to the Kafka binding json-schema version 0.5.0, which
 requires `additionalProperties: false` for channel and operation bindings
 (`spec/asyncapi-json-schema/bindings/kafka/0.5.0`).
 
+### Anypoint MQ Binding Implementation Issues
+
+The AnypointMQ binding implementation (`asyncapi3/models/bindings/anypointmq.py`) may
+contain errors due to version mismatch between the code implementation and available
+JSON schemas.
+
+**Known issues:**
+
+- Version mismatch: Code and [Anypoint MQ Binding] uses `0.1.0` but JSON schemas
+  only provide `0.0.1`.
+
+[Anypoint MQ Binding]: https://github.com/asyncapi/bindings/blob/master/anypointmq/README.md
+
 ### SNS Binding Implementation Issues
 
 The SNS binding implementation (`asyncapi3/models/bindings/sns.py`) may contain errors
