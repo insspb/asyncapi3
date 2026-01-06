@@ -574,6 +574,67 @@ test methods:
 - **Separate `model_dump_json()` tests are NOT required** - `model_dump()` covers
   serialization testing
 
+#### Testing Empty Models
+
+For empty models (models without fields) that have `extra="forbid"` configuration and
+are reserved for future use (e.g., AMQP1 bindings), create **4 tests** to fix the behavior:
+
+1. **Serialization test** - Test that empty object serializes to empty dict
+2. **Python validation error test** - Test that creating object with any arguments
+   raises `ValidationError`
+3. **YAML validation error test** - Test that reading YAML with any fields raises
+   `ValidationError`
+4. **YAML empty validation test** - Test that reading empty YAML object succeeds
+
+**CRITICAL**: For empty models, store test data **directly in the test methods**,
+not in separate case functions.
+
+**Example for empty model testing:**
+
+```python
+"""Tests for EmptyModel bindings models."""
+
+import pytest
+import yaml
+from pydantic import ValidationError
+
+from asyncapi3.models.bindings.empty import EmptyModel
+
+
+class TestEmptyModel:
+    """Tests for EmptyModel model."""
+
+    def test_empty_model_serialization(self) -> None:
+        """Test EmptyModel serialization."""
+        empty_model = EmptyModel()
+        dumped = empty_model.model_dump()
+        assert dumped == {}
+
+    def test_empty_model_python_validation_error(self) -> None:
+        """Test EmptyModel Python validation error with any arguments."""
+        with pytest.raises(ValidationError):
+            EmptyModel(some_field="value")
+
+    def test_empty_model_yaml_validation_error(self) -> None:
+        """Test EmptyModel YAML validation error with any fields."""
+        yaml_data = """
+        empty:
+          some_field: value
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError):
+            EmptyModel.model_validate(data["empty"])
+
+    def test_empty_model_yaml_empty_validation(self) -> None:
+        """Test EmptyModel YAML validation with no fields."""
+        yaml_data = """
+        empty: {}
+        """
+        data = yaml.safe_load(yaml_data)
+        empty_model = EmptyModel.model_validate(data["empty"])
+        assert empty_model is not None
+```
+
 ## Type Checking
 
 The project uses **MyPy** for type checking:
@@ -965,5 +1026,11 @@ Before submitting code, ensure:
   - [ ] Use separate case functions for validation (return `str`) and serialization
     (return `tuple[Model, dict]`)
   - [ ] Include all valid examples from specification
+  - [ ] **For empty models** (without fields, `extra="forbid"`), create 4 tests fixing behavior:
+    - [ ] Serialization test (empty dict)
+    - [ ] Python validation error test (any arguments raise ValidationError)
+    - [ ] YAML validation error test (any fields raise ValidationError)
+    - [ ] YAML empty validation test (empty object succeeds)
+    - [ ] **Store test data directly in test methods** (not in case functions)
 - [ ] Code/Markdown files passes pre-commit hooks (`uv run pre-commit run --all-files`)
 - [ ] EditorConfig rules are followed
