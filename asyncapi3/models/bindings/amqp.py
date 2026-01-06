@@ -12,7 +12,7 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from asyncapi3.models.helpers import is_null
 
@@ -167,8 +167,27 @@ class AMQPChannelBindings(BaseModel):
         description="The version of this binding. If omitted, 'latest' MUST be assumed",
     )
 
+    @model_validator(mode="after")
+    def validate_exchange_queue_depending_on_is(self) -> "AMQPChannelBindings":
+        """
+        Validate that exchange and queue fields are set according to the 'is' field.
 
-# TODO: Cross validation (some fields has 'applies to action' constraint
+        When is='routingKey', exchange must be provided and queue must not be provided.
+        When is='queue', queue must be provided and exchange must not be provided.
+        """
+        if self.is_ == "routingKey":
+            if self.exchange is None:
+                raise ValueError("exchange must be provided when is='routingKey'")
+            if self.queue is not None:
+                raise ValueError("queue must not be provided when is='routingKey'")
+        elif self.is_ == "queue":
+            if self.queue is None:
+                raise ValueError("queue must be provided when is='queue'")
+            if self.exchange is not None:
+                raise ValueError("exchange must not be provided when is='queue'")
+        return self
+
+
 class AMQPOperationBindings(BaseModel):
     """
     AMQP Operation Binding Object.

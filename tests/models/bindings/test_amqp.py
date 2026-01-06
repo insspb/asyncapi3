@@ -2,8 +2,10 @@
 
 from typing import Any
 
+import pytest
 import yaml
 
+from pydantic import ValidationError
 from pytest_cases import parametrize_with_cases
 
 from asyncapi3.models.bindings.amqp import (
@@ -97,18 +99,6 @@ def case_amqp_channel_binding_serialization_queue() -> tuple[AMQPChannelBindings
             "autoDelete": False,
             "vhost": "/",
         },
-        "bindingVersion": "0.3.0",
-    }
-    return amqp_binding, expected
-
-
-def case_amqp_channel_binding_serialization_minimal() -> tuple[
-    AMQPChannelBindings, dict
-]:
-    """AMQPChannelBindings serialization with minimal fields."""
-    amqp_binding = AMQPChannelBindings(is_="routingKey")
-    expected: dict[str, Any] = {
-        "is": "routingKey",
         "bindingVersion": "0.3.0",
     }
     return amqp_binding, expected
@@ -216,18 +206,35 @@ def case_amqp_server_binding_serialization_empty() -> tuple[AMQPServerBindings, 
 class TestAMQPServerBindings:
     """Tests for AMQPServerBindings model."""
 
-    @parametrize_with_cases(
-        "amqp_binding,expected",
-        cases=[case_amqp_server_binding_serialization_empty],
-    )
-    def test_amqp_server_bindings_serialization(
-        self,
-        amqp_binding: AMQPServerBindings,
-        expected: dict,
-    ) -> None:
+    def test_amqp_server_bindings_serialization(self) -> None:
         """Test AMQPServerBindings serialization."""
+        amqp_binding = AMQPServerBindings()
         dumped = amqp_binding.model_dump()
-        assert dumped == expected
+        assert dumped == {}
+
+    def test_amqp_server_bindings_python_validation_error(self) -> None:
+        """Test AMQPServerBindings Python validation error with any arguments."""
+        with pytest.raises(ValidationError):
+            AMQPServerBindings(some_field="value")
+
+    def test_amqp_server_bindings_yaml_validation_error(self) -> None:
+        """Test AMQPServerBindings YAML validation error with any fields."""
+        yaml_data = """
+        amqp:
+          some_field: value
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError):
+            AMQPServerBindings.model_validate(data["amqp"])
+
+    def test_amqp_server_bindings_yaml_empty_validation(self) -> None:
+        """Test AMQPServerBindings YAML validation with no fields."""
+        yaml_data = """
+        amqp: {}
+        """
+        data = yaml.safe_load(yaml_data)
+        amqp_binding = AMQPServerBindings.model_validate(data["amqp"])
+        assert amqp_binding is not None
 
 
 class TestAMQPChannelBindings:
@@ -247,7 +254,6 @@ class TestAMQPChannelBindings:
     @parametrize_with_cases(
         "amqp_binding,expected",
         cases=[
-            case_amqp_channel_binding_serialization_minimal,
             case_amqp_channel_binding_serialization_routing_key,
             case_amqp_channel_binding_serialization_queue,
         ],
@@ -311,6 +317,104 @@ class TestAMQPChannelBindings:
         assert amqp_binding.queue.vhost == "/"
         assert amqp_binding.binding_version == "0.3.0"
 
+    def test_amqp_channel_bindings_python_validation_error(self) -> None:
+        """Test AMQPChannelBindings Python validation error with invalid arguments."""
+        with pytest.raises(ValidationError):
+            AMQPChannelBindings(invalid_field="value")
+
+    def test_amqp_channel_bindings_yaml_validation_error(self) -> None:
+        """Test AMQPChannelBindings YAML validation error with invalid fields."""
+        yaml_data = """
+        amqp:
+          is: routingKey
+          exchange:
+            name: myExchange
+            type: topic
+          invalid_field: value
+          bindingVersion: 0.3.0
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError):
+            AMQPChannelBindings.model_validate(data["amqp"])
+
+
+# Validation error test cases for AMQPChannelBindings validator
+def case_amqp_channel_binding_validator_routing_key_without_exchange() -> tuple[
+    str, str
+]:
+    """RoutingKey without exchange - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: routingKey
+      bindingVersion: 0.3.0
+    """
+    expected_error = "exchange must be provided when is='routingKey'"
+    return yaml_data, expected_error
+
+
+def case_amqp_channel_binding_validator_routing_key_with_queue() -> tuple[str, str]:
+    """RoutingKey with queue - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: routingKey
+      exchange:
+        name: myExchange
+        type: topic
+      queue:
+        name: myQueue
+      bindingVersion: 0.3.0
+    """
+    expected_error = "queue must not be provided when is='routingKey'"
+    return yaml_data, expected_error
+
+
+def case_amqp_channel_binding_validator_queue_without_queue() -> tuple[str, str]:
+    """Queue binding without queue - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: queue
+      bindingVersion: 0.3.0
+    """
+    expected_error = "queue must be provided when is='queue'"
+    return yaml_data, expected_error
+
+
+def case_amqp_channel_binding_validator_queue_with_exchange() -> tuple[str, str]:
+    """Queue binding with exchange - should fail validation."""
+    yaml_data = """
+    amqp:
+      is: queue
+      queue:
+        name: myQueue
+      exchange:
+        name: myExchange
+        type: topic
+      bindingVersion: 0.3.0
+    """
+    expected_error = "exchange must not be provided when is='queue'"
+    return yaml_data, expected_error
+
+
+class TestAMQPChannelBindingsValidator:
+    """Tests for AMQPChannelBindings model validator."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_amqp_channel_binding_validator_routing_key_without_exchange,
+            case_amqp_channel_binding_validator_routing_key_with_queue,
+            case_amqp_channel_binding_validator_queue_without_queue,
+            case_amqp_channel_binding_validator_queue_with_exchange,
+        ],
+    )
+    def test_amqp_channel_bindings_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test AMQPChannelBindings validator errors for invalid field combinations."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            AMQPChannelBindings.model_validate(data["amqp"])
+
 
 class TestAMQPOperationBindings:
     """Tests for AMQPOperationBindings model."""
@@ -368,6 +472,23 @@ class TestAMQPOperationBindings:
         assert amqp_binding.ack is False
         assert amqp_binding.binding_version == "0.3.0"
 
+    def test_amqp_operation_bindings_python_validation_error(self) -> None:
+        """Test AMQPOperationBindings Python validation error with invalid arguments."""
+        with pytest.raises(ValidationError):
+            AMQPOperationBindings(invalid_field="value")
+
+    def test_amqp_operation_bindings_yaml_validation_error(self) -> None:
+        """Test AMQPOperationBindings YAML validation error with invalid fields."""
+        yaml_data = """
+        amqp:
+          expiration: 100000
+          invalid_field: value
+          bindingVersion: 0.3.0
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError):
+            AMQPOperationBindings.model_validate(data["amqp"])
+
 
 class TestAMQPMessageBindings:
     """Tests for AMQPMessageBindings model."""
@@ -410,3 +531,20 @@ class TestAMQPMessageBindings:
         assert amqp_binding.content_encoding == "gzip"
         assert amqp_binding.message_type == "user.signup"
         assert amqp_binding.binding_version == "0.3.0"
+
+    def test_amqp_message_bindings_python_validation_error(self) -> None:
+        """Test AMQPMessageBindings Python validation error with invalid arguments."""
+        with pytest.raises(ValidationError):
+            AMQPMessageBindings(invalid_field="value")
+
+    def test_amqp_message_bindings_yaml_validation_error(self) -> None:
+        """Test AMQPMessageBindings YAML validation error with invalid fields."""
+        yaml_data = """
+        amqp:
+          contentEncoding: gzip
+          invalid_field: value
+          bindingVersion: 0.3.0
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError):
+            AMQPMessageBindings.model_validate(data["amqp"])
