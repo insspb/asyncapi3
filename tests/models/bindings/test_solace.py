@@ -112,6 +112,7 @@ def case_solace_operation_binding_serialization_with_destinations() -> tuple[
     expected: dict[str, Any] = {
         "destinations": [
             {
+                "deliveryMode": "persistent",
                 "destinationType": "queue",
                 "queue": {
                     "name": "CreatedHREvents",

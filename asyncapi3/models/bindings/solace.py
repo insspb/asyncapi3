@@ -28,7 +28,7 @@ class SolaceServerBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -83,7 +83,7 @@ class SolaceQueue(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -145,7 +145,7 @@ class SolaceTopic(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -173,7 +173,7 @@ class SolaceDestination(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -194,10 +194,8 @@ class SolaceDestination(BaseModel):
             "by the channel name or to the provided topicSubscriptions."
         ),
     )
-    # TODO: Make a default decision globally.
-    delivery_mode: Literal["direct", "persistent"] | None = Field(
-        default=None,
-        exclude_if=is_null,
+    delivery_mode: Literal["direct", "persistent"] = Field(
+        default="persistent",
         alias="deliveryMode",
         description=(
             "'direct' or 'persistent'. This determines the quality of service for "
@@ -228,7 +226,7 @@ class SolaceOperationBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
