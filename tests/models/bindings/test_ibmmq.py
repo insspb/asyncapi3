@@ -18,6 +18,119 @@ from asyncapi3.models.bindings.ibmmq import (
 )
 
 
+# Server Bindings Validation Error Test Cases
+def case_server_binding_heart_beat_interval_too_low() -> tuple[str, str]:
+    """Server binding with heartBeatInterval too low."""
+    yaml_data = """
+    ibmmq:
+      heartBeatInterval: -1
+      bindingVersion: 0.1.0
+    """
+    expected_error = "heartBeatInterval MUST be 0-999999"
+    return yaml_data, expected_error
+
+
+def case_server_binding_heart_beat_interval_too_high() -> tuple[str, str]:
+    """Server binding with heartBeatInterval too high."""
+    yaml_data = """
+    ibmmq:
+      heartBeatInterval: 1000000
+      bindingVersion: 0.1.0
+    """
+    expected_error = "heartBeatInterval MUST be 0-999999"
+    return yaml_data, expected_error
+
+
+# Channel Bindings Validation Error Test Cases
+def case_channel_binding_max_msg_length_too_low() -> tuple[str, str]:
+    """Channel binding with maxMsgLength too low."""
+    yaml_data = """
+    ibmmq:
+      destinationType: topic
+      maxMsgLength: -1
+      bindingVersion: 0.1.0
+    """
+    expected_error = r"maxMsgLength MUST be 0-104,857,600 bytes \(100 MB\)"
+    return yaml_data, expected_error
+
+
+def case_channel_binding_max_msg_length_too_high() -> tuple[str, str]:
+    """Channel binding with maxMsgLength too high."""
+    yaml_data = """
+    ibmmq:
+      destinationType: topic
+      maxMsgLength: 104857601
+      bindingVersion: 0.1.0
+    """
+    expected_error = r"maxMsgLength MUST be 0-104,857,600 bytes \(100 MB\)"
+    return yaml_data, expected_error
+
+
+def case_channel_binding_queue_and_topic_coexist() -> tuple[str, str]:
+    """Channel binding with both queue and topic."""
+    yaml_data = """
+    ibmmq:
+      destinationType: topic
+      queue:
+        objectName: myQueue
+      topic:
+        objectName: myTopic
+      bindingVersion: 0.1.0
+    """
+    expected_error = "queue and topic fields MUST NOT coexist within a channel binding"
+    return yaml_data, expected_error
+
+
+def case_channel_binding_queue_destination_type_without_queue() -> tuple[str, str]:
+    """Channel binding with destinationType=queue but no queue field."""
+    yaml_data = """
+    ibmmq:
+      destinationType: queue
+      bindingVersion: 0.1.0
+    """
+    expected_error = "queue must be provided when destinationType='queue'"
+    return yaml_data, expected_error
+
+
+# Message Bindings Validation Error Test Cases
+def case_message_binding_headers_with_string_type() -> tuple[str, str]:
+    """Message binding with headers and string type."""
+    yaml_data = """
+    ibmmq:
+      type: string
+      headers: some_headers
+      bindingVersion: 0.1.0
+    """
+    expected_error = "headers MUST NOT be specified if type = 'string' or 'jms'"
+    return yaml_data, expected_error
+
+
+def case_message_binding_headers_with_jms_type() -> tuple[str, str]:
+    """Message binding with headers and jms type."""
+    yaml_data = """
+    ibmmq:
+      type: jms
+      headers: some_headers
+      bindingVersion: 0.1.0
+    """
+    expected_error = "headers MUST NOT be specified if type = 'string' or 'jms'"
+    return yaml_data, expected_error
+
+
+def case_message_binding_expiry_negative() -> tuple[str, str]:
+    """Message binding with negative expiry."""
+    yaml_data = """
+    ibmmq:
+      type: binary
+      expiry: -1
+      bindingVersion: 0.1.0
+    """
+    expected_error = (
+        r"expiry value MUST be either zero \(unlimited\) or greater than zero"
+    )
+    return yaml_data, expected_error
+
+
 # Server Bindings Validation Test Cases
 def case_server_binding_with_group_id() -> str:
     """Server binding with groupId and cipherSpec."""
@@ -368,4 +481,90 @@ class TestIBMMQMessageBindings:
         """
         data = yaml.safe_load(yaml_data)
         with pytest.raises(ValidationError):
+            IBMMQMessageBindings.model_validate(data["ibmmq"])
+
+
+class TestIBMMQServerBindingsValidator:
+    """Tests for IBMMQServerBindings model validator."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_server_binding_heart_beat_interval_too_low,
+            case_server_binding_heart_beat_interval_too_high,
+        ],
+    )
+    def test_ibmmq_server_bindings_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test IBMMQServerBindings validator errors for invalid heartBeatInterval."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError, match=expected_error):
+            IBMMQServerBindings.model_validate(data["ibmmq"])
+
+
+class TestIBMMQChannelBindingsValidator:
+    """Tests for IBMMQChannelBindings model validator."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_channel_binding_max_msg_length_too_low,
+            case_channel_binding_max_msg_length_too_high,
+        ],
+    )
+    def test_ibmmq_channel_bindings_field_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test IBMMQChannelBindings field validator errors for invalid maxMsgLength."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError, match=expected_error):
+            IBMMQChannelBindings.model_validate(data["ibmmq"])
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_channel_binding_queue_and_topic_coexist,
+            case_channel_binding_queue_destination_type_without_queue,
+        ],
+    )
+    def test_ibmmq_channel_bindings_model_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test IBMMQChannelBindings model validator errors for invalid constraints."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            IBMMQChannelBindings.model_validate(data["ibmmq"])
+
+
+class TestIBMMQMessageBindingsValidator:
+    """Tests for IBMMQMessageBindings model validator."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_message_binding_expiry_negative,
+        ],
+    )
+    def test_ibmmq_message_bindings_field_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test IBMMQMessageBindings field validator errors for invalid expiry."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValidationError, match=expected_error):
+            IBMMQMessageBindings.model_validate(data["ibmmq"])
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_message_binding_headers_with_string_type,
+            case_message_binding_headers_with_jms_type,
+        ],
+    )
+    def test_ibmmq_message_bindings_model_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test IBMMQMessageBindings model validator errors for invalid constraints."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
             IBMMQMessageBindings.model_validate(data["ibmmq"])

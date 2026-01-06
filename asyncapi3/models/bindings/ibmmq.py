@@ -11,11 +11,12 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncapi3.models.helpers import is_null
 
 
+# TODO: Depends on parent object
 class IBMMQServerBindings(BaseModel):
     """
     IBM MQ Server Binding Object.
@@ -36,6 +37,7 @@ class IBMMQServerBindings(BaseModel):
         validate_by_alias=True,
     )
 
+    # TODO: MUST NOT be specified for URI Scheme http:// or file://
     group_id: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -47,6 +49,7 @@ class IBMMQServerBindings(BaseModel):
             "NOT be specified for URI Scheme http:// or file://."
         ),
     )
+    # TODO: MUST NOT be specified for URI Scheme ibmmq://
     ccdt_queue_manager_name: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -56,6 +59,7 @@ class IBMMQServerBindings(BaseModel):
             "Optional, defaults to *. MUST NOT be specified for URI Scheme ibmmq://."
         ),
     )
+    # TODO: MUST NOT be specified for protocol ibmmq or URI Scheme file:// or http://
     cipher_spec: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -68,6 +72,7 @@ class IBMMQServerBindings(BaseModel):
             "for protocol ibmmq or URI Scheme file:// or http://."
         ),
     )
+    # TODO: MUST NOT be specified for URI Scheme file:// or http://
     multi_endpoint_server: bool | None = Field(
         default=None,
         exclude_if=is_null,
@@ -99,6 +104,17 @@ class IBMMQServerBindings(BaseModel):
         alias="bindingVersion",
         description="The version of this binding. Optional, defaults to latest.",
     )
+
+    @field_validator("heart_beat_interval")
+    @classmethod
+    def validate_heart_beat_interval(
+        cls, heart_beat_interval: int | None
+    ) -> int | None:
+        if heart_beat_interval is not None and (
+            heart_beat_interval < 0 or heart_beat_interval > 999999
+        ):
+            raise ValueError("heartBeatInterval MUST be 0-999999")
+        return heart_beat_interval
 
 
 class IBMMQQueue(BaseModel):
@@ -162,6 +178,7 @@ class IBMMQTopic(BaseModel):
         validate_by_alias=True,
     )
 
+    # TODO: OPTIONAL Note: if specified, SHALL override AsyncAPI channel name.
     string: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -172,6 +189,7 @@ class IBMMQTopic(BaseModel):
             "characters in length. MAY coexist with topic.objectName."
         ),
     )
+    # TODO: OPTIONAL Note: if specified, SHALL override AsyncAPI channel name.
     object_name: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -200,7 +218,6 @@ class IBMMQTopic(BaseModel):
     )
 
 
-# TODO: Has cross-fields constraints
 class IBMMQChannelBindings(BaseModel):
     """
     IBM MQ Channel Binding Object.
@@ -263,6 +280,29 @@ class IBMMQChannelBindings(BaseModel):
         description="The version of this binding. Optional, defaults to latest.",
     )
 
+    @field_validator("max_msg_length")
+    @classmethod
+    def validate_max_msg_length(cls, max_msg_length: int | None) -> int | None:
+        if max_msg_length is not None and (
+            max_msg_length < 0 or max_msg_length > 104857600
+        ):
+            raise ValueError("maxMsgLength MUST be 0-104,857,600 bytes (100 MB)")
+        return max_msg_length
+
+    @model_validator(mode="after")
+    def validate_queue_topic_constraints(self) -> "IBMMQChannelBindings":
+        # queue and topic fields MUST NOT coexist within a channel binding
+        if self.queue is not None and self.topic is not None:
+            raise ValueError(
+                "queue and topic fields MUST NOT coexist within a channel binding"
+            )
+
+        # queue REQUIRED if destinationType = queue
+        if self.destination_type == "queue" and self.queue is None:
+            raise ValueError("queue must be provided when destinationType='queue'")
+
+        return self
+
 
 class IBMMQOperationBindings(BaseModel):
     """
@@ -279,7 +319,6 @@ class IBMMQOperationBindings(BaseModel):
     )
 
 
-# TODO: Has cross-fields constraints
 class IBMMQMessageBindings(BaseModel):
     """
     IBM MQ Message Binding Object.
@@ -340,3 +379,21 @@ class IBMMQMessageBindings(BaseModel):
         alias="bindingVersion",
         description="The version of this binding. Optional, defaults to latest.",
     )
+
+    @field_validator("expiry")
+    @classmethod
+    def validate_expiry(cls, expiry: int | None) -> int | None:
+        if expiry is not None and expiry < 0:
+            raise ValueError(
+                "expiry value MUST be either zero (unlimited) or greater than zero"
+            )
+        return expiry
+
+    @model_validator(mode="after")
+    def validate_headers_constraints(self) -> "IBMMQMessageBindings":
+        # headers MUST NOT be specified if type = string or jms
+        if self.type in ["string", "jms"] and self.headers is not None:
+            raise ValueError(
+                "headers MUST NOT be specified if type = 'string' or 'jms'"
+            )
+        return self
