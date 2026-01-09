@@ -11,9 +11,9 @@ __all__ = [
 ]
 
 
-from typing import Literal
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncapi3.models.base import Reference
 from asyncapi3.models.helpers import is_null
@@ -217,6 +217,21 @@ class SolaceDestination(BaseModel):
         ),
     )
 
+    @model_validator(mode="after")
+    def validate_destination_fields(self) -> "SolaceDestination":
+        """Validate that queue/topic fields match destination_type."""
+        if self.destination_type == "queue":
+            if self.queue is None:
+                raise ValueError("queue required for destinationType 'queue'")
+            if self.topic is not None:
+                raise ValueError("topic not allowed for destinationType 'queue'")
+        elif self.destination_type == "topic":
+            if self.topic is None:
+                raise ValueError("topic required for destinationType 'topic'")
+            if self.queue is not None:
+                raise ValueError("queue not allowed for destinationType 'topic'")
+        return self
+
 
 class SolaceOperationBindings(BaseModel):
     """
@@ -271,6 +286,14 @@ class SolaceOperationBindings(BaseModel):
             "default value is false."
         ),
     )
+
+    @field_validator("priority")
+    @classmethod
+    def validate_priority(cls, priority: Any) -> Any:
+        """Validate priority range when it's an integer."""
+        if isinstance(priority, int) and (priority < 0 or priority > 255):
+            raise ValueError("priority must be between 0 and 255")
+        return priority
 
 
 class SolaceMessageBindings(BaseModel):
