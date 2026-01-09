@@ -16,41 +16,26 @@ __all__ = [
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class SNSServerBindings(BaseModel):
+class SNSServerBindings(NonExtendableBaseModel):
     """
     SNS Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class SNSOrdering(BaseModel):
+class SNSOrdering(NonExtendableBaseModel):
     """
     SNS Ordering.
 
     Configuration for FIFO SNS Topic.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     type: Literal["standard", "FIFO"] = Field(
         description=(
@@ -67,21 +52,12 @@ class SNSOrdering(BaseModel):
     )
 
 
-class SNSStatement(BaseModel):
+class SNSStatement(NonExtendableBaseModel):
     """
     SNS Statement.
 
     Controls a permission for this topic.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     effect: Literal["Allow", "Deny"] = Field(
         description="Required. Either 'Allow' or 'Deny'.",
@@ -111,21 +87,12 @@ class SNSStatement(BaseModel):
     )
 
 
-class SNSPolicy(BaseModel):
+class SNSPolicy(NonExtendableBaseModel):
     """
     SNS Policy.
 
     The security policy for the SNS Topic.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     statements: list[SNSStatement] = Field(
         description=(
@@ -135,7 +102,7 @@ class SNSPolicy(BaseModel):
     )
 
 
-class SNSChannelBindings(BaseModel):
+class SNSChannelBindings(NonExtendableBaseModel):
     """
     SNS Channel Binding Object.
 
@@ -150,15 +117,6 @@ class SNSChannelBindings(BaseModel):
     SNS supports many optional properties. To mark a channel as SNS, but use default
     values for the channel properties, just use an empty object {}.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str = Field(
         description=(
@@ -191,7 +149,7 @@ class SNSChannelBindings(BaseModel):
     )
 
 
-class SNSIdentifier(BaseModel):
+class SNSIdentifier(NonExtendableBaseModel):
     """
     SNS Identifier.
 
@@ -199,15 +157,6 @@ class SNSIdentifier(BaseModel):
     defined endpoint for this SNS publication to target, or an endpoint on another
     binding against this Operation Object (via the name field).
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     url: str | None = Field(
         default=None,
@@ -246,21 +195,12 @@ class SNSIdentifier(BaseModel):
     )
 
 
-class SNSDeliveryPolicy(BaseModel):
+class SNSDeliveryPolicy(NonExtendableBaseModel):
     """
     SNS Delivery Policy.
 
     Policy for retries to HTTP.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     min_delay_target: int | None = Field(
         default=None,
@@ -323,22 +263,13 @@ class SNSDeliveryPolicy(BaseModel):
     )
 
 
-class SNSRedrivePolicy(BaseModel):
+class SNSRedrivePolicy(NonExtendableBaseModel):
     """
     SNS Redrive Policy.
 
     Prevent poison pill messages by moving un-processable messages to an SQS dead letter
     queue.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     dead_letter_queue: SNSIdentifier = Field(
         alias="deadLetterQueue",
@@ -363,21 +294,12 @@ class SNSRedrivePolicy(BaseModel):
     )
 
 
-class SNSConsumer(BaseModel):
+class SNSConsumer(NonExtendableBaseModel):
     """
     SNS Consumer.
 
     The protocols that listen to this topic and their endpoints.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     protocol: Literal[
         "http",
@@ -450,7 +372,7 @@ class SNSConsumer(BaseModel):
     )
 
 
-class SNSOperationBindings(BaseModel):
+class SNSOperationBindings(NonExtendableBaseModel):
     """
     SNS Operation Binding Object.
 
@@ -475,15 +397,6 @@ class SNSOperationBindings(BaseModel):
     for multiple consumers with the same protocol, instead of representing each consumer
     in a separate file.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     topic: SNSIdentifier | None = Field(
         default=None,
@@ -517,16 +430,9 @@ class SNSOperationBindings(BaseModel):
     )
 
 
-class SNSMessageBindings(BaseModel):
+class SNSMessageBindings(NonExtendableBaseModel):
     """
     SNS Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

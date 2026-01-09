@@ -12,44 +12,27 @@ __all__ = [
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class GooglePubSubServerBindings(BaseModel):
+class GooglePubSubServerBindings(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class GooglePubSubMessageStoragePolicy(BaseModel):
+class GooglePubSubMessageStoragePolicy(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Message Storage Policy Object.
 
     Policy constraining the set of Google Cloud Platform regions where messages
     published to the topic may be stored.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     allowed_persistence_regions: list[str] | None = Field(
         default=None,
@@ -62,21 +45,12 @@ class GooglePubSubMessageStoragePolicy(BaseModel):
     )
 
 
-class GooglePubSubSchemaSettings(BaseModel):
+class GooglePubSubSchemaSettings(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Schema Settings Object.
 
     Settings for validating messages published against a schema.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     encoding: (
         Literal[
@@ -118,22 +92,13 @@ class GooglePubSubSchemaSettings(BaseModel):
     )
 
 
-class GooglePubSubChannelBindings(BaseModel):
+class GooglePubSubChannelBindings(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Channel Binding Object.
 
     The Channel Bindings Object is used to describe the Google Cloud Pub/Sub specific
     Topic details with AsyncAPI.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     binding_version: str = Field(
         default="0.2.0",
@@ -174,38 +139,20 @@ class GooglePubSubChannelBindings(BaseModel):
     )
 
 
-class GooglePubSubOperationBindings(BaseModel):
+class GooglePubSubOperationBindings(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class GooglePubSubSchemaDefinition(BaseModel):
+class GooglePubSubSchemaDefinition(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Schema Definition Object.
 
     Describes the schema used to validate the payload of this message.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str | None = Field(
         default=None,
@@ -214,7 +161,7 @@ class GooglePubSubSchemaDefinition(BaseModel):
     )
 
 
-class GooglePubSubMessageBindings(BaseModel):
+class GooglePubSubMessageBindings(NonExtendableBaseModel):
     """
     Google Cloud Pub/Sub Message Binding Object.
 
@@ -222,15 +169,6 @@ class GooglePubSubMessageBindings(BaseModel):
     PubsubMessage details, alongside with pertinent parts of the Google Cloud Pub/Sub
     Schema Object, with AsyncAPI.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     binding_version: str = Field(
         default="0.2.0",

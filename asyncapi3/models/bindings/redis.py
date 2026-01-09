@@ -7,64 +7,36 @@ __all__ = [
     "RedisServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict
+from asyncapi3.models.base_models import NonExtendableBaseModel
 
 
-class RedisServerBindings(BaseModel):
+class RedisServerBindings(NonExtendableBaseModel):
     """
     Redis Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class RedisChannelBindings(BaseModel):
+class RedisChannelBindings(NonExtendableBaseModel):
     """
     Redis Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class RedisOperationBindings(BaseModel):
+class RedisOperationBindings(NonExtendableBaseModel):
     """
     Redis Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class RedisMessageBindings(BaseModel):
+class RedisMessageBindings(NonExtendableBaseModel):
     """
     Redis Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

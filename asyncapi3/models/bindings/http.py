@@ -9,44 +9,31 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class HTTPServerBindings(BaseModel):
+class HTTPServerBindings(NonExtendableBaseModel):
     """
     HTTP Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class HTTPChannelBindings(BaseModel):
+class HTTPChannelBindings(NonExtendableBaseModel):
     """
     HTTP Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class HTTPOperationBindings(BaseModel):
+class HTTPOperationBindings(NonExtendableBaseModel):
     """
     HTTP Operation Binding Object.
 
@@ -54,15 +41,6 @@ class HTTPOperationBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     method: Literal[
         "GET",
@@ -95,7 +73,7 @@ class HTTPOperationBindings(BaseModel):
     )
 
 
-class HTTPMessageBindings(BaseModel):
+class HTTPMessageBindings(NonExtendableBaseModel):
     """
     HTTP Message Binding Object.
 
@@ -103,15 +81,6 @@ class HTTPMessageBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     headers: Schema | Reference | None = Field(
         default=None,

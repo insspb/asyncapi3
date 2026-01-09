@@ -9,29 +9,23 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class WebSocketsServerBindings(BaseModel):
+class WebSocketsServerBindings(NonExtendableBaseModel):
     """
     WebSockets Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class WebSocketsChannelBindings(BaseModel):
+class WebSocketsChannelBindings(NonExtendableBaseModel):
     """
     WebSockets Channel Binding Object.
 
@@ -43,15 +37,6 @@ class WebSocketsChannelBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     method: Literal["GET", "POST"] | None = Field(
         default=None,
@@ -85,31 +70,17 @@ class WebSocketsChannelBindings(BaseModel):
     )
 
 
-class WebSocketsOperationBindings(BaseModel):
+class WebSocketsOperationBindings(NonExtendableBaseModel):
     """
     WebSockets Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class WebSocketsMessageBindings(BaseModel):
+class WebSocketsMessageBindings(NonExtendableBaseModel):
     """
     WebSockets Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

@@ -10,29 +10,21 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class MQTTLastWill(BaseModel):
+class MQTTLastWill(NonExtendableBaseModel):
     """
     MQTT Last Will and Testament configuration.
 
     Last Will and Testament configuration. topic, qos, message and retain are
     properties of this object.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     topic: str = Field(
         description="The topic where the Last Will and Testament message will be sent.",
@@ -54,7 +46,7 @@ class MQTTLastWill(BaseModel):
     )
 
 
-class MQTTServerBindings(BaseModel):
+class MQTTServerBindings(NonExtendableBaseModel):
     """
     MQTT Server Binding Object.
 
@@ -62,15 +54,6 @@ class MQTTServerBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     client_id: str | None = Field(
         default=None,
@@ -128,22 +111,15 @@ class MQTTServerBindings(BaseModel):
     )
 
 
-class MQTTChannelBindings(BaseModel):
+class MQTTChannelBindings(NonExtendableBaseModel):
     """
     MQTT Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MQTTOperationBindings(BaseModel):
+class MQTTOperationBindings(NonExtendableBaseModel):
     """
     MQTT Operation Binding Object.
 
@@ -151,15 +127,6 @@ class MQTTOperationBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     qos: Literal[0, 1, 2] | None = Field(
         default=None,
@@ -191,7 +158,7 @@ class MQTTOperationBindings(BaseModel):
     )
 
 
-class MQTTMessageBindings(BaseModel):
+class MQTTMessageBindings(NonExtendableBaseModel):
     """
     MQTT Message Binding Object.
 
@@ -199,15 +166,6 @@ class MQTTMessageBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     payload_format_indicator: Literal[0, 1] | None = Field(
         default=None,

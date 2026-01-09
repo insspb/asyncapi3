@@ -13,11 +13,12 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class KafkaServerBindings(BaseModel):
+class KafkaServerBindings(NonExtendableBaseModel):
     """
     Kafka Server Binding Object.
 
@@ -25,15 +26,6 @@ class KafkaServerBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     schema_registry_url: str | None = Field(
         default=None,
@@ -161,7 +153,7 @@ class KafkaTopicConfiguration(BaseModel):
     )
 
 
-class KafkaChannelBindings(BaseModel):
+class KafkaChannelBindings(NonExtendableBaseModel):
     """
     Kafka Channel Binding Object.
 
@@ -170,15 +162,6 @@ class KafkaChannelBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     topic: str | None = Field(
         default=None,
@@ -227,7 +210,7 @@ class KafkaChannelBindings(BaseModel):
         return replicas
 
 
-class KafkaOperationBindings(BaseModel):
+class KafkaOperationBindings(NonExtendableBaseModel):
     """
     Kafka Operation Binding Object.
 
@@ -236,15 +219,6 @@ class KafkaOperationBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     group_id: Schema | Reference | None = Field(
         default=None,
@@ -265,7 +239,7 @@ class KafkaOperationBindings(BaseModel):
     )
 
 
-class KafkaMessageBindings(BaseModel):
+class KafkaMessageBindings(NonExtendableBaseModel):
     """
     Kafka Message Binding Object.
 
@@ -273,15 +247,6 @@ class KafkaMessageBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     # TODO: Think about AVRO Schema
     key: Schema | Reference | dict[str, Any] | None = Field(

@@ -7,64 +7,36 @@ __all__ = [
     "AMQP1ServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict
+from asyncapi3.models.base_models import NonExtendableBaseModel
 
 
-class AMQP1ServerBindings(BaseModel):
+class AMQP1ServerBindings(NonExtendableBaseModel):
     """
     AMQP 1.0 Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class AMQP1ChannelBindings(BaseModel):
+class AMQP1ChannelBindings(NonExtendableBaseModel):
     """
     AMQP 1.0 Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class AMQP1OperationBindings(BaseModel):
+class AMQP1OperationBindings(NonExtendableBaseModel):
     """
     AMQP 1.0 Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class AMQP1MessageBindings(BaseModel):
+class AMQP1MessageBindings(NonExtendableBaseModel):
     """
     AMQP 1.0 Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

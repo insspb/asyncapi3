@@ -7,56 +7,34 @@ __all__ = [
     "NATSServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class NATSServerBindings(BaseModel):
+class NATSServerBindings(NonExtendableBaseModel):
     """
     NATS Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class NATSChannelBindings(BaseModel):
+class NATSChannelBindings(NonExtendableBaseModel):
     """
     NATS Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class NATSOperationBindings(BaseModel):
+class NATSOperationBindings(NonExtendableBaseModel):
     """
     NATS Operation Binding Object.
 
     This object contains information about the operation representation in NATS.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     queue: str | None = Field(
         default=None,
@@ -73,16 +51,9 @@ class NATSOperationBindings(BaseModel):
     )
 
 
-class NATSMessageBindings(BaseModel):
+class NATSMessageBindings(NonExtendableBaseModel):
     """
     NATS Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

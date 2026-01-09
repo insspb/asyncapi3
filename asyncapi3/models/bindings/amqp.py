@@ -12,41 +12,26 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class AMQPServerBindings(BaseModel):
+class AMQPServerBindings(NonExtendableBaseModel):
     """
     AMQP Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class AMQPExchange(BaseModel):
+class AMQPExchange(NonExtendableBaseModel):
     """
     AMQP Exchange.
 
     When is=routingKey, this object defines the exchange properties.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str = Field(
         max_length=255,
@@ -79,21 +64,12 @@ class AMQPExchange(BaseModel):
     )
 
 
-class AMQPQueue(BaseModel):
+class AMQPQueue(NonExtendableBaseModel):
     """
     AMQP Queue.
 
     When is=queue, this object defines the queue properties.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str | None = Field(
         default=None,
@@ -126,7 +102,7 @@ class AMQPQueue(BaseModel):
     )
 
 
-class AMQPChannelBindings(BaseModel):
+class AMQPChannelBindings(NonExtendableBaseModel):
     """
     AMQP Channel Binding Object.
 
@@ -134,15 +110,6 @@ class AMQPChannelBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     is_: Literal["queue", "routingKey"] = Field(
         alias="is",
@@ -188,7 +155,7 @@ class AMQPChannelBindings(BaseModel):
         return self
 
 
-class AMQPOperationBindings(BaseModel):
+class AMQPOperationBindings(NonExtendableBaseModel):
     """
     AMQP Operation Binding Object.
 
@@ -196,15 +163,6 @@ class AMQPOperationBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     expiration: int | None = Field(
         default=None,
@@ -269,7 +227,7 @@ class AMQPOperationBindings(BaseModel):
     )
 
 
-class AMQPMessageBindings(BaseModel):
+class AMQPMessageBindings(NonExtendableBaseModel):
     """
     AMQP Message Binding Object.
 
@@ -277,15 +235,6 @@ class AMQPMessageBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     content_encoding: str | None = Field(
         default=None,

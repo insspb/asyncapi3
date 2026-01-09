@@ -7,64 +7,36 @@ __all__ = [
     "MercureServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict
+from asyncapi3.models.base_models import NonExtendableBaseModel
 
 
-class MercureServerBindings(BaseModel):
+class MercureServerBindings(NonExtendableBaseModel):
     """
     Mercure Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MercureChannelBindings(BaseModel):
+class MercureChannelBindings(NonExtendableBaseModel):
     """
     Mercure Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MercureOperationBindings(BaseModel):
+class MercureOperationBindings(NonExtendableBaseModel):
     """
     Mercure Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MercureMessageBindings(BaseModel):
+class MercureMessageBindings(NonExtendableBaseModel):
     """
     Mercure Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

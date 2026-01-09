@@ -7,64 +7,36 @@ __all__ = [
     "STOMPServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict
+from asyncapi3.models.base_models import NonExtendableBaseModel
 
 
-class STOMPServerBindings(BaseModel):
+class STOMPServerBindings(NonExtendableBaseModel):
     """
     STOMP Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class STOMPChannelBindings(BaseModel):
+class STOMPChannelBindings(NonExtendableBaseModel):
     """
     STOMP Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class STOMPOperationBindings(BaseModel):
+class STOMPOperationBindings(NonExtendableBaseModel):
     """
     STOMP Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class STOMPMessageBindings(BaseModel):
+class STOMPMessageBindings(NonExtendableBaseModel):
     """
     STOMP Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

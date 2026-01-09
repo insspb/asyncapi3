@@ -11,13 +11,14 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
 # TODO: Depends on parent object
-class IBMMQServerBindings(BaseModel):
+class IBMMQServerBindings(NonExtendableBaseModel):
     """
     IBM MQ Server Binding Object.
 
@@ -27,15 +28,6 @@ class IBMMQServerBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     # TODO: MUST NOT be specified for URI Scheme http:// or file://
     group_id: str | None = Field(
@@ -117,21 +109,12 @@ class IBMMQServerBindings(BaseModel):
         return heart_beat_interval
 
 
-class IBMMQQueue(BaseModel):
+class IBMMQQueue(NonExtendableBaseModel):
     """
     IBM MQ Queue.
 
     Defines the properties of a queue.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     object_name: str = Field(
         max_length=48,
@@ -162,21 +145,12 @@ class IBMMQQueue(BaseModel):
     )
 
 
-class IBMMQTopic(BaseModel):
+class IBMMQTopic(NonExtendableBaseModel):
     """
     IBM MQ Topic.
 
     Defines the properties of a topic.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     # TODO: OPTIONAL Note: if specified, SHALL override AsyncAPI channel name.
     string: str | None = Field(
@@ -218,7 +192,7 @@ class IBMMQTopic(BaseModel):
     )
 
 
-class IBMMQChannelBindings(BaseModel):
+class IBMMQChannelBindings(NonExtendableBaseModel):
     """
     IBM MQ Channel Binding Object.
 
@@ -227,15 +201,6 @@ class IBMMQChannelBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     destination_type: Literal["topic", "queue"] = Field(
         default="topic",
@@ -304,22 +269,15 @@ class IBMMQChannelBindings(BaseModel):
         return self
 
 
-class IBMMQOperationBindings(BaseModel):
+class IBMMQOperationBindings(NonExtendableBaseModel):
     """
     IBM MQ Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class IBMMQMessageBindings(BaseModel):
+class IBMMQMessageBindings(NonExtendableBaseModel):
     """
     IBM MQ Message Binding Object.
 
@@ -327,15 +285,6 @@ class IBMMQMessageBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     type: Literal["string", "jms", "binary"] = Field(
         default="string",

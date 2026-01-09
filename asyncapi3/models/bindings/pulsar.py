@@ -10,26 +10,18 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class PulsarServerBindings(BaseModel):
+class PulsarServerBindings(NonExtendableBaseModel):
     """
     Pulsar Server Binding Object.
 
     This object contains information about the server representation in Pulsar.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     tenant: str = Field(
         default="public",
@@ -42,21 +34,12 @@ class PulsarServerBindings(BaseModel):
     )
 
 
-class PulsarRetention(BaseModel):
+class PulsarRetention(NonExtendableBaseModel):
     """
     Retention Definition Object.
 
     The Retention Definition Object is used to describe the Pulsar Retention policy.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     time: int | None = Field(
         default=0,
@@ -70,21 +53,12 @@ class PulsarRetention(BaseModel):
     )
 
 
-class PulsarChannelBindings(BaseModel):
+class PulsarChannelBindings(NonExtendableBaseModel):
     """
     Pulsar Channel Binding Object.
 
     This object contains information about the channel representation in Pulsar.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     namespace: str = Field(
         ...,
@@ -133,31 +107,17 @@ class PulsarChannelBindings(BaseModel):
     )
 
 
-class PulsarOperationBindings(BaseModel):
+class PulsarOperationBindings(NonExtendableBaseModel):
     """
     Pulsar Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class PulsarMessageBindings(BaseModel):
+class PulsarMessageBindings(NonExtendableBaseModel):
     """
     Pulsar Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

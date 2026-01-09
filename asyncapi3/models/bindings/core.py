@@ -7,8 +7,9 @@ __all__ = [
     "ServerBindingsObject",
 ]
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings.amqp import (
     AMQPChannelBindings,
     AMQPMessageBindings,
@@ -126,7 +127,7 @@ from asyncapi3.models.bindings.websockets import (
 from asyncapi3.models.helpers import is_null
 
 
-class ServerBindingsObject(BaseModel):
+class ServerBindingsObject(ExtendableBaseModel):
     """
     Server Bindings Object.
 
@@ -134,15 +135,6 @@ class ServerBindingsObject(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     http: HTTPServerBindings | None = Field(
         default=None,
@@ -241,7 +233,7 @@ class ServerBindingsObject(BaseModel):
     )
 
 
-class ChannelBindingsObject(BaseModel):
+class ChannelBindingsObject(ExtendableBaseModel):
     """
     Channel Bindings Object.
 
@@ -249,15 +241,6 @@ class ChannelBindingsObject(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     http: HTTPChannelBindings | None = Field(
         default=None,
@@ -356,7 +339,7 @@ class ChannelBindingsObject(BaseModel):
     )
 
 
-class OperationBindingsObject(BaseModel):
+class OperationBindingsObject(ExtendableBaseModel):
     """
     Operation Bindings Object.
 
@@ -364,15 +347,6 @@ class OperationBindingsObject(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     http: HTTPOperationBindings | None = Field(
         default=None,
@@ -473,7 +447,7 @@ class OperationBindingsObject(BaseModel):
     )
 
 
-class MessageBindingsObject(BaseModel):
+class MessageBindingsObject(ExtendableBaseModel):
     """
     Message Bindings Object.
 
@@ -481,15 +455,6 @@ class MessageBindingsObject(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     http: HTTPMessageBindings | None = Field(
         default=None,

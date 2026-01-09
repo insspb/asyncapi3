@@ -7,14 +7,15 @@ __all__ = [
     "MQTT5ServerBindings",
 ]
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class MQTT5ServerBindings(BaseModel):
+class MQTT5ServerBindings(NonExtendableBaseModel):
     """
     MQTT 5 Server Binding Object.
 
@@ -22,15 +23,6 @@ class MQTT5ServerBindings(BaseModel):
 
     This object MUST contain only the properties defined below.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     session_expiry_interval: int | Schema | Reference | None = Field(
         default=None,
@@ -48,46 +40,25 @@ class MQTT5ServerBindings(BaseModel):
     )
 
 
-class MQTT5ChannelBindings(BaseModel):
+class MQTT5ChannelBindings(NonExtendableBaseModel):
     """
     MQTT 5 Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MQTT5OperationBindings(BaseModel):
+class MQTT5OperationBindings(NonExtendableBaseModel):
     """
     MQTT 5 Operation Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class MQTT5MessageBindings(BaseModel):
+class MQTT5MessageBindings(NonExtendableBaseModel):
     """
     MQTT 5 Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

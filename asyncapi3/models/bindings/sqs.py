@@ -14,41 +14,26 @@ __all__ = [
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class SQSServerBindings(BaseModel):
+class SQSServerBindings(NonExtendableBaseModel):
     """
     SQS Server Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class SQSStatement(BaseModel):
+class SQSStatement(NonExtendableBaseModel):
     """
     SQS Statement.
 
     Controls a permission for this queue.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     effect: Literal["Allow", "Deny"] = Field(
         description="Required. Either 'Allow' or 'Deny'.",
@@ -78,21 +63,12 @@ class SQSStatement(BaseModel):
     )
 
 
-class SQSPolicy(BaseModel):
+class SQSPolicy(NonExtendableBaseModel):
     """
     SQS Policy.
 
     The security policy for the SQS Queue.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     statements: list[SQSStatement] = Field(
         alias="Statements",
@@ -103,21 +79,12 @@ class SQSPolicy(BaseModel):
     )
 
 
-class SQSIdentifier(BaseModel):
+class SQSIdentifier(NonExtendableBaseModel):
     """
     SQS Identifier.
 
     Used to identify an endpoint or queue.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     arn: str | None = Field(
         default=None,
@@ -139,22 +106,13 @@ class SQSIdentifier(BaseModel):
     )
 
 
-class SQSRedrivePolicy(BaseModel):
+class SQSRedrivePolicy(NonExtendableBaseModel):
     """
     SQS Redrive Policy.
 
     Prevent poison pill messages by moving un-processable messages to an SQS dead letter
     queue.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     dead_letter_queue: SQSIdentifier = Field(
         alias="deadLetterQueue",
@@ -171,21 +129,12 @@ class SQSRedrivePolicy(BaseModel):
     )
 
 
-class SQSQueue(BaseModel):
+class SQSQueue(NonExtendableBaseModel):
     """
     SQS Queue.
 
     A definition of the queue that will be used as the channel.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str = Field(
         description=(
@@ -283,7 +232,7 @@ class SQSQueue(BaseModel):
     )
 
 
-class SQSChannelBindings(BaseModel):
+class SQSChannelBindings(NonExtendableBaseModel):
     """
     SQS Channel Binding Object.
 
@@ -313,15 +262,6 @@ class SQSChannelBindings(BaseModel):
     also supports an ARN).
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
     queue: SQSQueue = Field(
         description=(
             "Required. A definition of the queue that will be used as the channel."
@@ -342,7 +282,7 @@ class SQSChannelBindings(BaseModel):
     )
 
 
-class SQSOperationBindings(BaseModel):
+class SQSOperationBindings(NonExtendableBaseModel):
     """
     SQS Operation Binding Object.
 
@@ -355,15 +295,6 @@ class SQSOperationBindings(BaseModel):
     SNS Operation Object of deadLetterQueue on the Redrive Policy to identify the
     required member of this array.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     queues: list[SQSQueue] = Field(
         description=(
@@ -379,16 +310,9 @@ class SQSOperationBindings(BaseModel):
     )
 
 
-class SQSMessageBindings(BaseModel):
+class SQSMessageBindings(NonExtendableBaseModel):
     """
     SQS Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )

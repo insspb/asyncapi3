@@ -13,28 +13,20 @@ __all__ = [
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from asyncapi3.models.base import Reference
+from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import Schema
 
 
-class SolaceServerBindings(BaseModel):
+class SolaceServerBindings(NonExtendableBaseModel):
     """
     Solace Server Binding Object.
 
     This object contains information about the server representation in Solace.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     binding_version: str = Field(
         default="0.4.0",
@@ -60,36 +52,20 @@ class SolaceServerBindings(BaseModel):
     )
 
 
-class SolaceChannelBindings(BaseModel):
+class SolaceChannelBindings(NonExtendableBaseModel):
     """
     Solace Channel Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
 
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
-
-class SolaceQueue(BaseModel):
+class SolaceQueue(NonExtendableBaseModel):
     """
     Solace Queue.
 
     Queue configuration for Solace destination.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str | None = Field(
         default=None,
@@ -137,21 +113,12 @@ class SolaceQueue(BaseModel):
     )
 
 
-class SolaceTopic(BaseModel):
+class SolaceTopic(NonExtendableBaseModel):
     """
     Solace Topic.
 
     Topic configuration for Solace destination.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     topic_subscriptions: list[str] | None = Field(
         default=None,
@@ -165,21 +132,12 @@ class SolaceTopic(BaseModel):
     )
 
 
-class SolaceDestination(BaseModel):
+class SolaceDestination(NonExtendableBaseModel):
     """
     Solace Destination.
 
     Destination Objects are described here.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     binding_version: str = Field(
         default="0.4.0",
@@ -233,21 +191,12 @@ class SolaceDestination(BaseModel):
         return self
 
 
-class SolaceOperationBindings(BaseModel):
+class SolaceOperationBindings(NonExtendableBaseModel):
     """
     Solace Operation Binding Object.
 
     We need the ability to support several bindings for each operation.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     binding_version: str = Field(
         default="0.4.0",
@@ -296,16 +245,9 @@ class SolaceOperationBindings(BaseModel):
         return priority
 
 
-class SolaceMessageBindings(BaseModel):
+class SolaceMessageBindings(NonExtendableBaseModel):
     """
     Solace Message Binding Object.
 
     This object MUST NOT contain any properties. Its name is reserved for future use.
     """
-
-    model_config = ConfigDict(
-        extra="forbid",
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
