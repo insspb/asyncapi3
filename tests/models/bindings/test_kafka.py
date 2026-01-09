@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import pytest
 import yaml
 
 from pytest_cases import parametrize_with_cases
@@ -14,6 +15,18 @@ from asyncapi3.models.bindings.kafka import (
     KafkaTopicConfiguration,
 )
 from asyncapi3.models.schema import Schema
+
+
+# Server Bindings Validator Test Cases
+def case_kafka_server_binding_validator_vendor_without_url() -> tuple[str, str]:
+    """schemaRegistryVendor without schemaRegistryUrl - should fail validation."""
+    yaml_data = """
+    kafka:
+      schemaRegistryVendor: 'confluent'
+      bindingVersion: '0.5.0'
+    """
+    expected_error = "schemaRegistryVendor requires schemaRegistryUrl"
+    return yaml_data, expected_error
 
 
 # Server Bindings Serialization Test Cases
@@ -36,6 +49,51 @@ def case_kafka_server_binding_serialization_full() -> tuple[KafkaServerBindings,
         "bindingVersion": "0.5.0",
     }
     return kafka_binding, expected
+
+
+# Channel Bindings Validator Test Cases
+def case_kafka_channel_binding_validator_partitions_zero() -> tuple[str, str]:
+    """Partitions with zero value - should fail validation."""
+    yaml_data = """
+    kafka:
+      partitions: 0
+      bindingVersion: '0.5.0'
+    """
+    expected_error = "partitions must be positive"
+    return yaml_data, expected_error
+
+
+def case_kafka_channel_binding_validator_partitions_negative() -> tuple[str, str]:
+    """Partitions with negative value - should fail validation."""
+    yaml_data = """
+    kafka:
+      partitions: -1
+      bindingVersion: '0.5.0'
+    """
+    expected_error = "partitions must be positive"
+    return yaml_data, expected_error
+
+
+def case_kafka_channel_binding_validator_replicas_zero() -> tuple[str, str]:
+    """Replicas with zero value - should fail validation."""
+    yaml_data = """
+    kafka:
+      replicas: 0
+      bindingVersion: '0.5.0'
+    """
+    expected_error = "replicas must be positive"
+    return yaml_data, expected_error
+
+
+def case_kafka_channel_binding_validator_replicas_negative() -> tuple[str, str]:
+    """Replicas with negative value - should fail validation."""
+    yaml_data = """
+    kafka:
+      replicas: -2
+      bindingVersion: '0.5.0'
+    """
+    expected_error = "replicas must be positive"
+    return yaml_data, expected_error
 
 
 # Channel Bindings Serialization Test Cases
@@ -217,6 +275,22 @@ def case_kafka_topic_configuration_serialization_full() -> tuple[
     return topic_config, expected
 
 
+class TestKafkaServerBindingsValidator:
+    """Tests for KafkaServerBindings model custom validators."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[case_kafka_server_binding_validator_vendor_without_url],
+    )
+    def test_kafka_server_bindings_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test KafkaServerBindings validator errors for invalid field combinations."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            KafkaServerBindings.model_validate(data["kafka"])
+
+
 class TestKafkaServerBindings:
     """Tests for KafkaServerBindings model."""
 
@@ -353,6 +427,27 @@ class TestKafkaChannelBindings:
         """Test KafkaChannelBindings serialization."""
         dumped = kafka_binding.model_dump()
         assert dumped == expected
+
+
+class TestKafkaChannelBindingsValidator:
+    """Tests for KafkaChannelBindings model custom validators."""
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_kafka_channel_binding_validator_partitions_zero,
+            case_kafka_channel_binding_validator_partitions_negative,
+            case_kafka_channel_binding_validator_replicas_zero,
+            case_kafka_channel_binding_validator_replicas_negative,
+        ],
+    )
+    def test_kafka_channel_bindings_validator_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test KafkaChannelBindings validator errors for invalid values."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            KafkaChannelBindings.model_validate(data["kafka"])
 
 
 class TestKafkaTopicConfiguration:

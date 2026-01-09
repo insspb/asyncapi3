@@ -10,7 +10,7 @@ __all__ = [
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from asyncapi3.models.base import Reference
 from asyncapi3.models.helpers import is_null
@@ -59,6 +59,13 @@ class KafkaServerBindings(BaseModel):
         alias="bindingVersion",
         description="The version of this binding.",
     )
+
+    @model_validator(mode="after")
+    def validate_schema_registry_vendor_dependency(self) -> "KafkaServerBindings":
+        """Validate schema_registry_vendor dependency on schema_registry_url."""
+        if self.schema_registry_url is None and self.schema_registry_vendor is not None:
+            raise ValueError("schemaRegistryVendor requires schemaRegistryUrl")
+        return self
 
 
 class KafkaTopicConfiguration(BaseModel):
@@ -203,6 +210,22 @@ class KafkaChannelBindings(BaseModel):
         description="The version of this binding. If omitted, 'latest' MUST be assumed",
     )
 
+    @field_validator("partitions")
+    @classmethod
+    def validate_partitions(cls, partitions: int | None) -> int | None:
+        """Validate that partitions is positive when specified."""
+        if partitions is not None and partitions <= 0:
+            raise ValueError("partitions must be positive")
+        return partitions
+
+    @field_validator("replicas")
+    @classmethod
+    def validate_replicas(cls, replicas: int | None) -> int | None:
+        """Validate that replicas is positive when specified."""
+        if replicas is not None and replicas <= 0:
+            raise ValueError("replicas must be positive")
+        return replicas
+
 
 class KafkaOperationBindings(BaseModel):
     """
@@ -268,6 +291,7 @@ class KafkaMessageBindings(BaseModel):
             "The message key. NOTE: You can also use the reference object way."
         ),
     )
+    # TODO: MUST NOT be specified if schemaRegistryUrl is not set at the Server level
     schema_id_location: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -278,6 +302,7 @@ class KafkaMessageBindings(BaseModel):
             "specified if schemaRegistryUrl is not specified at the Server level."
         ),
     )
+    # TODO: MUST NOT be specified if schemaRegistryUrl is not set at the Server level
     schema_id_payload_encoding: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -288,6 +313,7 @@ class KafkaMessageBindings(BaseModel):
             "specified if schemaRegistryUrl is not specified at the Server level."
         ),
     )
+    # TODO: MUST NOT be specified if schemaRegistryUrl is not set at the Server level
     schema_lookup_strategy: str | None = Field(
         default=None,
         exclude_if=is_null,
