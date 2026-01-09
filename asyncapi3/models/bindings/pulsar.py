@@ -23,7 +23,7 @@ class PulsarServerBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -50,7 +50,7 @@ class PulsarRetention(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -78,7 +78,7 @@ class PulsarChannelBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
