@@ -814,6 +814,27 @@ When creating Pydantic models based on the AsyncAPI 3 specification:
 - Use `alias` parameter when the JSON field name differs from Python variable name (
   e.g., `externalDocs` → `external_docs`)
 
+### Field Validators
+
+When implementing custom field validators using `@field_validator`:
+
+- **ALWAYS** use the field name as the parameter name instead of generic names like
+  `v` or `value`
+- Parameter name **MUST** match the field name being validated
+- This improves code readability and makes validation logic clearer
+
+**Example:**
+
+```python
+@field_validator("priority")
+@classmethod
+def validate_priority(cls, priority: Any) -> Any:
+    """Validate priority range when it's an integer."""
+    if isinstance(priority, int) and (priority < 0 or priority > 255):
+        raise ValueError("priority must be between 0 and 255")
+    return priority
+```
+
 ### Binding Version Fields
 
 **CRITICAL**: When working with binding models, the `binding_version` field **MUST**
