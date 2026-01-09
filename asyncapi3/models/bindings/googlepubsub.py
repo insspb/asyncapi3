@@ -26,6 +26,8 @@ class GooglePubSubServerBindings(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        revalidate_instances="always",
+        validate_assignment=True,
         serialize_by_alias=True,
         validate_by_name=True,
         validate_by_alias=True,
@@ -41,7 +43,7 @@ class GooglePubSubMessageStoragePolicy(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -68,7 +70,7 @@ class GooglePubSubSchemaSettings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -125,7 +127,7 @@ class GooglePubSubChannelBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -181,6 +183,8 @@ class GooglePubSubOperationBindings(BaseModel):
 
     model_config = ConfigDict(
         extra="forbid",
+        revalidate_instances="always",
+        validate_assignment=True,
         serialize_by_alias=True,
         validate_by_name=True,
         validate_by_alias=True,
@@ -195,7 +199,7 @@ class GooglePubSubSchemaDefinition(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
@@ -220,7 +224,7 @@ class GooglePubSubMessageBindings(BaseModel):
     """
 
     model_config = ConfigDict(
-        extra="allow",
+        extra="forbid",
         revalidate_instances="always",
         validate_assignment=True,
         serialize_by_alias=True,
