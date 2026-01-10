@@ -7,15 +7,20 @@ __all__ = [
     "Parameters",
 ]
 
-from pydantic import BaseModel, ConfigDict, Field
+import re
+
+from collections.abc import Iterator
+
+from pydantic import ConfigDict, Field, RootModel, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings import ChannelBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.message import Messages
 
 
-class Parameter(BaseModel):
+class Parameter(ExtendableBaseModel):
     """
     Parameter Object.
 
@@ -23,15 +28,6 @@ class Parameter(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     enum: list[str] | None = Field(
         default=None,
@@ -71,11 +67,53 @@ class Parameter(BaseModel):
     )
 
 
-# Parameters is a type alias for a dictionary of Parameter objects
-Parameters = dict[str, Parameter | Reference]
+class Parameters(RootModel[dict[str, Parameter | Reference]]):
+    r"""
+    Parameters Object.
+
+    This model validates that all keys match the pattern r"^[A-Za-z0-9_\-]+$",
+    values match Reference or Parameter objects.
+    """
+
+    model_config = ConfigDict(
+        revalidate_instances="always",
+        validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
+
+    def __iter__(self) -> Iterator[str]:  # type: ignore[override]
+        return iter(self.root)
+
+    def __getitem__(self, item: str) -> Parameter | Reference:
+        return self.root[item]
+
+    def __getattr__(self, item: str) -> Parameter | Reference:
+        return self.root[item]
+
+    @model_validator(mode="after")
+    def validate_parameter_keys(self) -> "Parameters":
+        r"""
+        Validate that all keys in the input data match the AsyncAPI patterned
+        object key pattern.
+
+        Keys must match the regex pattern ^[A-Za-z0-9_\-]+$
+        """
+        if not self.root:
+            return self
+
+        extension_pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
+        for field_name in self.root:
+            if not extension_pattern.match(field_name):
+                raise ValueError(
+                    f"Field '{field_name}' does not match patterned object key pattern."
+                    " Keys must contain letters, digits, hyphens, and underscores."
+                )
+        return self
 
 
-class Channel(BaseModel):
+class Channel(ExtendableBaseModel):
     """
     Channel Object.
 
@@ -83,15 +121,6 @@ class Channel(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     # TODO: What is 'unknown' mean?
     address: str | None = Field(
@@ -154,7 +183,6 @@ class Channel(BaseModel):
             "experience."
         ),
     )
-    # TODO: MUST be present only when the address contains Channel Address Expressions.
     parameters: Parameters | None = Field(
         default=None,
         exclude_if=is_null,
@@ -182,6 +210,33 @@ class Channel(BaseModel):
             "describe protocol-specific definitions for the channel."
         ),
     )
+
+    @model_validator(mode="after")
+    def validate_parameters(self) -> "Channel":
+        """
+        Validate that parameters are present only when address contains
+        Channel Address Expressions.
+
+        Channel Address Expressions are expressions enclosed in curly braces
+        like {userId}.
+        """
+        if self.parameters is None:
+            return self
+
+        if self.address is None:
+            raise ValueError(
+                "parameters must not be provided when address is null or absent"
+            )
+
+        # Check if address contains channel address expressions (curly braces)
+        expression_pattern = re.compile(r"\{[^}]+\}")
+        if not expression_pattern.search(self.address):
+            raise ValueError(
+                "parameters must not be provided when address does not contain "
+                "Channel Address Expressions"
+            )
+
+        return self
 
 
 # Channels is a type alias for a dictionary of Channel objects
