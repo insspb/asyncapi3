@@ -5,7 +5,11 @@ import yaml
 
 from pydantic import ValidationError
 
-from asyncapi3.models.base_models import ExtendableBaseModel, NonExtendableBaseModel
+from asyncapi3.models.base_models import (
+    ExtendableBaseModel,
+    NonExtendableBaseModel,
+    PatternedRootModel,
+)
 
 
 class TestExtendableBaseModel:
@@ -142,3 +146,105 @@ class TestNonExtendableBaseModel:
 
         with pytest.raises(ValidationError):
             TestModel(name="test", extra_field="value")
+
+
+class TestPatternedRootModel:
+    """Tests for PatternedRootModel."""
+
+    def test_patterned_object_valid_keys(self) -> None:
+        """Test PatternedRootModel accepts valid keys."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        # Valid keys
+        data = {
+            "user": "value1",
+            "user123": "value2",
+            "user-name": "value3",
+            "user_name": "value4",
+            "user.name": "value5",
+        }
+
+        obj = TestObject.model_validate(data)
+        assert obj.root == data
+        assert len(obj.root) == 5
+
+    def test_patterned_object_invalid_keys(self) -> None:
+        """Test PatternedRootModel rejects invalid keys."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        # Invalid keys
+        invalid_data = {
+            "user id": "value1",  # space
+            "user@id": "value2",  # special char @
+            "user(id)": "value3",  # parentheses
+        }
+
+        with pytest.raises(
+            ValueError, match="does not match patterned object key pattern"
+        ):
+            TestObject.model_validate(invalid_data)
+
+    def test_patterned_object_iteration(self) -> None:
+        """Test PatternedRootModel __iter__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        data = {"user1": "value1", "user2": "value2"}
+        obj = TestObject.model_validate(data)
+
+        keys = list(obj)
+        assert len(keys) == 2
+        assert "user1" in keys
+        assert "user2" in keys
+
+    def test_patterned_object_getitem(self) -> None:
+        """Test PatternedRootModel __getitem__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        data = {"user1": "value1", "user2": "value2"}
+        obj = TestObject.model_validate(data)
+
+        assert obj["user1"] == "value1"
+        assert obj["user2"] == "value2"
+
+    def test_patterned_object_getattr(self) -> None:
+        """Test PatternedRootModel __getattr__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        data = {"user1": "value1", "user2": "value2"}
+        obj = TestObject.model_validate(data)
+
+        assert obj.user1 == "value1"
+        assert obj.user2 == "value2"
+
+    def test_patterned_object_empty_dict(self) -> None:
+        """Test PatternedRootModel with empty dictionary."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        obj = TestObject.model_validate({})
+        assert obj.root == {}
+        assert len(obj.root) == 0
+
+    def test_patterned_object_single_valid_key(self) -> None:
+        """Test PatternedRootModel with single valid key."""
+
+        class TestObject(PatternedRootModel[int]):
+            pass
+
+        data = {"validKey123": 42}
+        obj = TestObject.model_validate(data)
+
+        assert obj.root == data
+        assert obj.validKey123 == 42
+        assert obj["validKey123"] == 42

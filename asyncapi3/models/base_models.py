@@ -1,10 +1,15 @@
 """Base model classes for AsyncAPI 3.0 specification."""
 
-__all__ = ["ExtendableBaseModel", "NonExtendableBaseModel"]
+__all__ = ["ExtendableBaseModel", "NonExtendableBaseModel", "PatternedRootModel"]
 
 import re
 
-from pydantic import BaseModel, ConfigDict, model_validator
+from collections.abc import Iterator
+from typing import Generic, TypeVar
+
+from pydantic import BaseModel, ConfigDict, RootModel, model_validator
+
+T = TypeVar("T")
 
 
 class ExtendableBaseModel(BaseModel):
@@ -62,3 +67,49 @@ class NonExtendableBaseModel(BaseModel):
         validate_by_name=True,
         validate_by_alias=True,
     )
+
+
+class PatternedRootModel(RootModel[dict[str, T]], Generic[T]):
+    """
+    Base class for AsyncAPI patterned objects that validate key patterns.
+
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$.
+    """
+
+    model_config = ConfigDict(
+        revalidate_instances="always",
+        validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
+
+    def __iter__(self) -> Iterator[str]:  # type: ignore[override]
+        return iter(self.root)
+
+    def __getitem__(self, item: str) -> T:
+        return self.root[item]
+
+    def __getattr__(self, item: str) -> T:
+        return self.root[item]
+
+    @model_validator(mode="after")
+    def validate_patterned_keys(self) -> "PatternedRootModel[T]":
+        """
+        Validate that all keys in the input data match the AsyncAPI patterned
+        object key pattern.
+
+        Keys must match the regex pattern ^[A-Za-z0-9\\.\\-_]+$
+        """
+        if not self.root:
+            return self
+
+        extension_pattern = re.compile(r"^[A-Za-z0-9\.\-_]+$")
+        for field_name in self.root:
+            if not extension_pattern.match(field_name):
+                raise ValueError(
+                    f"Field '{field_name}' does not match patterned object key pattern."
+                    " Keys must match [A-Za-z0-9\\.\\-_]+"
+                )
+        return self

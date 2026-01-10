@@ -26,6 +26,7 @@ __all__ = [
     "Operations",
     "Parameter",
     "Parameters",
+    "PatternedRootModel",
     "Reference",
     "Schema",
     "SecurityScheme",
@@ -39,6 +40,7 @@ __all__ = [
 
 from asyncapi3.models.asyncapi import AsyncAPI3
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tag, Tags
+from asyncapi3.models.base_models import PatternedRootModel
 from asyncapi3.models.bindings import (
     ChannelBindingsObject,
     MessageBindingsObject,
