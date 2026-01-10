@@ -6,17 +6,20 @@ __all__ = [
     "Servers",
 ]
 
-from typing import Any
+import re
 
-from pydantic import BaseModel, ConfigDict, Field
+from collections.abc import Iterator
+
+from pydantic import ConfigDict, Field, RootModel, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings import ServerBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
 
 
-class ServerVariable(BaseModel):
+class ServerVariable(ExtendableBaseModel):
     """
     Server Variable Object.
 
@@ -24,15 +27,6 @@ class ServerVariable(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     enum: list[str] | None = Field(
         default=None,
@@ -58,15 +52,14 @@ class ServerVariable(BaseModel):
             "be used for rich text representation."
         ),
     )
-    # TODO: Find a spec with examples
-    examples: list[Any] | None = Field(
+    examples: list[str] | None = Field(
         default=None,
         exclude_if=is_null,
         description="An array of examples of the server variable.",
     )
 
 
-class Server(BaseModel):
+class Server(ExtendableBaseModel):
     """
     Server Object.
 
@@ -77,16 +70,6 @@ class Server(BaseModel):
     injected by code generation tools.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
-    # TODO: Supports Server Variables?!
     host: str = Field(
         description=(
             "REQUIRED. The server host name. It MAY include the port. This field "
@@ -106,7 +89,6 @@ class Server(BaseModel):
             "AMQP 0.9.1, HTTP 2.0, Kafka 1.0.0, etc."
         ),
     )
-    # TODO: Supports Server Variables?!
     pathname: str | None = Field(
         default=None,
         exclude_if=is_null,
@@ -174,5 +156,47 @@ class Server(BaseModel):
     )
 
 
-# Servers is a type alias for a dictionary of Server objects
-Servers = dict[str, Server | Reference]
+class Servers(RootModel[dict[str, Server | Reference]]):
+    r"""
+    Servers Object.
+
+    This model validates that all keys match the pattern r"^[A-Za-z0-9_\-]+$",
+    values match Reference or Server objects.
+    """
+
+    model_config = ConfigDict(
+        revalidate_instances="always",
+        validate_assignment=True,
+        serialize_by_alias=True,
+        validate_by_name=True,
+        validate_by_alias=True,
+    )
+
+    def __iter__(self) -> Iterator[str]:  # type: ignore[override]
+        return iter(self.root)
+
+    def __getitem__(self, item: str) -> Server | Reference:
+        return self.root[item]
+
+    def __getattr__(self, item: str) -> Server | Reference:
+        return self.root[item]
+
+    @model_validator(mode="after")
+    def validate_extensions(self) -> "Servers":
+        r"""
+        Validate that all keys in the input data match the AsyncAPI patterned
+        object key pattern.
+
+        Keys must match the regex pattern ^[A-Za-z0-9_\-]+$
+        """
+        if not self.root:
+            return self
+
+        extension_pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
+        for field_name in self.root:
+            if not extension_pattern.match(field_name):
+                raise ValueError(
+                    f"Field '{field_name}' does not match patterned object key pattern."
+                    " Keys must contain letters, digits, hyphens, and underscores."
+                )
+        return self

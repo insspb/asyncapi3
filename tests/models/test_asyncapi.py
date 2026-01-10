@@ -381,9 +381,10 @@ class TestAsyncAPI3:
         asyncapi = AsyncAPI3.model_validate(data)
 
         assert asyncapi.servers is not None
-        assert "production" in asyncapi.servers
-        assert asyncapi.servers["production"].host == "kafka.in.mycompany.com:9092"
-        assert asyncapi.servers["production"].protocol == "kafka"
+        assert asyncapi.servers.production == Server(
+            host="kafka.in.mycompany.com:9092",
+            protocol="kafka",
+        )
 
     def test_asyncapi3_with_channels_validation(self) -> None:
         """Test AsyncAPI3 with channels validation."""
