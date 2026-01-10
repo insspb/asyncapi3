@@ -2,9 +2,11 @@
 
 __all__ = ["AsyncAPI3"]
 
+import re
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AnyUrl, Field, field_validator
 
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.channel import Channels
 from asyncapi3.models.components import Components
 from asyncapi3.models.helpers import is_null
@@ -13,7 +15,7 @@ from asyncapi3.models.operation import Operations
 from asyncapi3.models.server import Servers
 
 
-class AsyncAPI3(BaseModel):
+class AsyncAPI3(ExtendableBaseModel):
     """
     AsyncAPI Object.
 
@@ -22,15 +24,6 @@ class AsyncAPI3(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     asyncapi: str = Field(
         default="3.0.0",
@@ -45,7 +38,7 @@ class AsyncAPI3(BaseModel):
             "document."
         ),
     )
-    id: str | None = Field(
+    id: AnyUrl | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -99,3 +92,25 @@ class AsyncAPI3(BaseModel):
             "MAY NOT be used by the implemented Application."
         ),
     )
+
+    @field_validator("asyncapi")
+    @classmethod
+    def validate_asyncapi_version(cls, version: str) -> str:
+        """Validate AsyncAPI version format (semantic versioning) and compatibility."""
+        # Pattern for semantic versioning: major.minor.patch[-suffix]
+        pattern = r"^\d+\.\d+\.\d+(-[\w\.\-]+)?$"
+        if not re.match(pattern, version):
+            raise ValueError(
+                "asyncapi must be in semantic versioning format: "
+                "major.minor.patch[-suffix]"
+            )
+
+        # Check that major version is 3 (this application only supports AsyncAPI 3.x.x)
+        major_version = int(version.split(".")[0])
+        if major_version != 3:
+            raise ValueError(
+                f"asyncapi version {version} is not supported. "
+                "This application only supports AsyncAPI 3.x.x versions"
+            )
+
+        return version
