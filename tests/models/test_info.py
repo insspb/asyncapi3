@@ -221,7 +221,7 @@ def case_info_serialization_with_external_docs() -> tuple[Info, dict]:
         "title": "My App",
         "version": "1.0.0",
         "externalDocs": {
-            "url": "https://www.asyncapi.org",
+            "url": "https://www.asyncapi.org/",
             "description": "Find more info here",
         },
     }
@@ -451,7 +451,7 @@ class TestInfo:
 
         assert info.external_docs is not None
         assert isinstance(info.external_docs, ExternalDocumentation)
-        assert info.external_docs.url == "https://www.asyncapi.org"
+        assert str(info.external_docs.url) == "https://www.asyncapi.org/"
         assert info.external_docs.description == "Find more info here"
 
     def test_info_with_reference_external_docs_validation(self) -> None:

@@ -2,12 +2,13 @@
 
 __all__ = ["ExternalDocumentation", "Reference", "Tag", "Tags"]
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import AnyUrl, Field
 
+from asyncapi3.models.base_models import ExtendableBaseModel, NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
 
 
-class Reference(BaseModel):
+class Reference(NonExtendableBaseModel):
     """
     Reference Object.
 
@@ -25,38 +26,20 @@ class Reference(BaseModel):
     Reference specification and not by the JSON Schema specification.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
     ref: str = Field(
         alias="$ref",
         description="The reference string.",
     )
 
 
-class ExternalDocumentation(BaseModel):
+class ExternalDocumentation(ExtendableBaseModel):
     """
     External Documentation Object.
 
     Allows referencing an external resource for extended documentation.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
-    url: str = Field(
+    url: AnyUrl = Field(
         description=(
             "The URL for the target documentation. This MUST be in the form of an "
             "absolute URL."
@@ -72,21 +55,12 @@ class ExternalDocumentation(BaseModel):
     )
 
 
-class Tag(BaseModel):
+class Tag(ExtendableBaseModel):
     """
     Tag Object.
 
     Allows adding meta data to a single tag.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     name: str = Field(
         description="The name of the tag.",
