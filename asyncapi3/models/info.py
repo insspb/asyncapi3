@@ -2,34 +2,26 @@
 
 __all__ = ["Contact", "Info", "License"]
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field, HttpUrl
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
-from asyncapi3.models.helpers import is_null
+from asyncapi3.models.base_models import ExtendableBaseModel
+from asyncapi3.models.helpers import EmailStr, is_null
 
 
-class Contact(BaseModel):
+class Contact(ExtendableBaseModel):
     """
     Contact Object.
 
     Contact information for the exposed API.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
     name: str | None = Field(
         default=None,
         exclude_if=is_null,
         description="The identifying name of the contact person/organization.",
     )
-    url: str | None = Field(
+    url: HttpUrl | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -37,7 +29,7 @@ class Contact(BaseModel):
             "of an absolute URL."
         ),
     )
-    email: str | None = Field(
+    email: EmailStr | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -47,26 +39,17 @@ class Contact(BaseModel):
     )
 
 
-class License(BaseModel):
+class License(ExtendableBaseModel):
     """
     License Object.
 
     License information for the exposed API.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
     name: str = Field(
         description="The license name used for the API.",
     )
-    url: str | None = Field(
+    url: HttpUrl | None = Field(
         default=None,
         exclude_if=is_null,
         description=(
@@ -76,7 +59,7 @@ class License(BaseModel):
     )
 
 
-class Info(BaseModel):
+class Info(ExtendableBaseModel):
     """
     Info Object.
 
@@ -84,21 +67,10 @@ class Info(BaseModel):
     The metadata can be used by the clients if needed.
     """
 
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
     title: str = Field(
-        default="AsyncAPI Sample App",
         description="The title of the application.",
     )
     version: str = Field(
-        default="0.0.1",
         description=(
             "Provides the version of the application API (not to be confused with "
             "the specification version)."
@@ -112,7 +84,7 @@ class Info(BaseModel):
             "for rich text representation."
         ),
     )
-    terms_of_service: str | None = Field(
+    terms_of_service: HttpUrl | None = Field(
         default=None,
         exclude_if=is_null,
         alias="termsOfService",

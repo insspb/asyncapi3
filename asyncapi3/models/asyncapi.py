@@ -58,7 +58,6 @@ class AsyncAPI3(BaseModel):
         ),
     )
     info: Info = Field(
-        default_factory=Info,
         description=(
             "Provides metadata about the API. The metadata can be used by the clients "
             "if needed."
