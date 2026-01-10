@@ -1049,6 +1049,35 @@ Tags = list[Tag | Reference]
 Type aliases should be defined in the same module where the related model is defined,
 and exported via `__all__`.
 
+### Custom Types
+
+For fields that require special validation and JSON schema generation, create custom types
+in `asyncapi3/models/helpers.py` using Pydantic's `__get_pydantic_core_schema__` and
+`__get_pydantic_json_schema__` methods.
+
+#### EmailStr Type
+
+The `EmailStr` type provides email validation and proper JSON schema generation.
+
+**Usage:**
+
+```python
+from asyncapi3.models.helpers import EmailStr
+from pydantic import BaseModel
+
+class User(BaseModel):
+    email: EmailStr
+
+# Generates JSON schema: {"type": "string", "format": "email"}
+```
+
+**Benefits:**
+
+- Automatic email validation
+- Type safety (isinstance check works)
+- Proper JSON Schema generation with `"format": "email"`
+- Reusable across the entire project
+
 ### Model Exports
 
 **ALL** models and type aliases **MUST** be exported using `__all__` at the top
