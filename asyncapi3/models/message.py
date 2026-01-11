@@ -9,16 +9,17 @@ __all__ = [
 
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings import MessageBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import MultiFormatSchema, Schema
 from asyncapi3.models.security import CorrelationID
 
 
-class MessageExample(BaseModel):
+class MessageExample(ExtendableBaseModel):
     """
     Message Example Object.
 
@@ -27,15 +28,6 @@ class MessageExample(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     headers: dict[str, Any] | None = Field(
         default=None,
@@ -64,8 +56,23 @@ class MessageExample(BaseModel):
         description="A short summary of what the example is about.",
     )
 
+    @model_validator(mode="after")
+    def validate_headers_or_payload(self) -> "MessageExample":
+        """
+        Validate that MessageExample contains either headers and/or payload fields.
 
-class MessageTrait(BaseModel):
+        According to AsyncAPI specification: "Message Example Object represents an
+        example of a Message Object and MUST contain either headers and/or payload
+        fields."
+        """
+        if self.headers is None and self.payload is None:
+            raise ValueError(
+                "MessageExample MUST contain either headers and/or payload fields"
+            )
+        return self
+
+
+class MessageTrait(ExtendableBaseModel):
     """
     Message Trait Object.
 
@@ -76,15 +83,6 @@ class MessageTrait(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     headers: MultiFormatSchema | Schema | Reference | None = Field(
         default=None,
@@ -167,7 +165,7 @@ class MessageTrait(BaseModel):
     )
 
 
-class Message(BaseModel):
+class Message(ExtendableBaseModel):
     """
     Message Object.
 
@@ -175,15 +173,6 @@ class Message(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     headers: MultiFormatSchema | Schema | Reference | None = Field(
         default=None,
