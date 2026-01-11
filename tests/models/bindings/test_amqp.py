@@ -427,6 +427,19 @@ class TestAMQPOperationBindings:
         assert amqp_binding is not None
         assert amqp_binding.binding_version == "0.3.0"
 
+    def test_amqp_operation_binding_expiration_negative_validation_error(self) -> None:
+        """Test AMQPOperationBindings validation error for negative expiration."""
+        yaml_data = """
+        amqp:
+          expiration: -100
+          bindingVersion: 0.3.0
+        """
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(
+            ValidationError, match="expiration must be greater than or equal to zero"
+        ):
+            AMQPOperationBindings.model_validate(data["amqp"])
+
     @parametrize_with_cases(
         "amqp_binding,expected",
         cases=[

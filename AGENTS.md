@@ -141,6 +141,12 @@ The project uses [Ruff](https://github.com/astral-sh/ruff) for linting and forma
   - `__init__.py`: Allows unused imports (F401, F403)
   - `test_*.py`: Allows assert statements (S101) and long lines (E501)
 
+**File Structure Rules:**
+
+- All imports must be at the beginning of the file
+- In Pydantic models: first model configuration (if any), then all field declarations,
+  then validation functions
+
 ### Markdown Documentation Rules
 
 The project uses markdownlint as `pre-commit` hook (`.markdownlint.jsonc`):

@@ -12,7 +12,7 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from asyncapi3.models.base_models import NonExtendableBaseModel
 from asyncapi3.models.helpers import is_null
@@ -225,6 +225,14 @@ class AMQPOperationBindings(NonExtendableBaseModel):
         alias="bindingVersion",
         description="The version of this binding. If omitted, 'latest' MUST be assumed",
     )
+
+    @field_validator("expiration")
+    @classmethod
+    def validate_expiration(cls, expiration: int | None) -> int | None:
+        """Validate that expiration is greater than or equal to zero."""
+        if expiration is not None and expiration < 0:
+            raise ValueError("expiration must be greater than or equal to zero")
+        return expiration
 
 
 class AMQPMessageBindings(NonExtendableBaseModel):
