@@ -207,3 +207,52 @@ with open("/path/to/asyncapi3.json") as fileobj:
 ```
 
 [AsyncAPI 3 specification]: https://github.com/asyncapi/spec/blob/master/spec/asyncapi.md
+
+## CI/CD
+
+This project uses GitHub Actions for continuous integration and deployment.
+The CI/CD pipeline includes:
+
+### Testing Workflow (`test.yml`)
+
+- **Trigger**: Runs on all push and pull requests
+- **Python versions**: Tests across Python 3.10, 3.11, 3.12, 3.13, and 3.14
+- **Dependencies**: Uses `uv` package manager for fast dependency management
+- **Testing**: Runs pytest with coverage reporting
+- **Coverage**: Uploads coverage reports to Codecov for the  Python
+  version (3.10)
+
+### Linting Workflow (`lint.yml`)
+
+- **Trigger**: Runs on all push and pull requests
+- **Tools**: Uses pre-commit hooks to run:
+  - Ruff (linting and formatting)
+  - MyPy (type checking)
+  - Markdownlint (markdown formatting)
+  - Various code quality checks
+- **Environment**: Uses Python 3.10 for linting checks
+
+### Publishing Workflow (`publish.yml`)
+
+- **Trigger**: Runs only on tag creation (any tag without "v" prefix)
+- **Build**: Uses `uv build` to create distribution packages
+- **Publish**: Automatically publishes to PyPI using secure token
+- **Environment**: Uses `release` environment for secure deployment
+
+### Local Development
+
+To run the same checks locally:
+
+```bash
+# Install dependencies
+uv sync --dev
+
+# Run tests
+uv run pytest
+
+# Run pre-commit checks on all files
+uvx pre-commit run --all-files
+
+# Run pre-commit checks on staged files only
+uvx pre-commit run
+```
