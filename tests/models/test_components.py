@@ -92,7 +92,7 @@ def case_components_full() -> str:
     securitySchemes:
       apiKey:
         type: apiKey
-        in: header
+        in: user
         name: api_key
     parameters:
       userId:
@@ -273,7 +273,7 @@ def case_components_serialization_with_security_schemes() -> tuple[Components, d
         security_schemes={
             "apiKey": SecurityScheme(
                 type_="apiKey",
-                in_="header",
+                in_="user",
                 name="api_key",
             ),
         },
@@ -282,7 +282,7 @@ def case_components_serialization_with_security_schemes() -> tuple[Components, d
         "securitySchemes": {
             "apiKey": {
                 "type": "apiKey",
-                "in": "header",
+                "in": "user",
                 "name": "api_key",
             },
         },
@@ -1141,7 +1141,7 @@ def case_security_schemes_basic() -> str:
     securitySchemes:
       apiKey:
         type: apiKey
-        in: header
+        in: user
         name: api_key
       basicAuth:
         type: http
@@ -1167,7 +1167,7 @@ def case_security_schemes_invalid_key_spaces() -> tuple[str, str]:
     securitySchemes:
       api key:
         type: apiKey
-        in: header
+        in: user
         name: api_key
     """
     expected_error = "Field 'api key' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
@@ -1180,7 +1180,7 @@ def case_security_schemes_invalid_key_special_chars() -> tuple[str, str]:
     securitySchemes:
       api@key:
         type: apiKey
-        in: header
+        in: user
         name: api_key
     """
     expected_error = "Field 'api@key' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
@@ -1193,7 +1193,7 @@ def case_security_schemes_invalid_key_parentheses() -> tuple[str, str]:
     securitySchemes:
       api(key):
         type: apiKey
-        in: header
+        in: user
         name: api_key
     """
     expected_error = "Field 'api(key)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
@@ -1243,7 +1243,7 @@ class TestSecuritySchemes:
         """Test SecuritySchemes __iter__ method."""
         api_key_scheme = SecurityScheme(
             type_="apiKey",
-            in_="header",
+            in_="user",
             name="api_key",
         )
         basic_auth_scheme = SecurityScheme(
@@ -1266,7 +1266,7 @@ class TestSecuritySchemes:
         """Test SecuritySchemes __getitem__ method."""
         api_key_scheme = SecurityScheme(
             type_="apiKey",
-            in_="header",
+            in_="user",
             name="api_key",
         )
         basic_auth_scheme = SecurityScheme(
@@ -1287,7 +1287,7 @@ class TestSecuritySchemes:
         """Test SecuritySchemes __getattr__ method."""
         api_key_scheme = SecurityScheme(
             type_="apiKey",
-            in_="header",
+            in_="user",
             name="api_key",
         )
         basic_auth_scheme = SecurityScheme(
@@ -2737,7 +2737,7 @@ class TestComponents:
         securitySchemes:
           apiKey:
             type: apiKey
-            in: header
+            in: user
             name: api_key
         serverVariables:
           port:
