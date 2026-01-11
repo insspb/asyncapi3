@@ -15,9 +15,27 @@ authors = [
 maintainers = [
     { name = "Andrey Shpak" },
 ]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Framework :: Pydantic",
+    "Framework :: Pydantic :: 2",
+    "Typing :: Typed",
+]
 
 [project.urls]
-repository = "https://github.com/insspb/asyncapi3"
+Repository = "https://github.com/insspb/asyncapi3"
+Issues = "https://github.com/insspb/asyncapi3/issues"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
