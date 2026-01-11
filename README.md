@@ -232,6 +232,13 @@ The CI/CD pipeline includes:
   - Various code quality checks
 - **Environment**: Uses Python 3.10 for linting checks
 
+### Publishing Workflow (`publish.yml`)
+
+- **Trigger**: Runs only on tag creation (any tag without "v" prefix)
+- **Build**: Uses `uv build` to create distribution packages
+- **Publish**: Automatically publishes to PyPI using secure token
+- **Environment**: Uses `release` environment for secure deployment
+
 ### Local Development
 
 To run the same checks locally:
