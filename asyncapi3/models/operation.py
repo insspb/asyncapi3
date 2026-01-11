@@ -10,15 +10,16 @@ __all__ = [
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings import OperationBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
 
 
-class OperationReplyAddress(BaseModel):
+class OperationReplyAddress(ExtendableBaseModel):
     """
     Operation Reply Address Object.
 
@@ -29,15 +30,6 @@ class OperationReplyAddress(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     location: str = Field(
         description=(
@@ -55,7 +47,7 @@ class OperationReplyAddress(BaseModel):
     )
 
 
-class OperationReply(BaseModel):
+class OperationReply(ExtendableBaseModel):
     """
     Operation Reply Object.
 
@@ -65,15 +57,6 @@ class OperationReply(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     address: OperationReplyAddress | Reference | None = Field(
         default=None,
@@ -122,7 +105,7 @@ class OperationReply(BaseModel):
     )
 
 
-class OperationTrait(BaseModel):
+class OperationTrait(ExtendableBaseModel):
     """
     Operation Trait Object.
 
@@ -134,15 +117,6 @@ class OperationTrait(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     title: str | None = Field(
         default=None,
@@ -195,7 +169,7 @@ class OperationTrait(BaseModel):
     )
 
 
-class Operation(BaseModel):
+class Operation(ExtendableBaseModel):
     """
     Operation Object.
 
@@ -203,15 +177,6 @@ class Operation(BaseModel):
 
     This object MAY be extended with Specification Extensions.
     """
-
-    model_config = ConfigDict(
-        extra="allow",
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
 
     action: Literal["send", "receive"] = Field(
         description=(
