@@ -169,24 +169,24 @@ class TestPatternedRootModel:
         assert obj.root == data
         assert len(obj.root) == 4
 
-    def test_patterned_object_invalid_keys(self) -> None:
+    @pytest.mark.parametrize(
+        "key",
+        ["user id", "user@id", "user(id)", "user.id"],
+        ids=["space", "special_char", "parentheses", "dot"],
+    )
+    def test_patterned_object_invalid_keys(self, key: str) -> None:
         """Test PatternedRootModel rejects invalid keys."""
 
         class TestObject(PatternedRootModel[str]):
             pass
 
-        # Invalid keys
-        invalid_data = {
-            "user id": "value1",  # space
-            "user@id": "value2",  # special char @
-            "user(id)": "value3",  # parentheses
-            "user.id": "value4",  # dot
-        }
+        invalid_data = {key: "value1"}
 
-        with pytest.raises(
-            ValueError, match="does not match patterned object key pattern"
-        ):
+        with pytest.raises(ValidationError) as exc_info:
             TestObject.model_validate(invalid_data)
+
+        error_str = str(exc_info.value)
+        assert f"Field '{key}' does not match" in error_str
 
     def test_patterned_object_iteration(self) -> None:
         """Test PatternedRootModel __iter__ method."""

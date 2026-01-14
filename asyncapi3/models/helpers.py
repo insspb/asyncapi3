@@ -1,4 +1,4 @@
-__all__ = ["EmailStr", "is_null"]
+__all__ = ["EmailStr", "is_null", "validate_patterned_key"]
 
 import re
 
@@ -14,6 +14,26 @@ def is_null(value: Any) -> bool:
     and False otherwise.
     """
     return value is None
+
+
+def validate_patterned_key(key: str, object_name: str = "object") -> None:
+    """
+    Validate that a key matches the AsyncAPI patterned key pattern.
+
+    Args:
+        key: The key to validate.
+        object_name: Name of the object type for error message (e.g., "server",
+            "channel").
+
+    Raises:
+        ValueError: If the key does not match the required pattern.
+    """
+    pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
+    if not pattern.match(key):
+        raise ValueError(
+            f"Field '{key}' does not match patterned object key pattern. "
+            "Keys must contain letters, digits, hyphens, and underscores."
+        )
 
 
 class EmailStr(str):

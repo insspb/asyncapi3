@@ -126,3 +126,74 @@ class TestEmailStr:
         assert string_schema is not None
         assert string_schema["type"] == "string"
         assert string_schema["format"] == "email"
+
+
+class TestValidatePatternedKey:
+    """Tests for validate_patterned_key function."""
+
+    @pytest.mark.parametrize(
+        "key",
+        [
+            "valid_key",
+            "valid-key",
+            "valid123",
+            "valid_key_123",
+            "a",
+            "A",
+            "Test123",
+            "test_123-456",
+        ],
+    )
+    def test_validate_patterned_key_accepts_valid_keys(self, key: str) -> None:
+        """Test validate_patterned_key accepts valid patterned keys."""
+        from asyncapi3.models.helpers import validate_patterned_key
+
+        # Should not raise any exception
+        validate_patterned_key(key, "test")
+
+    @pytest.mark.parametrize(
+        ("key", "expected_error"),
+        [
+            (
+                "invalid@key",
+                "Field 'invalid@key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid key",
+                "Field 'invalid key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid.key",
+                "Field 'invalid.key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid/key",
+                "Field 'invalid/key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid#key",
+                "Field 'invalid#key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid?key",
+                "Field 'invalid?key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "invalid:key",
+                "Field 'invalid:key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+            (
+                "",
+                "Field '' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores.",
+            ),
+        ],
+    )
+    def test_validate_patterned_key_rejects_invalid_keys(
+        self, key: str, expected_error: str
+    ) -> None:
+        """Test validate_patterned_key rejects invalid patterned keys."""
+        from asyncapi3.models.helpers import validate_patterned_key
+
+        with pytest.raises(ValueError) as exc_info:  # noqa: PT011
+            validate_patterned_key(key, "test")
+        assert str(exc_info.value) == expected_error
