@@ -635,7 +635,7 @@ class TestOperations:
         assert operations["receiveUserSignup"] == receive_operation
 
     def test_operations_getattr(self) -> None:
-        """Test Operations __getattr__ method."""
+        """Test Operations __getitem__ method."""
         send_operation = Operation(
             action="send", channel=Reference(ref="#/channels/userChannel")
         )
@@ -649,5 +649,5 @@ class TestOperations:
         }
         operations = Operations(root=data)
 
-        assert operations.sendUserSignup == send_operation
-        assert operations.receiveUserSignup == receive_operation
+        assert operations["sendUserSignup"] == send_operation
+        assert operations["receiveUserSignup"] == receive_operation

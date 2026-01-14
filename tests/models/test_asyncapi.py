@@ -381,7 +381,7 @@ class TestAsyncAPI3:
         asyncapi = AsyncAPI3.model_validate(data)
 
         assert asyncapi.servers is not None
-        assert asyncapi.servers.production == Server(
+        assert asyncapi.servers["production"] == Server(
             host="kafka.in.mycompany.com:9092",
             protocol="kafka",
         )

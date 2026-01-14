@@ -661,7 +661,7 @@ class TestMessages:
         assert messages["UserLoggedOut"] == user_logged_out
 
     def test_messages_getattr(self) -> None:
-        """Test Messages __getattr__ method."""
+        """Test Messages __getitem__ method."""
         user_signed_up = Message(
             payload=Schema(
                 type="object",
@@ -684,5 +684,5 @@ class TestMessages:
         }
         messages = Messages(root=data)
 
-        assert messages.UserSignedUp == user_signed_up
-        assert messages.UserLoggedOut == user_logged_out
+        assert messages["UserSignedUp"] == user_signed_up
+        assert messages["UserLoggedOut"] == user_logged_out

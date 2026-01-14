@@ -572,7 +572,7 @@ class TestServers:
         assert servers_with_ref["dev"] == ref
 
     def test_servers_getattr(self) -> None:
-        """Test Servers __getattr__ method."""
+        """Test Servers __getitem__ method."""
         production_server = Server(host="kafka.in.mycompany.com:9092", protocol="kafka")
         staging_server = Server(
             host="kafka-staging.in.mycompany.com:9092", protocol="kafka"
@@ -584,11 +584,11 @@ class TestServers:
         }
         servers = Servers(root=data)
 
-        assert servers.production == production_server
-        assert servers.staging == staging_server
+        assert servers["production"] == production_server
+        assert servers["staging"] == staging_server
 
         # Test with Reference
         ref = Reference(ref="#/components/servers/dev")
         data_with_ref: dict[str, Server | Reference] = {"dev": ref}
         servers_with_ref = Servers(root=data_with_ref)
-        assert servers_with_ref.dev == ref
+        assert servers_with_ref["dev"] == ref
