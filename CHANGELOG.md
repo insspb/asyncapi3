@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.0.2] - 2026-01-14
+
+### CHANGED
+
+- Strict patterned object key validation - dots no longer allowed in keys for:
+  - `AsyncAPI3.servers`;
+  - `AsyncAPI3.channels`;
+  - `AsyncAPI3.channels.messages`;
+  - `AsyncAPI3.channels.parameters`;
+  - `AsyncAPI3.operations`;
+  - `AsyncAPI3.components.servers`;
+  - `AsyncAPI3.components.channels`;
+  - `AsyncAPI3.components.operations`;
+  - `AsyncAPI3.components.messages`;
+  - `AsyncAPI3.components.securitySchemes`;
+  - `AsyncAPI3.components.serverVariables`;
+  - `AsyncAPI3.components.parameters`;
+  - `AsyncAPI3.components.correlationIds`;
+  - `AsyncAPI3.components.replies`;
+  - `AsyncAPI3.components.replyAddresses`;
+  - `AsyncAPI3.components.externalDocs`;
+  - `AsyncAPI3.components.tags`;
+  - `AsyncAPI3.components.operationTraits`;
+  - `AsyncAPI3.components.messageTraits`;
+  - `AsyncAPI3.components.serverBindings`;
+  - `AsyncAPI3.components.channelBindings`;
+  - `AsyncAPI3.components.operationBindings`;
+  - `AsyncAPI3.components.messageBindings`;
+
 ## [0.0.1] - 2026-01-11
 
 ### ADDED
