@@ -9,9 +9,7 @@ __all__ = [
 
 import re
 
-from collections.abc import Iterator
-
-from pydantic import ConfigDict, Field, RootModel, model_validator
+from pydantic import Field, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.base_models import ExtendableBaseModel, PatternedRootModel
@@ -67,50 +65,13 @@ class Parameter(ExtendableBaseModel):
     )
 
 
-class Parameters(RootModel[dict[str, Parameter | Reference]]):
-    r"""
+class Parameters(PatternedRootModel[Parameter | Reference]):
+    """
     Parameters Object.
 
-    This model validates that all keys match the pattern r"^[A-Za-z0-9_\-]+$",
-    values match Reference or Parameter objects.
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Parameter objects.
     """
-
-    model_config = ConfigDict(
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
-    def __iter__(self) -> Iterator[str]:  # type: ignore[override]
-        return iter(self.root)
-
-    def __getitem__(self, item: str) -> Parameter | Reference:
-        return self.root[item]
-
-    def __getattr__(self, item: str) -> Parameter | Reference:
-        return self.root[item]
-
-    @model_validator(mode="after")
-    def validate_parameter_keys(self) -> "Parameters":
-        r"""
-        Validate that all keys in the input data match the AsyncAPI patterned
-        object key pattern.
-
-        Keys must match the regex pattern ^[A-Za-z0-9_\-]+$
-        """
-        if not self.root:
-            return self
-
-        extension_pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
-        for field_name in self.root:
-            if not extension_pattern.match(field_name):
-                raise ValueError(
-                    f"Field '{field_name}' does not match patterned object key pattern."
-                    " Keys must contain letters, digits, hyphens, and underscores."
-                )
-        return self
 
 
 class Channel(ExtendableBaseModel):
