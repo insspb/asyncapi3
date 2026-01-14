@@ -187,6 +187,9 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"asyncapi3/builder.py" = [
+    "PLR0913", # too-many-arguments
+]
 "asyncapi3/models/bindings/__init__.py" = ["RUF022"]
 "__init__.py" = [
     "F401",     # unused import
