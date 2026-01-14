@@ -2,9 +2,14 @@
 
 ## [0.0.2] - 2026-01-14
 
+### ADDED
+
+- #5: Added: `__setitem__`, `__delitem__`, `__contains__`, `__len__` methods to
+  PatternedRootModel and child models.
+
 ### CHANGED
 
-- Strict patterned object key validation - dots no longer allowed in keys for:
+- #4: Strict patterned object key validation - dots no longer allowed in keys for:
   - `AsyncAPI3.servers`;
   - `AsyncAPI3.channels`;
   - `AsyncAPI3.channels.messages`;
@@ -28,6 +33,12 @@
   - `AsyncAPI3.components.channelBindings`;
   - `AsyncAPI3.components.operationBindings`;
   - `AsyncAPI3.components.messageBindings`;
+
+### FIXED
+
+- #5: Remove `__getattr__` access type from PatternedRootModel and child models.
+  Unified dict-like API for patterned objects - replaced `__getattr__` with proper dict
+  methods to support keys starting with digits;
 
 ## [0.0.1] - 2026-01-11
 
