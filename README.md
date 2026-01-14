@@ -160,6 +160,25 @@ This ensures that binding version information is always present in serialized ou
 making it clear which version of the binding specification is being used, even when
 the version was not explicitly provided in the input.
 
+### Implementation Specific Behavior
+
+#### Patterned Object Key Validation
+
+All patterned objects (`Servers`, `Channels`, `Operations`, `Messages`, `Parameters`,
+and all objects in `components`) use strict validation with the pattern
+`^[A-Za-z0-9_\-]+$` for keys, allowing only letters, digits, hyphens, and underscores.
+
+This strict validation ensures:
+
+- **Full compliance** with AsyncAPI 3.0 specification requirements
+- **Consistency** across all patterned objects in specific location(`components`) and
+  other root objects.
+
+The implementation is intentionally stricter than some interpretations of the
+specification to provide robust and predictable behavior.
+
+List of changed objects available at [CHANGELOG v0.0.2](CHANGELOG.md#002---2026-01-14)
+
 ## ⚠️ Known Issues
 
 ### Invalid Example Specification

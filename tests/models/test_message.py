@@ -8,7 +8,7 @@ import yaml
 from pytest_cases import parametrize_with_cases
 
 from asyncapi3.models.base import Reference
-from asyncapi3.models.message import Message, MessageExample, MessageTrait
+from asyncapi3.models.message import Message, MessageExample, Messages, MessageTrait
 from asyncapi3.models.schema import Schema
 
 
@@ -313,6 +313,77 @@ def case_message_serialization_with_traits() -> tuple[Message, dict]:
     return message, expected
 
 
+# Messages Validation Test Cases
+def case_messages_basic() -> str:
+    """Messages with basic message objects."""
+    return """
+    messages:
+      UserSignedUp:
+        payload:
+          type: object
+          properties:
+            displayName:
+              type: string
+            email:
+              type: string
+              format: email
+      UserLoggedOut:
+        payload:
+          type: object
+          properties:
+            userId:
+              type: string
+    """
+
+
+def case_messages_with_references() -> str:
+    """Messages with references."""
+    return """
+    messages:
+      UserSignedUp:
+        $ref: '#/components/messages/UserSignedUp'
+      UserLoggedOut:
+        $ref: '#/components/messages/UserLoggedOut'
+    """
+
+
+# Messages Validation Error Test Cases
+def case_messages_invalid_key_spaces() -> tuple[str, str]:
+    """Messages with key containing spaces - should fail validation."""
+    yaml_data = """
+    messages:
+      user signed up:
+        payload:
+          type: object
+    """
+    expected_error = "Field 'user signed up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
+def case_messages_invalid_key_special_chars() -> tuple[str, str]:
+    """Messages with key containing special characters - should fail validation."""
+    yaml_data = """
+    messages:
+      user@signed@up:
+        payload:
+          type: object
+    """
+    expected_error = "Field 'user@signed@up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
+def case_messages_invalid_key_parentheses() -> tuple[str, str]:
+    """Messages with key containing parentheses - should fail validation."""
+    yaml_data = """
+    messages:
+      user(signed)up:
+        payload:
+          type: object
+    """
+    expected_error = "Field 'user\\(signed\\)up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
 class TestMessageExample:
     """Tests for MessageExample model."""
 
@@ -493,3 +564,125 @@ class TestMessage:
         assert message.payload is not None
         assert isinstance(message.payload, Reference)
         assert message.payload.ref == "#/components/schemas/userCreate"
+
+
+class TestMessages:
+    """Tests for Messages model."""
+
+    @parametrize_with_cases(
+        "yaml_data",
+        cases=[case_messages_basic, case_messages_with_references],
+    )
+    def test_messages_validation(self, yaml_data: str) -> None:
+        """Test Messages model validation."""
+        data = yaml.safe_load(yaml_data)
+        messages = Messages.model_validate(data["messages"])
+        assert messages is not None
+        assert isinstance(messages.root, dict)
+        assert len(messages.root) > 0
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_messages_invalid_key_spaces,
+            case_messages_invalid_key_special_chars,
+            case_messages_invalid_key_parentheses,
+        ],
+    )
+    def test_messages_validation_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test Messages validation errors for invalid field names."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            Messages.model_validate(data["messages"])
+
+    def test_messages_empty_dict_validation(self) -> None:
+        """Test Messages with empty dict validation."""
+        messages = Messages.model_validate({})
+        assert messages is not None
+        assert messages.root == {}
+        assert len(messages.root) == 0
+
+    def test_messages_iteration(self) -> None:
+        """Test Messages __iter__ method."""
+        user_signed_up = Message(
+            payload=Schema(
+                type="object",
+                properties={
+                    "displayName": Schema(type="string"),
+                    "email": Schema(type="string", format="email"),
+                },
+            ),
+        )
+        user_logged_out = Message(
+            payload=Schema(
+                type="object",
+                properties={"userId": Schema(type="string")},
+            ),
+        )
+
+        data: dict[str, Message | Reference] = {
+            "UserSignedUp": user_signed_up,
+            "UserLoggedOut": user_logged_out,
+        }
+        messages = Messages(root=data)
+
+        keys = list(messages)
+        assert len(keys) == 2
+        assert "UserSignedUp" in keys
+        assert "UserLoggedOut" in keys
+
+    def test_messages_getitem(self) -> None:
+        """Test Messages __getitem__ method."""
+        user_signed_up = Message(
+            payload=Schema(
+                type="object",
+                properties={
+                    "displayName": Schema(type="string"),
+                    "email": Schema(type="string", format="email"),
+                },
+            ),
+        )
+        user_logged_out = Message(
+            payload=Schema(
+                type="object",
+                properties={"userId": Schema(type="string")},
+            ),
+        )
+
+        data: dict[str, Message | Reference] = {
+            "UserSignedUp": user_signed_up,
+            "UserLoggedOut": user_logged_out,
+        }
+        messages = Messages(root=data)
+
+        assert messages["UserSignedUp"] == user_signed_up
+        assert messages["UserLoggedOut"] == user_logged_out
+
+    def test_messages_getattr(self) -> None:
+        """Test Messages __getattr__ method."""
+        user_signed_up = Message(
+            payload=Schema(
+                type="object",
+                properties={
+                    "displayName": Schema(type="string"),
+                    "email": Schema(type="string", format="email"),
+                },
+            ),
+        )
+        user_logged_out = Message(
+            payload=Schema(
+                type="object",
+                properties={"userId": Schema(type="string")},
+            ),
+        )
+
+        data: dict[str, Message | Reference] = {
+            "UserSignedUp": user_signed_up,
+            "UserLoggedOut": user_logged_out,
+        }
+        messages = Messages(root=data)
+
+        assert messages.UserSignedUp == user_signed_up
+        assert messages.UserLoggedOut == user_logged_out

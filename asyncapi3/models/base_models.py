@@ -74,7 +74,7 @@ class PatternedRootModel(RootModel[dict[str, T]], Generic[T]):
     Base class for AsyncAPI patterned objects that validate key patterns.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$.
+    ^[A-Za-z0-9_\\-]+$.
     """
 
     model_config = ConfigDict(
@@ -100,16 +100,16 @@ class PatternedRootModel(RootModel[dict[str, T]], Generic[T]):
         Validate that all keys in the input data match the AsyncAPI patterned
         object key pattern.
 
-        Keys must match the regex pattern ^[A-Za-z0-9\\.\\-_]+$
+        Keys must match the regex pattern ^[A-Za-z0-9_\\-]+$
         """
         if not self.root:
             return self
 
-        extension_pattern = re.compile(r"^[A-Za-z0-9\.\-_]+$")
+        extension_pattern = re.compile(r"^[A-Za-z0-9_\\-]+$")
         for field_name in self.root:
             if not extension_pattern.match(field_name):
                 raise ValueError(
                     f"Field '{field_name}' does not match patterned object key pattern."
-                    " Keys must match [A-Za-z0-9\\.\\-_]+"
+                    " Keys must contain letters, digits, hyphens, and underscores."
                 )
         return self

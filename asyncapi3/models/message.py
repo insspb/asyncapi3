@@ -12,7 +12,7 @@ from typing import Any
 from pydantic import Field, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
-from asyncapi3.models.base_models import ExtendableBaseModel
+from asyncapi3.models.base_models import ExtendableBaseModel, PatternedRootModel
 from asyncapi3.models.bindings import MessageBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.schema import MultiFormatSchema, Schema
@@ -275,5 +275,10 @@ class Message(ExtendableBaseModel):
     )
 
 
-# Messages is a type alias for a dictionary of Message objects
-Messages = dict[str, Message | Reference]
+class Messages(PatternedRootModel[Message | Reference]):
+    """
+    Messages Object.
+
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Message objects.
+    """

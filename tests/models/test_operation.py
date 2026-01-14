@@ -2,6 +2,7 @@
 
 from typing import Any
 
+import pytest
 import yaml
 
 from pytest_cases import parametrize_with_cases
@@ -11,6 +12,7 @@ from asyncapi3.models.operation import (
     Operation,
     OperationReply,
     OperationReplyAddress,
+    Operations,
     OperationTrait,
 )
 
@@ -296,6 +298,73 @@ def case_operation_serialization_with_traits() -> tuple[Operation, dict]:
     return operation, expected
 
 
+# Operations Validation Test Cases
+def case_operations_basic() -> str:
+    """Operations with basic operation objects."""
+    return """
+    operations:
+      sendUserSignup:
+        action: send
+        channel:
+          $ref: '#/channels/userChannel'
+      receiveUserSignup:
+        action: receive
+        channel:
+          $ref: '#/channels/userChannel'
+    """
+
+
+def case_operations_with_references() -> str:
+    """Operations with references."""
+    return """
+    operations:
+      sendUserSignup:
+        $ref: '#/components/operations/sendUserSignup'
+      receiveUserSignup:
+        $ref: '#/components/operations/receiveUserSignup'
+    """
+
+
+# Operations Validation Error Test Cases
+def case_operations_invalid_key_spaces() -> tuple[str, str]:
+    """Operations with key containing spaces - should fail validation."""
+    yaml_data = """
+    operations:
+      send user signup:
+        action: send
+        channel:
+          $ref: '#/channels/userChannel'
+    """
+    expected_error = "Field 'send user signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
+def case_operations_invalid_key_special_chars() -> tuple[str, str]:
+    """Operations with key containing special characters - should fail validation."""
+    yaml_data = """
+    operations:
+      send@user@signup:
+        action: send
+        channel:
+          $ref: '#/channels/userChannel'
+    """
+    expected_error = "Field 'send@user@signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
+def case_operations_invalid_key_parentheses() -> tuple[str, str]:
+    """Operations with key containing parentheses - should fail validation."""
+    yaml_data = """
+    operations:
+      send(user)signup:
+        action: send
+        channel:
+          $ref: '#/channels/userChannel'
+    """
+    expected_error = "Field 'send\\(user\\)signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
+    return yaml_data, expected_error
+
+
 class TestOperationReplyAddress:
     """Tests for OperationReplyAddress model."""
 
@@ -487,3 +556,98 @@ class TestOperation:
         assert len(operation.traits) == 1
         assert isinstance(operation.traits[0], Reference)
         assert operation.traits[0].ref == "#/components/operationTraits/kafka"
+
+
+class TestOperations:
+    """Tests for Operations model."""
+
+    @parametrize_with_cases(
+        "yaml_data",
+        cases=[case_operations_basic, case_operations_with_references],
+    )
+    def test_operations_validation(self, yaml_data: str) -> None:
+        """Test Operations model validation."""
+        data = yaml.safe_load(yaml_data)
+        operations = Operations.model_validate(data["operations"])
+        assert operations is not None
+        assert isinstance(operations.root, dict)
+        assert len(operations.root) > 0
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_operations_invalid_key_spaces,
+            case_operations_invalid_key_special_chars,
+            case_operations_invalid_key_parentheses,
+        ],
+    )
+    def test_operations_validation_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test Operations validation errors for invalid field names."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            Operations.model_validate(data["operations"])
+
+    def test_operations_empty_dict_validation(self) -> None:
+        """Test Operations with empty dict validation."""
+        operations = Operations.model_validate({})
+        assert operations is not None
+        assert operations.root == {}
+        assert len(operations.root) == 0
+
+    def test_operations_iteration(self) -> None:
+        """Test Operations __iter__ method."""
+        send_operation = Operation(
+            action="send", channel=Reference(ref="#/channels/userChannel")
+        )
+        receive_operation = Operation(
+            action="receive", channel=Reference(ref="#/channels/userChannel")
+        )
+
+        data: dict[str, Operation | Reference] = {
+            "sendUserSignup": send_operation,
+            "receiveUserSignup": receive_operation,
+        }
+        operations = Operations(root=data)
+
+        keys = list(operations)
+        assert len(keys) == 2
+        assert "sendUserSignup" in keys
+        assert "receiveUserSignup" in keys
+
+    def test_operations_getitem(self) -> None:
+        """Test Operations __getitem__ method."""
+        send_operation = Operation(
+            action="send", channel=Reference(ref="#/channels/userChannel")
+        )
+        receive_operation = Operation(
+            action="receive", channel=Reference(ref="#/channels/userChannel")
+        )
+
+        data: dict[str, Operation | Reference] = {
+            "sendUserSignup": send_operation,
+            "receiveUserSignup": receive_operation,
+        }
+        operations = Operations(root=data)
+
+        assert operations["sendUserSignup"] == send_operation
+        assert operations["receiveUserSignup"] == receive_operation
+
+    def test_operations_getattr(self) -> None:
+        """Test Operations __getattr__ method."""
+        send_operation = Operation(
+            action="send", channel=Reference(ref="#/channels/userChannel")
+        )
+        receive_operation = Operation(
+            action="receive", channel=Reference(ref="#/channels/userChannel")
+        )
+
+        data: dict[str, Operation | Reference] = {
+            "sendUserSignup": send_operation,
+            "receiveUserSignup": receive_operation,
+        }
+        operations = Operations(root=data)
+
+        assert operations.sendUserSignup == send_operation
+        assert operations.receiveUserSignup == receive_operation

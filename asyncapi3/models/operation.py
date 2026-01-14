@@ -13,7 +13,7 @@ from typing import Literal
 from pydantic import Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
-from asyncapi3.models.base_models import ExtendableBaseModel
+from asyncapi3.models.base_models import ExtendableBaseModel, PatternedRootModel
 from asyncapi3.models.bindings import OperationBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
@@ -286,5 +286,10 @@ class Operation(ExtendableBaseModel):
     )
 
 
-# Operations is a type alias for a dictionary of Operation objects
-Operations = dict[str, Operation | Reference]
+class Operations(PatternedRootModel[Operation | Reference]):
+    """
+    Operations Object.
+
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Operation objects.
+    """

@@ -163,12 +163,11 @@ class TestPatternedRootModel:
             "user123": "value2",
             "user-name": "value3",
             "user_name": "value4",
-            "user.name": "value5",
         }
 
         obj = TestObject.model_validate(data)
         assert obj.root == data
-        assert len(obj.root) == 5
+        assert len(obj.root) == 4
 
     def test_patterned_object_invalid_keys(self) -> None:
         """Test PatternedRootModel rejects invalid keys."""
@@ -181,6 +180,7 @@ class TestPatternedRootModel:
             "user id": "value1",  # space
             "user@id": "value2",  # special char @
             "user(id)": "value3",  # parentheses
+            "user.id": "value4",  # dot
         }
 
         with pytest.raises(
