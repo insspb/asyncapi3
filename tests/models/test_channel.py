@@ -9,7 +9,64 @@ from pydantic import ValidationError
 from pytest_cases import parametrize_with_cases
 
 from asyncapi3.models.base import Reference
-from asyncapi3.models.channel import Channel, Parameter, Parameters
+from asyncapi3.models.channel import Channel, Channels, Parameter, Parameters
+
+
+# Channels Validation Test Cases
+def case_channels_basic() -> str:
+    """Channels with basic channel objects."""
+    return """
+    channels:
+      userChannel:
+        address: user/signedup
+      adminChannel:
+        address: admin/events
+    """
+
+
+def case_channels_with_references() -> str:
+    """Channels with references."""
+    return """
+    channels:
+      userChannel:
+        $ref: '#/components/channels/userChannel'
+      adminChannel:
+        $ref: '#/components/channels/adminChannel'
+    """
+
+
+# Channels Validation Error Test Cases
+def case_channels_invalid_key_spaces() -> tuple[str, str]:
+    """Channels with key containing spaces - should fail validation."""
+    yaml_data = """
+    channels:
+      user channel:
+        address: user/signedup
+    """
+    expected_error = "Field 'user channel' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    return yaml_data, expected_error
+
+
+def case_channels_invalid_key_special_chars() -> tuple[str, str]:
+    """Channels with key containing special characters - should fail validation."""
+    yaml_data = """
+    channels:
+      user@channel:
+        address: user/signedup
+    """
+    expected_error = "Field 'user@channel' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    return yaml_data, expected_error
+
+
+def case_channels_invalid_key_parentheses() -> tuple[str, str]:
+    """Channels with key containing parentheses - should fail validation."""
+    yaml_data = """
+    channels:
+      user(channel):
+        address: user/signedup
+    """
+    expected_error = "Field 'user\\(channel\\)' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    return yaml_data, expected_error
 
 
 # Parameter Validation Test Cases
@@ -572,3 +629,86 @@ class TestChannel:
         assert "parameters must not be provided when address is null or absent" in str(
             exc_info.value
         )
+
+
+class TestChannels:
+    """Tests for Channels model."""
+
+    @parametrize_with_cases(
+        "yaml_data",
+        cases=[case_channels_basic, case_channels_with_references],
+    )
+    def test_channels_validation(self, yaml_data: str) -> None:
+        """Test Channels model validation."""
+        data = yaml.safe_load(yaml_data)
+        channels = Channels.model_validate(data["channels"])
+        assert channels is not None
+        assert isinstance(channels.root, dict)
+        assert len(channels.root) > 0
+
+    @parametrize_with_cases(
+        "yaml_data,expected_error",
+        cases=[
+            case_channels_invalid_key_spaces,
+            case_channels_invalid_key_special_chars,
+            case_channels_invalid_key_parentheses,
+        ],
+    )
+    def test_channels_validation_errors(
+        self, yaml_data: str, expected_error: str
+    ) -> None:
+        """Test Channels validation errors for invalid field names."""
+        data = yaml.safe_load(yaml_data)
+        with pytest.raises(ValueError, match=expected_error):
+            Channels.model_validate(data["channels"])
+
+    def test_channels_empty_dict_validation(self) -> None:
+        """Test Channels with empty dict validation."""
+        channels = Channels.model_validate({})
+        assert channels is not None
+        assert channels.root == {}
+        assert len(channels.root) == 0
+
+    def test_channels_iteration(self) -> None:
+        """Test Channels __iter__ method."""
+        user_channel = Channel(address="user/signedup")
+        admin_channel = Channel(address="admin/events")
+
+        data: dict[str, Channel | Reference] = {
+            "userChannel": user_channel,
+            "adminChannel": admin_channel,
+        }
+        channels = Channels(root=data)
+
+        keys = list(channels)
+        assert len(keys) == 2
+        assert "userChannel" in keys
+        assert "adminChannel" in keys
+
+    def test_channels_getitem(self) -> None:
+        """Test Channels __getitem__ method."""
+        user_channel = Channel(address="user/signedup")
+        admin_channel = Channel(address="admin/events")
+
+        data: dict[str, Channel | Reference] = {
+            "userChannel": user_channel,
+            "adminChannel": admin_channel,
+        }
+        channels = Channels(root=data)
+
+        assert channels["userChannel"] == user_channel
+        assert channels["adminChannel"] == admin_channel
+
+    def test_channels_getattr(self) -> None:
+        """Test Channels __getattr__ method."""
+        user_channel = Channel(address="user/signedup")
+        admin_channel = Channel(address="admin/events")
+
+        data: dict[str, Channel | Reference] = {
+            "userChannel": user_channel,
+            "adminChannel": admin_channel,
+        }
+        channels = Channels(root=data)
+
+        assert channels.userChannel == user_channel
+        assert channels.adminChannel == admin_channel

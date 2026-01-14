@@ -2,7 +2,6 @@
 
 __all__ = [
     "ChannelBindings",
-    "Channels",
     "Components",
     "CorrelationIDs",
     "ExternalDocs",
@@ -10,7 +9,6 @@ __all__ = [
     "Messages",
     "OperationBindings",
     "OperationTraits",
-    "Operations",
     "Parameters",
     "Replies",
     "ReplyAddresses",
@@ -18,7 +16,6 @@ __all__ = [
     "SecuritySchemes",
     "ServerBindings",
     "ServerVariables",
-    "Servers",
     "Tags",
 ]
 
@@ -33,18 +30,18 @@ from asyncapi3.models.bindings import (
     OperationBindingsObject,
     ServerBindingsObject,
 )
-from asyncapi3.models.channel import Channel, Parameter
+from asyncapi3.models.channel import Channels, Parameter
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.message import Message, MessageTrait
 from asyncapi3.models.operation import (
-    Operation,
     OperationReply,
     OperationReplyAddress,
+    Operations,
     OperationTrait,
 )
 from asyncapi3.models.schema import MultiFormatSchema, Schema
 from asyncapi3.models.security import CorrelationID, SecurityScheme
-from asyncapi3.models.server import Server, ServerVariable
+from asyncapi3.models.server import Servers, ServerVariable
 
 
 class Schemas(PatternedRootModel[MultiFormatSchema | Schema | Reference]):
@@ -53,33 +50,6 @@ class Schemas(PatternedRootModel[MultiFormatSchema | Schema | Reference]):
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
     ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Schema objects.
-    """
-
-
-class Servers(PatternedRootModel[Server | Reference]):
-    """
-    Servers Object.
-
-    This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Server objects.
-    """
-
-
-class Channels(PatternedRootModel[Channel | Reference]):
-    """
-    Channels Object.
-
-    This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Channel objects.
-    """
-
-
-class Operations(PatternedRootModel[Operation | Reference]):
-    """
-    Operations Object.
-
-    This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Operation objects.
     """
 
 

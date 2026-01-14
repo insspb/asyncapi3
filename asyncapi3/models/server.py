@@ -6,14 +6,11 @@ __all__ = [
     "Servers",
 ]
 
-import re
 
-from collections.abc import Iterator
-
-from pydantic import ConfigDict, Field, RootModel, model_validator
+from pydantic import Field
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
-from asyncapi3.models.base_models import ExtendableBaseModel
+from asyncapi3.models.base_models import ExtendableBaseModel, PatternedRootModel
 from asyncapi3.models.bindings import ServerBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.security import SecurityScheme
@@ -156,47 +153,10 @@ class Server(ExtendableBaseModel):
     )
 
 
-class Servers(RootModel[dict[str, Server | Reference]]):
-    r"""
+class Servers(PatternedRootModel[Server | Reference]):
+    """
     Servers Object.
 
-    This model validates that all keys match the pattern r"^[A-Za-z0-9_\-]+$",
-    values match Reference or Server objects.
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Server objects.
     """
-
-    model_config = ConfigDict(
-        revalidate_instances="always",
-        validate_assignment=True,
-        serialize_by_alias=True,
-        validate_by_name=True,
-        validate_by_alias=True,
-    )
-
-    def __iter__(self) -> Iterator[str]:  # type: ignore[override]
-        return iter(self.root)
-
-    def __getitem__(self, item: str) -> Server | Reference:
-        return self.root[item]
-
-    def __getattr__(self, item: str) -> Server | Reference:
-        return self.root[item]
-
-    @model_validator(mode="after")
-    def validate_extensions(self) -> "Servers":
-        r"""
-        Validate that all keys in the input data match the AsyncAPI patterned
-        object key pattern.
-
-        Keys must match the regex pattern ^[A-Za-z0-9_\-]+$
-        """
-        if not self.root:
-            return self
-
-        extension_pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
-        for field_name in self.root:
-            if not extension_pattern.match(field_name):
-                raise ValueError(
-                    f"Field '{field_name}' does not match patterned object key pattern."
-                    " Keys must contain letters, digits, hyphens, and underscores."
-                )
-        return self

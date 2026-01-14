@@ -14,7 +14,7 @@ from collections.abc import Iterator
 from pydantic import ConfigDict, Field, RootModel, model_validator
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
-from asyncapi3.models.base_models import ExtendableBaseModel
+from asyncapi3.models.base_models import ExtendableBaseModel, PatternedRootModel
 from asyncapi3.models.bindings import ChannelBindingsObject
 from asyncapi3.models.helpers import is_null
 from asyncapi3.models.message import Messages
@@ -239,5 +239,10 @@ class Channel(ExtendableBaseModel):
         return self
 
 
-# Channels is a type alias for a dictionary of Channel objects
-Channels = dict[str, Channel | Reference]
+class Channels(PatternedRootModel[Channel | Reference]):
+    """
+    Channels Object.
+
+    This model validates that all keys match the AsyncAPI patterned object key pattern
+    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Channel objects.
+    """
