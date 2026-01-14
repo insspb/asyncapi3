@@ -58,6 +58,7 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cases>=3.9.1",
     "pytest-cov>=7.0.0",
+    "pytest-mock>=3.14.0",
 ]
 
 [tool.mypy]
