@@ -463,7 +463,7 @@ class TestParameters:
         assert parameters_with_ref["orderId"] == ref
 
     def test_parameters_getattr(self) -> None:
-        """Test Parameters __getattr__ method."""
+        """Test Parameters __getitem__ method."""
         user_param = Parameter(description="Id of the user.")
         order_param = Parameter(description="Id of the order.")
 
@@ -473,14 +473,14 @@ class TestParameters:
         }
         parameters = Parameters(root=data)
 
-        assert parameters.userId == user_param
-        assert parameters.orderId == order_param
+        assert parameters["userId"] == user_param
+        assert parameters["orderId"] == order_param
 
         # Test with Reference
         ref = Reference(ref="#/components/parameters/orderId")
         data_with_ref: dict[str, Parameter | Reference] = {"orderId": ref}
         parameters_with_ref = Parameters(root=data_with_ref)
-        assert parameters_with_ref.orderId == ref
+        assert parameters_with_ref["orderId"] == ref
 
 
 class TestChannel:
@@ -711,7 +711,7 @@ class TestChannels:
         assert channels["adminChannel"] == admin_channel
 
     def test_channels_getattr(self) -> None:
-        """Test Channels __getattr__ method."""
+        """Test Channels __getitem__ method."""
         user_channel = Channel(address="user/signedup")
         admin_channel = Channel(address="admin/events")
 
@@ -721,5 +721,5 @@ class TestChannels:
         }
         channels = Channels(root=data)
 
-        assert channels.userChannel == user_channel
-        assert channels.adminChannel == admin_channel
+        assert channels["userChannel"] == user_channel
+        assert channels["adminChannel"] == admin_channel

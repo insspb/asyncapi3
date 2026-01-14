@@ -91,8 +91,17 @@ class PatternedRootModel(RootModel[dict[str, T]], Generic[T]):
     def __getitem__(self, item: str) -> T:
         return self.root[item]
 
-    def __getattr__(self, item: str) -> T:
-        return self.root[item]
+    def __setitem__(self, key: str, value: T) -> None:
+        self.root[key] = value
+
+    def __delitem__(self, key: str) -> None:
+        del self.root[key]
+
+    def __contains__(self, key: str) -> bool:
+        return key in self.root
+
+    def __len__(self) -> int:
+        return len(self.root)
 
     @model_validator(mode="after")
     def validate_patterned_keys(self) -> "PatternedRootModel[T]":

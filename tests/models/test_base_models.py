@@ -214,18 +214,6 @@ class TestPatternedRootModel:
         assert obj["user1"] == "value1"
         assert obj["user2"] == "value2"
 
-    def test_patterned_object_getattr(self) -> None:
-        """Test PatternedRootModel __getattr__ method."""
-
-        class TestObject(PatternedRootModel[str]):
-            pass
-
-        data = {"user1": "value1", "user2": "value2"}
-        obj = TestObject.model_validate(data)
-
-        assert obj.user1 == "value1"
-        assert obj.user2 == "value2"
-
     def test_patterned_object_empty_dict(self) -> None:
         """Test PatternedRootModel with empty dictionary."""
 
@@ -246,5 +234,56 @@ class TestPatternedRootModel:
         obj = TestObject.model_validate(data)
 
         assert obj.root == data
-        assert obj.validKey123 == 42
         assert obj["validKey123"] == 42
+
+    def test_patterned_object_setitem(self) -> None:
+        """Test PatternedRootModel __setitem__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        obj = TestObject.model_validate({"user1": "value1"})
+        obj["user2"] = "value2"
+
+        assert obj.root == {"user1": "value1", "user2": "value2"}
+        assert obj["user2"] == "value2"
+
+    def test_patterned_object_delitem(self) -> None:
+        """Test PatternedRootModel __delitem__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        obj = TestObject.model_validate({"user1": "value1", "user2": "value2"})
+        del obj["user1"]
+
+        assert obj.root == {"user2": "value2"}
+        assert len(obj.root) == 1
+
+    def test_patterned_object_contains(self) -> None:
+        """Test PatternedRootModel __contains__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        obj = TestObject.model_validate({"user1": "value1", "user2": "value2"})
+
+        assert "user1" in obj
+        assert "user2" in obj
+        assert "user3" not in obj
+
+    def test_patterned_object_len(self) -> None:
+        """Test PatternedRootModel __len__ method."""
+
+        class TestObject(PatternedRootModel[str]):
+            pass
+
+        obj = TestObject.model_validate({"user1": "value1", "user2": "value2"})
+
+        assert len(obj) == 2
+
+        obj["user3"] = "value3"
+        assert len(obj) == 3
+
+        del obj["user1"]
+        assert len(obj) == 2

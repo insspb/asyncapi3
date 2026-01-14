@@ -575,7 +575,7 @@ class TestSchemas:
         assert schemas["order"] == order_schema
 
     def test_schemas_getattr(self) -> None:
-        """Test Schemas __getattr__ method."""
+        """Test Schemas __getitem__ method."""
         user_schema = Schema(type="object", properties={"name": Schema(type="string")})
         order_schema = Schema(type="object", properties={"id": Schema(type="integer")})
 
@@ -585,8 +585,8 @@ class TestSchemas:
         }
         schemas = Schemas(root=data)
 
-        assert schemas.user == user_schema
-        assert schemas.order == order_schema
+        assert schemas["user"] == user_schema
+        assert schemas["order"] == order_schema
 
 
 # Servers Validation Test Cases
@@ -754,7 +754,7 @@ class TestChannels:
         assert channels["adminChannel"] == admin_channel
 
     def test_channels_getattr(self) -> None:
-        """Test Channels __getattr__ method."""
+        """Test Channels __getitem__ method."""
         user_channel = Channel(address="user/signedup")
         admin_channel = Channel(address="admin/events")
 
@@ -764,8 +764,8 @@ class TestChannels:
         }
         channels = Channels(root=data)
 
-        assert channels.userChannel == user_channel
-        assert channels.adminChannel == admin_channel
+        assert channels["userChannel"] == user_channel
+        assert channels["adminChannel"] == admin_channel
 
 
 # Operations Validation Test Cases
@@ -913,7 +913,7 @@ class TestOperations:
         assert operations["receiveUserSignup"] == receive_operation
 
     def test_operations_getattr(self) -> None:
-        """Test Operations __getattr__ method."""
+        """Test Operations __getitem__ method."""
         send_operation = Operation(
             action="send", channel=Reference(ref="#/channels/userChannel")
         )
@@ -927,8 +927,8 @@ class TestOperations:
         }
         operations = Operations(root=data)
 
-        assert operations.sendUserSignup == send_operation
-        assert operations.receiveUserSignup == receive_operation
+        assert operations["sendUserSignup"] == send_operation
+        assert operations["receiveUserSignup"] == receive_operation
 
 
 # Messages Validation Test Cases
@@ -1107,7 +1107,7 @@ class TestMessages:
         assert messages["UserLoggedOut"] == user_logged_out
 
     def test_messages_getattr(self) -> None:
-        """Test Messages __getattr__ method."""
+        """Test Messages __getitem__ method."""
         user_signed_up = Message(
             payload=Schema(
                 type="object",
@@ -1130,8 +1130,8 @@ class TestMessages:
         }
         messages = Messages(root=data)
 
-        assert messages.UserSignedUp == user_signed_up
-        assert messages.UserLoggedOut == user_logged_out
+        assert messages["UserSignedUp"] == user_signed_up
+        assert messages["UserLoggedOut"] == user_logged_out
 
 
 # SecuritySchemes Validation Test Cases
@@ -1284,7 +1284,7 @@ class TestSecuritySchemes:
         assert security_schemes["basicAuth"] == basic_auth_scheme
 
     def test_security_schemes_getattr(self) -> None:
-        """Test SecuritySchemes __getattr__ method."""
+        """Test SecuritySchemes __getitem__ method."""
         api_key_scheme = SecurityScheme(
             type_="apiKey",
             in_="user",
@@ -1301,8 +1301,8 @@ class TestSecuritySchemes:
         }
         security_schemes = SecuritySchemes(root=data)
 
-        assert security_schemes.apiKey == api_key_scheme
-        assert security_schemes.basicAuth == basic_auth_scheme
+        assert security_schemes["apiKey"] == api_key_scheme
+        assert security_schemes["basicAuth"] == basic_auth_scheme
 
 
 # ServerVariables Validation Test Cases
@@ -1435,7 +1435,7 @@ class TestServerVariables:
         assert server_variables["username"] == username_var
 
     def test_server_variables_getattr(self) -> None:
-        """Test ServerVariables __getattr__ method."""
+        """Test ServerVariables __getitem__ method."""
         port_var = ServerVariable(default="1883", enum=["1883", "8883"])
         username_var = ServerVariable(default="guest")
 
@@ -1445,8 +1445,8 @@ class TestServerVariables:
         }
         server_variables = ServerVariables(root=data)
 
-        assert server_variables.port == port_var
-        assert server_variables.username == username_var
+        assert server_variables["port"] == port_var
+        assert server_variables["username"] == username_var
 
 
 # Parameters Validation Test Cases
@@ -1576,7 +1576,7 @@ class TestParameters:
         assert parameters["channelId"] == channel_id_param
 
     def test_parameters_getattr(self) -> None:
-        """Test Parameters __getattr__ method."""
+        """Test Parameters __getitem__ method."""
         user_id_param = Parameter(description="Id of the user.")
         channel_id_param = Parameter(description="Id of the channel.")
 
@@ -1586,8 +1586,8 @@ class TestParameters:
         }
         parameters = Parameters(root=data)
 
-        assert parameters.userId == user_id_param
-        assert parameters.channelId == channel_id_param
+        assert parameters["userId"] == user_id_param
+        assert parameters["channelId"] == channel_id_param
 
 
 # CorrelationIDs Validation Test Cases
@@ -1717,7 +1717,7 @@ class TestCorrelationIDs:
         assert correlation_ids["requestId"] == request_id_corr_id
 
     def test_correlation_ids_getattr(self) -> None:
-        """Test CorrelationIDs __getattr__ method."""
+        """Test CorrelationIDs __getitem__ method."""
         default_corr_id = CorrelationID(location="$message.header#/correlationId")
         request_id_corr_id = CorrelationID(location="$message.header#/requestId")
 
@@ -1727,8 +1727,8 @@ class TestCorrelationIDs:
         }
         correlation_ids = CorrelationIDs(root=data)
 
-        assert correlation_ids.default == default_corr_id
-        assert correlation_ids.requestId == request_id_corr_id
+        assert correlation_ids["default"] == default_corr_id
+        assert correlation_ids["requestId"] == request_id_corr_id
 
 
 # Replies Validation Test Cases
@@ -1871,7 +1871,7 @@ class TestReplies:
         assert replies["adminReply"] == admin_reply
 
     def test_replies_getattr(self) -> None:
-        """Test Replies __getattr__ method."""
+        """Test Replies __getitem__ method."""
         user_reply = OperationReply(
             address=OperationReplyAddress(location="$message.header#/replyTo")
         )
@@ -1885,8 +1885,8 @@ class TestReplies:
         }
         replies = Replies(root=data)
 
-        assert replies.userReply == user_reply
-        assert replies.adminReply == admin_reply
+        assert replies["userReply"] == user_reply
+        assert replies["adminReply"] == admin_reply
 
 
 # ReplyAddresses Validation Test Cases
@@ -2020,7 +2020,7 @@ class TestReplyAddresses:
         assert reply_addresses["adminReplyAddress"] == admin_reply_address
 
     def test_reply_addresses_getattr(self) -> None:
-        """Test ReplyAddresses __getattr__ method."""
+        """Test ReplyAddresses __getitem__ method."""
         user_reply_address = OperationReplyAddress(location="$message.header#/replyTo")
         admin_reply_address = OperationReplyAddress(
             location="$message.header#/adminReplyTo"
@@ -2032,8 +2032,8 @@ class TestReplyAddresses:
         }
         reply_addresses = ReplyAddresses(root=data)
 
-        assert reply_addresses.userReplyAddress == user_reply_address
-        assert reply_addresses.adminReplyAddress == admin_reply_address
+        assert reply_addresses["userReplyAddress"] == user_reply_address
+        assert reply_addresses["adminReplyAddress"] == admin_reply_address
 
 
 # ExternalDocs Validation Test Cases
@@ -2168,7 +2168,7 @@ class TestExternalDocs:
         assert external_docs["userDocs"] == user_docs
 
     def test_external_docs_getattr(self) -> None:
-        """Test ExternalDocs __getattr__ method."""
+        """Test ExternalDocs __getitem__ method."""
         info_docs = ExternalDocumentation(
             url="https://example.com", description="API documentation"
         )
@@ -2180,8 +2180,8 @@ class TestExternalDocs:
         }
         external_docs = ExternalDocs(root=data)
 
-        assert external_docs.infoDocs == info_docs
-        assert external_docs.userDocs == user_docs
+        assert external_docs["infoDocs"] == info_docs
+        assert external_docs["userDocs"] == user_docs
 
 
 # Tags Validation Test Cases
@@ -2311,7 +2311,7 @@ class TestTags:
         assert tags["admin"] == admin_tag
 
     def test_tags_getattr(self) -> None:
-        """Test Tags __getattr__ method."""
+        """Test Tags __getitem__ method."""
         user_tag = Tag(name="user", description="User related operations")
         admin_tag = Tag(name="admin", description="Admin related operations")
 
@@ -2321,8 +2321,8 @@ class TestTags:
         }
         tags = Tags(root=data)
 
-        assert tags.user == user_tag
-        assert tags.admin == admin_tag
+        assert tags["user"] == user_tag
+        assert tags["admin"] == admin_tag
 
 
 # OperationTraits Validation Test Cases
@@ -2454,7 +2454,7 @@ class TestOperationTraits:
         assert operation_traits["summaryTrait"] == summary_trait
 
     def test_operation_traits_getattr(self) -> None:
-        """Test OperationTraits __getattr__ method."""
+        """Test OperationTraits __getitem__ method."""
         http_trait = OperationTrait(bindings={"http": {"method": "POST"}})
         summary_trait = OperationTrait(summary="A summary of the operation")
 
@@ -2464,8 +2464,8 @@ class TestOperationTraits:
         }
         operation_traits = OperationTraits(root=data)
 
-        assert operation_traits.httpTrait == http_trait
-        assert operation_traits.summaryTrait == summary_trait
+        assert operation_traits["httpTrait"] == http_trait
+        assert operation_traits["summaryTrait"] == summary_trait
 
 
 # MessageTraits Validation Test Cases
@@ -2609,7 +2609,7 @@ class TestMessageTraits:
         assert message_traits["eventHeaders"] == event_headers
 
     def test_message_traits_getattr(self) -> None:
-        """Test MessageTraits __getattr__ method."""
+        """Test MessageTraits __getitem__ method."""
         common_headers = MessageTrait(content_type="application/json")
         event_headers = MessageTrait(
             headers=Schema(
@@ -2624,8 +2624,8 @@ class TestMessageTraits:
         }
         message_traits = MessageTraits(root=data)
 
-        assert message_traits.commonHeaders == common_headers
-        assert message_traits.eventHeaders == event_headers
+        assert message_traits["commonHeaders"] == common_headers
+        assert message_traits["eventHeaders"] == event_headers
 
 
 class TestServers:
