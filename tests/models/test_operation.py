@@ -335,7 +335,7 @@ def case_operations_invalid_key_spaces() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send user signup' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'send user signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -348,7 +348,7 @@ def case_operations_invalid_key_special_chars() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send@user@signup' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'send@user@signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -361,7 +361,7 @@ def case_operations_invalid_key_parentheses() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send\\(user\\)signup' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'send\\(user\\)signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 

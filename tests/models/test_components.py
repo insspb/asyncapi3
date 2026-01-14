@@ -479,7 +479,7 @@ def case_schemas_invalid_key_spaces() -> tuple[str, str]:
       user schema:
         type: object
     """
-    expected_error = "Field 'user schema' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user schema' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -490,7 +490,7 @@ def case_schemas_invalid_key_special_chars() -> tuple[str, str]:
       user@schema:
         type: object
     """
-    expected_error = "Field 'user@schema' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@schema' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -501,7 +501,7 @@ def case_schemas_invalid_key_parentheses() -> tuple[str, str]:
       user(schema):
         type: object
     """
-    expected_error = "Field 'user(schema)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(schema)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -623,7 +623,7 @@ def case_servers_invalid_key_spaces() -> tuple[str, str]:
         host: kafka.in.mycompany.com:9092
         protocol: kafka
     """
-    expected_error = "Field 'production server' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'production server' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -658,7 +658,7 @@ def case_channels_invalid_key_spaces() -> tuple[str, str]:
       user channel:
         address: user/signedup
     """
-    expected_error = "Field 'user channel' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user channel' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -669,7 +669,7 @@ def case_channels_invalid_key_special_chars() -> tuple[str, str]:
       user@channel:
         address: user/signedup
     """
-    expected_error = "Field 'user@channel' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@channel' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -680,7 +680,7 @@ def case_channels_invalid_key_parentheses() -> tuple[str, str]:
       user(channel):
         address: user/signedup
     """
-    expected_error = "Field 'user(channel)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(channel)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -805,7 +805,7 @@ def case_operations_invalid_key_spaces() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send user signup' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'send user signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -818,7 +818,7 @@ def case_operations_invalid_key_special_chars() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send@user@signup' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'send@user@signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -831,7 +831,7 @@ def case_operations_invalid_key_parentheses() -> tuple[str, str]:
         channel:
           $ref: '#/channels/userChannel'
     """
-    expected_error = "Field 'send(user)signup' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'send(user)signup' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -977,7 +977,7 @@ def case_messages_invalid_key_spaces() -> tuple[str, str]:
             displayName:
               type: string
     """
-    expected_error = "Field 'user signed up' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user signed up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -992,7 +992,7 @@ def case_messages_invalid_key_special_chars() -> tuple[str, str]:
             displayName:
               type: string
     """
-    expected_error = "Field 'user@signed@up' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@signed@up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1007,7 +1007,7 @@ def case_messages_invalid_key_parentheses() -> tuple[str, str]:
             displayName:
               type: string
     """
-    expected_error = "Field 'user(signed)up' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(signed)up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1170,7 +1170,7 @@ def case_security_schemes_invalid_key_spaces() -> tuple[str, str]:
         in: user
         name: api_key
     """
-    expected_error = "Field 'api key' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'api key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1183,7 +1183,7 @@ def case_security_schemes_invalid_key_special_chars() -> tuple[str, str]:
         in: user
         name: api_key
     """
-    expected_error = "Field 'api@key' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'api@key' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1196,7 +1196,7 @@ def case_security_schemes_invalid_key_parentheses() -> tuple[str, str]:
         in: user
         name: api_key
     """
-    expected_error = "Field 'api(key)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'api(key)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1339,7 +1339,7 @@ def case_server_variables_invalid_key_spaces() -> tuple[str, str]:
       server port:
         default: '1883'
     """
-    expected_error = "Field 'server port' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'server port' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1350,7 +1350,7 @@ def case_server_variables_invalid_key_special_chars() -> tuple[str, str]:
       server@port:
         default: '1883'
     """
-    expected_error = "Field 'server@port' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'server@port' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1361,7 +1361,7 @@ def case_server_variables_invalid_key_parentheses() -> tuple[str, str]:
       server(port):
         default: '1883'
     """
-    expected_error = "Field 'server(port)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'server(port)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1480,7 +1480,7 @@ def case_parameters_invalid_key_spaces() -> tuple[str, str]:
       user id:
         description: Id of the user.
     """
-    expected_error = "Field 'user id' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user id' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1491,7 +1491,7 @@ def case_parameters_invalid_key_special_chars() -> tuple[str, str]:
       user@id:
         description: Id of the user.
     """
-    expected_error = "Field 'user@id' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@id' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1502,7 +1502,7 @@ def case_parameters_invalid_key_parentheses() -> tuple[str, str]:
       user(id):
         description: Id of the user.
     """
-    expected_error = "Field 'user(id)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(id)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1621,7 +1621,7 @@ def case_correlation_ids_invalid_key_spaces() -> tuple[str, str]:
       default id:
         location: $message.header#/correlationId
     """
-    expected_error = "Field 'default id' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'default id' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1632,7 +1632,7 @@ def case_correlation_ids_invalid_key_special_chars() -> tuple[str, str]:
       default@id:
         location: $message.header#/correlationId
     """
-    expected_error = "Field 'default@id' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'default@id' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1643,7 +1643,7 @@ def case_correlation_ids_invalid_key_parentheses() -> tuple[str, str]:
       default(id):
         location: $message.header#/correlationId
     """
-    expected_error = "Field 'default(id)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'default(id)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1765,7 +1765,7 @@ def case_replies_invalid_key_spaces() -> tuple[str, str]:
         address:
           location: $message.header#/replyTo
     """
-    expected_error = "Field 'user reply' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user reply' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1777,7 +1777,7 @@ def case_replies_invalid_key_special_chars() -> tuple[str, str]:
         address:
           location: $message.header#/replyTo
     """
-    expected_error = "Field 'user@reply' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@reply' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1789,7 +1789,7 @@ def case_replies_invalid_key_parentheses() -> tuple[str, str]:
         address:
           location: $message.header#/replyTo
     """
-    expected_error = "Field 'user(reply)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(reply)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1920,7 +1920,7 @@ def case_reply_addresses_invalid_key_spaces() -> tuple[str, str]:
       user reply address:
         location: $message.header#/replyTo
     """
-    expected_error = "Field 'user reply address' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user reply address' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1931,7 +1931,7 @@ def case_reply_addresses_invalid_key_special_chars() -> tuple[str, str]:
       user@reply@address:
         location: $message.header#/replyTo
     """
-    expected_error = "Field 'user@reply@address' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@reply@address' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -1942,7 +1942,7 @@ def case_reply_addresses_invalid_key_parentheses() -> tuple[str, str]:
       user(reply)address:
         location: $message.header#/replyTo
     """
-    expected_error = "Field 'user(reply)address' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(reply)address' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2068,7 +2068,7 @@ def case_external_docs_invalid_key_spaces() -> tuple[str, str]:
       info docs:
         url: https://example.com
     """
-    expected_error = "Field 'info docs' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'info docs' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2079,7 +2079,7 @@ def case_external_docs_invalid_key_special_chars() -> tuple[str, str]:
       info@docs:
         url: https://example.com
     """
-    expected_error = "Field 'info@docs' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'info@docs' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2090,7 +2090,7 @@ def case_external_docs_invalid_key_parentheses() -> tuple[str, str]:
       info(docs):
         url: https://example.com
     """
-    expected_error = "Field 'info(docs)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'info(docs)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2217,7 +2217,7 @@ def case_tags_invalid_key_spaces() -> tuple[str, str]:
       user tag:
         name: user
     """
-    expected_error = "Field 'user tag' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user tag' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2228,7 +2228,7 @@ def case_tags_invalid_key_special_chars() -> tuple[str, str]:
       user@tag:
         name: user
     """
-    expected_error = "Field 'user@tag' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user@tag' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2239,7 +2239,7 @@ def case_tags_invalid_key_parentheses() -> tuple[str, str]:
       user(tag):
         name: user
     """
-    expected_error = "Field 'user(tag)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'user(tag)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2358,7 +2358,7 @@ def case_operation_traits_invalid_key_spaces() -> tuple[str, str]:
       kafka trait:
         summary: "A summary"
     """
-    expected_error = "Field 'kafka trait' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'kafka trait' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2369,7 +2369,7 @@ def case_operation_traits_invalid_key_special_chars() -> tuple[str, str]:
       kafka@trait:
         summary: "A summary"
     """
-    expected_error = "Field 'kafka@trait' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'kafka@trait' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2380,7 +2380,7 @@ def case_operation_traits_invalid_key_parentheses() -> tuple[str, str]:
       kafka(trait):
         summary: "A summary"
     """
-    expected_error = "Field 'kafka(trait)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'kafka(trait)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2503,7 +2503,7 @@ def case_message_traits_invalid_key_spaces() -> tuple[str, str]:
       common headers:
         contentType: application/json
     """
-    expected_error = "Field 'common headers' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'common headers' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2514,7 +2514,7 @@ def case_message_traits_invalid_key_special_chars() -> tuple[str, str]:
       common@headers:
         contentType: application/json
     """
-    expected_error = "Field 'common@headers' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'common@headers' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -2525,7 +2525,7 @@ def case_message_traits_invalid_key_parentheses() -> tuple[str, str]:
       common(headers):
         contentType: application/json
     """
-    expected_error = "Field 'common(headers)' does not match patterned object key pattern. Keys must match [A-Za-z0-9\\.\\-_]+"
+    expected_error = "Field 'common(headers)' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 

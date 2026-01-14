@@ -47,7 +47,7 @@ class Schemas(PatternedRootModel[MultiFormatSchema | Schema | Reference]):
     Schemas Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Schema objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or Schema objects.
     """
 
 
@@ -56,7 +56,7 @@ class SecuritySchemes(PatternedRootModel[SecurityScheme | Reference]):
     SecuritySchemes Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or SecurityScheme objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or SecurityScheme objects.
     """
 
 
@@ -65,7 +65,7 @@ class ServerVariables(PatternedRootModel[ServerVariable | Reference]):
     ServerVariable Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or ServerVariable objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or ServerVariable objects.
     """
 
 
@@ -74,7 +74,7 @@ class CorrelationIDs(PatternedRootModel[CorrelationID | Reference]):
     CorrelationID Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or CorrelationID objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or CorrelationID objects.
     """
 
 
@@ -83,7 +83,7 @@ class Replies(PatternedRootModel[OperationReply | Reference]):
     OperationReply Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or OperationReply objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or OperationReply objects.
     """
 
 
@@ -92,7 +92,7 @@ class ReplyAddresses(PatternedRootModel[OperationReplyAddress | Reference]):
     OperationReplyAddress Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or OperationReplyAddress objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or OperationReplyAddress objects.
     """
 
 
@@ -101,7 +101,7 @@ class ExternalDocs(PatternedRootModel[ExternalDocumentation | Reference]):
     ExternalDocumentation Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or ExternalDocumentation objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or ExternalDocumentation objects.
     """
 
 
@@ -110,7 +110,7 @@ class Tags(PatternedRootModel[Tag | Reference]):
     Tag Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or Tag objects.
+    ^[A-Za-z0-9_\\-]+$+$, values match Reference or Tag objects.
     """
 
 
@@ -119,7 +119,7 @@ class OperationTraits(PatternedRootModel[OperationTrait | Reference]):
     OperationTrait Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or OperationTrait objects.
+    ^[A-Za-z0-9_\\-]+$+$, values match Reference or OperationTrait objects.
     """
 
 
@@ -128,7 +128,7 @@ class MessageTraits(PatternedRootModel[MessageTrait | Reference]):
     MessageTrait Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or MessageTrait objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or MessageTrait objects.
     """
 
 
@@ -137,7 +137,7 @@ class ServerBindings(PatternedRootModel[ServerBindingsObject | Reference]):
     ServerBindingsObject Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or ServerBindingsObject objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or ServerBindingsObject objects.
     """
 
 
@@ -146,7 +146,7 @@ class ChannelBindings(PatternedRootModel[ChannelBindingsObject | Reference]):
     ChannelBindingsObject Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or ChannelBindingsObject objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or ChannelBindingsObject objects.
     """
 
 
@@ -155,7 +155,7 @@ class OperationBindings(PatternedRootModel[OperationBindingsObject | Reference])
     OperationBindingsObject Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or OperationBindingsObject objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or OperationBindingsObject objects.
     """
 
 
@@ -164,7 +164,7 @@ class MessageBindings(PatternedRootModel[MessageBindingsObject | Reference]):
     MessageBindingsObject Object.
 
     This model validates that all keys match the AsyncAPI patterned object key pattern
-    ^[A-Za-z0-9\\.\\-_]+$, values match Reference or MessageBindingsObject objects.
+    ^[A-Za-z0-9_\\-]+$, values match Reference or MessageBindingsObject objects.
     """
 
 

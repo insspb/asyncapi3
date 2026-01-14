@@ -356,7 +356,7 @@ def case_messages_invalid_key_spaces() -> tuple[str, str]:
         payload:
           type: object
     """
-    expected_error = "Field 'user signed up' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'user signed up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -368,7 +368,7 @@ def case_messages_invalid_key_special_chars() -> tuple[str, str]:
         payload:
           type: object
     """
-    expected_error = "Field 'user@signed@up' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'user@signed@up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -380,7 +380,7 @@ def case_messages_invalid_key_parentheses() -> tuple[str, str]:
         payload:
           type: object
     """
-    expected_error = "Field 'user\\(signed\\)up' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'user\\(signed\\)up' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 

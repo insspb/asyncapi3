@@ -265,7 +265,7 @@ def case_servers_invalid_key_spaces() -> tuple[str, str]:
       host: kafka.in.mycompany.com:9092
       protocol: kafka
     """
-    expected_error = "Field 'production server' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'production server' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -276,7 +276,7 @@ def case_servers_invalid_key_special_chars() -> tuple[str, str]:
       host: kafka.in.mycompany.com:9092
       protocol: kafka
     """
-    expected_error = "Field 'production@server' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field 'production@server' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
 
 
@@ -298,20 +298,8 @@ def case_servers_invalid_key_empty() -> tuple[str, str]:
       host: kafka.in.mycompany.com:9092
       protocol: kafka
     """
-    expected_error = "Field '' does not match patterned object key pattern. Keys must match \\[A-Za-z0-9\\\\\\.\\\\-_\\]\\+"
+    expected_error = "Field '' does not match patterned object key pattern. Keys must contain letters, digits, hyphens, and underscores."
     return yaml_data, expected_error
-
-
-def case_servers_with_dots() -> str:
-    """Servers with keys containing dots - should pass validation."""
-    return """
-    production.server:
-      host: kafka.in.mycompany.com:9092
-      protocol: kafka
-    staging.server:
-      host: kafka-staging.in.mycompany.com:9092
-      protocol: kafka
-    """
 
 
 class TestServerVariable:
@@ -511,7 +499,6 @@ class TestServers:
         cases=[
             case_servers_basic,
             case_servers_with_underscores_and_hyphens,
-            case_servers_with_dots,
             case_servers_with_references,
         ],
     )
@@ -528,6 +515,7 @@ class TestServers:
         cases=[
             case_servers_invalid_key_spaces,
             case_servers_invalid_key_special_chars,
+            case_servers_invalid_key_dots,
             case_servers_invalid_key_empty,
         ],
     )
