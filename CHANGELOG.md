@@ -11,6 +11,8 @@
 ### FIXED
 
 - #8: Style issues
+- #10: Channel's `address` property is `null` in empty object (assumed by spec and valid
+  by studio validation)
 
 ## [0.0.2] - 2026-01-14
 

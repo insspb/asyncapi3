@@ -83,10 +83,8 @@ class Channel(ExtendableBaseModel):
     This object MAY be extended with Specification Extensions.
     """
 
-    # TODO: What is 'unknown' mean?
     address: str | None = Field(
         default=None,
-        exclude_if=is_null,
         description=(
             "An optional string representation of this channel's address. The address "
             "is typically the 'topic name', 'routing key', 'event type', or 'path'. "
