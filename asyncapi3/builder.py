@@ -9,7 +9,7 @@ __all__ = ["AsyncAPI3Builder"]
 
 
 from types import EllipsisType
-from typing import Any, Literal, NoReturn
+from typing import Any, Literal, NoReturn, cast
 
 import yaml
 
@@ -385,12 +385,9 @@ class AsyncAPI3Builder:
         # Validate name format
         validate_patterned_key(name, "server")
 
-        # Initialize components.servers if not exists
-        if self._components.servers is None:
-            self._components.servers = Servers({})
-
         # Check if a server exists in components
-        server = self._components.servers.root.get(name)
+        _components_servers = cast(Servers, self._components.servers)
+        server = _components_servers.root.get(name)
 
         # For new servers, require host and protocol
         if server is None:
@@ -426,7 +423,7 @@ class AsyncAPI3Builder:
         )
 
         # Always store/update in components.servers
-        self._components.servers[name] = server
+        _components_servers[name] = server
 
         # Add/remove reference in root servers
         if is_root_server:
@@ -455,7 +452,8 @@ class AsyncAPI3Builder:
         validate_patterned_key(name, "server")
 
         # Check if server exists in components
-        if self._components.servers is None or name not in self._components.servers:
+        _components_servers = cast(Servers, self._components.servers)
+        if name not in _components_servers:
             raise ValueError(
                 f"Cannot add server '{name}' to root servers: "
                 "server does not exist in components.servers. "
@@ -560,12 +558,9 @@ class AsyncAPI3Builder:
         # Validate name format
         validate_patterned_key(name, "channel")
 
-        # Initialize components.channels if not exists
-        if self._components.channels is None:
-            self._components.channels = Channels({})
-
         # Check if a channel exists in components
-        channel = self._components.channels.root.get(name)
+        _components_channels = cast(Channels, self._components.channels)
+        channel = _components_channels.root.get(name)
 
         # New channel
         if channel is None:
@@ -593,7 +588,7 @@ class AsyncAPI3Builder:
         )
 
         # Always store/update in components.channels
-        self._components.channels[name] = channel
+        _components_channels[name] = channel
 
         # Add/remove reference in root channels
         if is_root_channel:
@@ -623,7 +618,8 @@ class AsyncAPI3Builder:
         validate_patterned_key(name, "channel")
 
         # Check if channel exists in components
-        if self._components.channels is None or name not in self._components.channels:
+        _components_channels = cast(Channels, self._components.channels)
+        if name not in _components_channels:
             raise ValueError(
                 f"Cannot add channel '{name}' to root channels: "
                 "channel does not exist in components.channels. "
@@ -762,12 +758,9 @@ class AsyncAPI3Builder:
                 f"action should be either 'send' or 'receive', got '{action}'"
             )
 
-        # Initialize components.operations if not exists
-        if self._components.operations is None:
-            self._components.operations = Operations({})
-
         # Check if an operation exists in components
-        operation = self._components.operations.root.get(name)
+        _components_operations = cast(Operations, self._components.operations)
+        operation = _components_operations.root.get(name)
 
         # For new operations, require action and channel_name
         if operation is None:
@@ -810,7 +803,7 @@ class AsyncAPI3Builder:
         )
 
         # Always store/update in components.operations
-        self._components.operations[name] = operation
+        _components_operations[name] = operation
 
         # Add/remove reference in root operations
         if is_root_operation:
