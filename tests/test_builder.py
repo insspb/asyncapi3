@@ -9,7 +9,9 @@ from pydantic import AnyUrl, HttpUrl
 from pytest_mock import MockerFixture
 
 from asyncapi3.builder import AsyncAPI3Builder
+from asyncapi3.models.base import Reference
 from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.server import Servers
 
 
 class TestAsyncAPI3Builder:
@@ -365,3 +367,188 @@ class TestAsyncAPI3Builder:
         assert builder._info.title == "Initial Title"
         assert builder._info.description == "Updated Description"
         assert builder._info.version == "1.0.0"
+
+    # Server method tests
+    def test_update_or_create_server_creates_new_server(self) -> None:
+        """Test update_or_create_server creates a new server when it doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        result = builder.update_or_create_server(
+            "test-server",
+            host="localhost:5672",
+            protocol="amqp",
+        )
+
+        assert result is builder  # Should return self for chaining
+        # Check server was added to components
+        assert "test-server" in builder._components.servers.root
+        server = builder._components.servers.root["test-server"]
+        assert server.host == "localhost:5672"
+        assert server.protocol == "amqp"
+        # Check reference was added to root servers
+        assert "test-server" in builder._servers.root
+        ref = builder._servers.root["test-server"]
+        assert ref.ref == "#/components/servers/test-server"
+
+    def test_update_or_create_server_updates_existing_server(self) -> None:
+        """Test update_or_create_server updates an existing server."""
+        builder = AsyncAPI3Builder()
+
+        # Create initial server
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        # Update some fields
+        result = builder.update_or_create_server(
+            "test-server", description="Updated description"
+        )
+
+        assert result is builder
+        server = builder._components.servers.root["test-server"]
+        assert server.host == "localhost:5672"  # Should remain unchanged
+        assert server.protocol == "amqp"  # Should remain unchanged
+        assert server.description == "Updated description"  # Should be updated
+
+    def test_update_or_create_server_requires_host_and_protocol_for_new_server(
+        self,
+    ) -> None:
+        """Test update_or_create_server requires host and protocol for new servers."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(ValueError, match="Cannot create new server 'test-server'"):
+            builder.update_or_create_server(
+                "test-server", description="Test description"
+            )
+
+    def test_update_or_create_server_validates_name_pattern(self) -> None:
+        """Test update_or_create_server validates server name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.update_or_create_server(
+                "invalid@name", host="localhost:5672", protocol="amqp"
+            )
+
+    def test_update_or_create_server_with_is_root_server_false(self) -> None:
+        """Test update_or_create_server with is_root_server=False doesn't add to root servers."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp", is_root_server=False
+        )
+
+        # Server should be in components
+        assert "test-server" in builder._components.servers.root
+        # But not in root servers
+        assert "test-server" not in builder._servers.root
+
+    def test_update_or_create_server_fails_if_server_stored_as_reference(self) -> None:
+        """Test update_or_create_server raises TypeError if server is stored as Reference."""
+
+        # Manually put a Reference in components.servers (simulating edge case)
+        builder = AsyncAPI3Builder()
+        builder._components.servers = Servers({})
+        builder._components.servers["bad-server"] = Reference.to_component_server_name(
+            "some-other-server"
+        )
+
+        # Try to update - should raise TypeError
+        with pytest.raises(
+            TypeError, match="The server with name 'bad-server' is stored as reference"
+        ):
+            builder.update_or_create_server(
+                "bad-server", host="localhost:5672", protocol="amqp"
+            )
+
+    def test_remove_root_server_removes_reference(self) -> None:
+        """Test remove_root_server removes server reference from root servers."""
+        builder = AsyncAPI3Builder()
+
+        # Add server
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        # Remove from root servers
+        result = builder.remove_root_server("test-server")
+
+        assert result is builder
+        # Reference should be removed from root servers
+        assert "test-server" not in builder._servers.root
+        # But server should remain in components
+        assert "test-server" in builder._components.servers.root
+
+    def test_remove_root_server_validates_name_pattern(self) -> None:
+        """Test remove_root_server validates server name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.remove_root_server("invalid@name")
+
+    def test_remove_root_server_with_cascade_removes_from_components(self) -> None:
+        """Test remove_root_server with cascade=True removes from both places."""
+        builder = AsyncAPI3Builder()
+
+        # Add server
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        # Remove with cascade
+        result = builder.remove_root_server("test-server", cascade=True)
+
+        assert result is builder
+        # Should be removed from both places
+        assert "test-server" not in builder._servers.root
+        assert "test-server" not in builder._components.servers.root
+
+    def test_add_root_server_as_ref_success(self) -> None:
+        """Test add_root_server_as_ref successfully adds reference when server exists."""
+        builder = AsyncAPI3Builder()
+
+        # Add server to components only (without adding to root servers)
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp", is_root_server=False
+        )
+
+        # Add reference to root servers
+        result = builder.add_root_server_as_ref("test-server")
+
+        assert result is builder  # Should return self for chaining
+        # Server should be in components
+        assert "test-server" in builder._components.servers.root
+        # Reference should be added to root servers
+        assert "test-server" in builder._servers.root
+        ref = builder._servers.root["test-server"]
+        assert ref.ref == "#/components/servers/test-server"
+
+    def test_add_root_server_as_ref_server_not_exists(self) -> None:
+        """Test add_root_server_as_ref raises ValueError when server doesn't exist in components."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"Cannot add server 'nonexistent-server' to root servers: "
+                r"server does not exist in components\.servers\. "
+                r"Add the server first using update_or_create_server\(\)\."
+            ),
+        ):
+            builder.add_root_server_as_ref("nonexistent-server")
+
+    def test_add_root_server_as_ref_invalid_name_pattern(self) -> None:
+        """Test add_root_server_as_ref validates server name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.add_root_server_as_ref("invalid@name")
