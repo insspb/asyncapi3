@@ -39,7 +39,28 @@ class TestAsyncAPI3Builder:
         assert len(builder._channels.root) == 0
         assert len(builder._operations.root) == 0
         # Components is now initialized with default values
-        assert builder._components.schemas is None
+        default_components: dict[str, dict[str, Any]] = {
+            "channelBindings": {},
+            "channels": {},
+            "correlationIds": {},
+            "externalDocs": {},
+            "messageBindings": {},
+            "messageTraits": {},
+            "messages": {},
+            "operationBindings": {},
+            "operationTraits": {},
+            "operations": {},
+            "parameters": {},
+            "replies": {},
+            "replyAddresses": {},
+            "schemas": {},
+            "securitySchemes": {},
+            "serverBindings": {},
+            "serverVariables": {},
+            "servers": {},
+            "tags": {},
+        }
+        assert builder._components.model_dump() == default_components
 
     def test_init_with_info_parameters(self) -> None:
         """Test that __init__ accepts and sets Info parameters."""
@@ -127,6 +148,44 @@ class TestAsyncAPI3Builder:
 
         # Verify return value
         assert yaml_output == "asyncapi: 3.0.0\ntitle: Test API\nversion: 1.0.0\n"
+
+    def test_get_yaml_empty_builder_renders_complete_structure(self) -> None:
+        """Test get_yaml method renders complete YAML structure for empty builder."""
+        builder = AsyncAPI3Builder()
+
+        yaml_output = builder.get_yaml()
+
+        expected_yaml = (
+            "asyncapi: 3.0.0\n"
+            "info:\n"
+            "  title: Sample APP\n"
+            "  version: 0.0.1\n"
+            "servers: {}\n"
+            "channels: {}\n"
+            "operations: {}\n"
+            "components:\n"
+            "  schemas: {}\n"
+            "  servers: {}\n"
+            "  channels: {}\n"
+            "  operations: {}\n"
+            "  messages: {}\n"
+            "  securitySchemes: {}\n"
+            "  serverVariables: {}\n"
+            "  parameters: {}\n"
+            "  correlationIds: {}\n"
+            "  replies: {}\n"
+            "  replyAddresses: {}\n"
+            "  externalDocs: {}\n"
+            "  tags: {}\n"
+            "  operationTraits: {}\n"
+            "  messageTraits: {}\n"
+            "  serverBindings: {}\n"
+            "  channelBindings: {}\n"
+            "  operationBindings: {}\n"
+            "  messageBindings: {}\n"
+        )
+
+        assert yaml_output == expected_yaml
 
     def test_replace_info_obj_sets_info_attribute(self) -> None:
         """Test replace_info_obj method sets _info attribute."""
