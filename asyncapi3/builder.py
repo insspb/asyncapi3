@@ -24,7 +24,23 @@ from asyncapi3.models.bindings import (
 )
 from asyncapi3.models.channel import Channel, Channels, Parameters
 from asyncapi3.models.components import (
+    ChannelBindings,
     Components,
+    CorrelationIDs,
+    ExternalDocs,
+    MessageBindings,
+    MessageTraits,
+    OperationBindings,
+    OperationTraits,
+    Replies,
+    ReplyAddresses,
+    Schemas,
+    SecuritySchemes,
+    ServerBindings,
+    ServerVariables,
+)
+from asyncapi3.models.components import (
+    Tags as TagsDict,
 )
 from asyncapi3.models.helpers import (
     UNSET,
@@ -88,7 +104,27 @@ class AsyncAPI3Builder:
         self._default_content_type: str | None = None
         self._channels: Channels = Channels({})
         self._operations: Operations = Operations({})
-        self._components: Components = Components()
+        self._components: Components = Components(
+            schemas=Schemas({}),
+            servers=Servers({}),
+            channels=Channels({}),
+            operations=Operations({}),
+            messages=Messages({}),
+            security_schemes=SecuritySchemes({}),
+            server_variables=ServerVariables({}),
+            parameters=Parameters({}),
+            correlation_ids=CorrelationIDs({}),
+            replies=Replies({}),
+            reply_addresses=ReplyAddresses({}),
+            external_docs=ExternalDocs({}),
+            tags=TagsDict({}),
+            operation_traits=OperationTraits({}),
+            message_traits=MessageTraits({}),
+            server_bindings=ServerBindings({}),
+            channel_bindings=ChannelBindings({}),
+            operation_bindings=OperationBindings({}),
+            message_bindings=MessageBindings({}),
+        )
 
     @property
     def spec(self) -> AsyncAPI3:
