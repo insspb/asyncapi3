@@ -19,6 +19,7 @@ from asyncapi3.models.asyncapi import AsyncAPI3
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.bindings import (
     ChannelBindingsObject,
+    MessageBindingsObject,
     OperationBindingsObject,
     ServerBindingsObject,
 )
@@ -48,14 +49,15 @@ from asyncapi3.models.helpers import (
     validate_patterned_key,
 )
 from asyncapi3.models.info import Contact, Info, License
-from asyncapi3.models.message import Messages
+from asyncapi3.models.message import Message, MessageExample, Messages, MessageTrait
 from asyncapi3.models.operation import (
     Operation,
     OperationReply,
     Operations,
     OperationTrait,
 )
-from asyncapi3.models.security import SecurityScheme
+from asyncapi3.models.schema import MultiFormatSchema, Schema
+from asyncapi3.models.security import CorrelationID, SecurityScheme
 from asyncapi3.models.server import Server, Servers, ServerVariable
 
 
@@ -876,5 +878,321 @@ class AsyncAPI3Builder:
             and name in self._components.operations
         ):
             del self._components.operations[name]
+
+        return self
+
+    # Message methods
+    def update_or_create_message(
+        self,
+        name: str,
+        headers: MultiFormatSchema | Schema | Reference | EllipsisType | None = UNSET,
+        payload: MultiFormatSchema | Schema | Reference | EllipsisType | None = UNSET,
+        correlation_id: CorrelationID | Reference | EllipsisType | None = UNSET,
+        content_type: str | EllipsisType | None = UNSET,
+        title: str | EllipsisType | None = UNSET,
+        summary: str | EllipsisType | None = UNSET,
+        description: str | EllipsisType | None = UNSET,
+        tags: Tags | EllipsisType | None = UNSET,
+        external_docs: ExternalDocumentation | Reference | EllipsisType | None = UNSET,
+        bindings: MessageBindingsObject | Reference | EllipsisType | None = UNSET,
+        examples: list[MessageExample] | EllipsisType | None = UNSET,
+        traits: list[MessageTrait | Reference] | EllipsisType | None = UNSET,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a message to the specification or update an existing message.
+
+        If the message doesn't exist in components.messages, it will be created.
+        The message is always stored in components.messages as a Message object.
+
+        Args:
+            name: Message name identifier (key in components.messages), also used as
+                message.name property.
+            headers: Schema definition of the application headers. Schema MUST be a
+                map of key-value pairs. It MUST NOT define the protocol headers.
+            payload: Definition of the message payload. If this is a Schema Object,
+                then the schemaFormat will be assumed to be
+                "application/vnd.aai.asyncapi+json;version=asyncapi" where the version
+                is equal to the AsyncAPI Version String.
+            correlation_id: Definition of the correlation ID used for message tracing
+                or matching.
+            content_type: The content type to use when encoding/decoding a message's
+                payload.
+                The value MUST be a specific media type (e.g. application/json).
+            title: A human-friendly title for the message.
+            summary: A short summary of what the message is about.
+            description: A verbose explanation of the message. CommonMark syntax can be
+                used for rich text representation.
+            tags: A list of tags for logical grouping and categorization of messages.
+            external_docs: Additional external documentation for this message.
+            bindings: A map where the keys describe the name of the protocol and the
+                values describe protocol-specific definitions for the message.
+            examples: List of examples.
+            traits: A list of traits to apply to the message object. Traits MUST be
+                merged using traits merge mechanism. The resulting object MUST be a
+                valid Message Object.
+
+        Raises:
+            ValueError: If the message name does not match the required pattern.
+            TypeError: If message name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "message")
+
+        # Get messages component with proper typing
+        _components_messages = cast(Messages, self._components.messages)
+
+        # Check if a message exists in components
+        message = _components_messages.root.get(name)
+
+        # New message
+        if message is None:
+            message = Message(name=name)
+
+        if isinstance(message, Reference):
+            raise TypeError(
+                f"The message with name '{name}' is stored as reference. "
+                "Cannot update a message reference, delete reference first."
+            )
+
+        # Update provided fields
+        update_object_attributes(
+            message,
+            payload=payload,
+            headers=headers,
+            correlation_id=correlation_id,
+            content_type=content_type,
+            title=title,
+            summary=summary,
+            description=description,
+            tags=tags,
+            external_docs=external_docs,
+            bindings=bindings,
+            examples=examples,
+            traits=traits,
+        )
+
+        # Always store/update in components.messages
+        _components_messages[name] = message
+
+        return self
+
+    def add_message_to_channel(
+        self,
+        channel_name: str,
+        message_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a message reference to a channel's messages.
+
+        Args:
+            channel_name: Name of the channel to add the message to.
+            message_name: Name of the message to add.
+
+        Raises:
+            ValueError: If the channel or message names do not match the required
+                pattern, or if the channel/message does not exist.
+            TypeError: If channel or message names are not strings, or if the channel
+                is stored as a reference.
+        """
+        # Validate names format
+        validate_patterned_key(channel_name, "channel")
+        validate_patterned_key(message_name, "message")
+
+        # Get messages component with proper typing
+        _components_messages = cast(Messages, self._components.messages)
+
+        # Check if message exists in components.messages
+        if message_name not in _components_messages:
+            raise ValueError(
+                f"Cannot add message '{message_name}' to channel: "
+                "message does not exist in components.messages. "
+                "Add the message first using update_or_create_message()."
+            )
+
+        # Get channels component with proper typing
+        _components_channels = cast(Channels, self._components.channels)
+
+        # We keep all objects in components, so we do not care is it root channel or not
+        channel = _components_channels.root.get(channel_name)
+        # Initialize channel if not exists
+        if channel is None:
+            raise ValueError(
+                f"Cannot add message '{message_name}' to channel: {channel_name} "
+                f"channel does not exist in components.channels."
+            )
+        if isinstance(channel, Reference):
+            raise TypeError(
+                f"Cannot add message to channel '{channel_name}': "
+                "channel is stored as a reference, not an object."
+            )
+
+        # Initialize messages dict if not exists
+        if channel.messages is None:
+            channel.messages = Messages({})
+
+        message_ref = Reference.to_component_message_name(message_name)
+        channel.messages[message_name] = message_ref
+
+        return self
+
+    def remove_message_from_channel(
+        self,
+        channel_name: str,
+        message_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a message reference from a channel's messages.
+
+        Args:
+            channel_name: Name of the channel to remove the message from.
+            message_name: Name of the message to remove.
+
+        Raises:
+            ValueError: If the channel or message names do not match the required
+                pattern, or if the channel/message does not exist.
+            TypeError: If channel or message names are not strings, or if the channel
+                is stored as a reference.
+        """
+        # Validate names format
+        validate_patterned_key(channel_name, "channel")
+        validate_patterned_key(message_name, "message")
+
+        # Find the channel
+        _components_channels = cast(Channels, self._components.channels)
+        channel = _components_channels.root.get(channel_name)
+        if channel is None:
+            raise ValueError(
+                f"Cannot remove message from channel '{channel_name}': "
+                f"channel does not exist in components.channels."
+            )
+        if isinstance(channel, Reference):
+            raise TypeError(
+                f"Cannot remove message from channel '{channel_name}': "
+                "channel is stored as a reference, not an object."
+            )
+
+        # Check if message exists in channel's messages
+        if channel.messages is None or message_name not in channel.messages:
+            raise ValueError("message does not exist in channel's messages.")
+
+        # Remove message from channel
+        del channel.messages[message_name]
+
+        return self
+
+    def add_message_to_operation(
+        self,
+        operation_name: str,
+        message_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a message reference to an operation's messages.
+
+        Args:
+            operation_name: Name of the operation to add the message to.
+            message_name: Name of the message to add.
+
+        Raises:
+            ValueError: If the operation or message names do not match the required
+                pattern, or if the operation/message does not exist.
+            TypeError: If operation or message names are not strings, or if
+                the operation is stored as a reference.
+        """
+        # Validate names format
+        validate_patterned_key(operation_name, "operation")
+        validate_patterned_key(message_name, "message")
+
+        # Get messages component with proper typing
+        _components_messages = cast(Messages, self._components.messages)
+
+        # Check if message exists in components.messages
+        if message_name not in _components_messages:
+            raise ValueError(
+                f"Cannot add message '{message_name}' to operation: "
+                "message does not exist in components.messages. "
+                "Add the message first using update_or_create_message()."
+            )
+
+        # Get operations component with proper typing
+        _components_operations = cast(Operations, self._components.operations)
+
+        # Find the operation
+        operation = _components_operations.root.get(operation_name)
+
+        if operation is None:
+            raise ValueError(
+                f"Cannot add message to operation '{operation_name}': "
+                f"operation does not exist in components.operations."
+            )
+
+        if isinstance(operation, Reference):
+            raise TypeError(
+                f"Cannot add message to operation '{operation_name}': "
+                "operation is stored as a reference, not an object."
+            )
+
+        # Initialize messages list if not exists
+        if operation.messages is None:
+            operation.messages = []
+
+        # Create reference to message
+        message_ref = Reference.to_component_message_name(message_name)
+
+        # Add message to operation (avoid duplicates)
+        if message_ref not in operation.messages:
+            operation.messages.append(message_ref)
+
+        return self
+
+    def remove_message_from_operation(
+        self,
+        operation_name: str,
+        message_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a message reference from an operation's messages.
+
+        Args:
+            operation_name: Name of the operation to remove the message from.
+            message_name: Name of the message to remove.
+
+        Raises:
+            ValueError: If the operation or message names do not match the required
+                pattern, or if the operation/message does not exist.
+            TypeError: If operation or message names are not strings, or if
+                the operation is stored as a reference.
+        """
+        # Validate names format
+        validate_patterned_key(operation_name, "operation")
+        validate_patterned_key(message_name, "message")
+
+        # Get operations component with proper typing
+        _components_operations = cast(Operations, self._components.operations)
+
+        # Find the operation
+        operation = _components_operations.root.get(operation_name)
+
+        if operation is None:
+            raise ValueError(
+                f"Cannot remove message from operation '{operation_name}': "
+                f"operation does not exist in components.operations."
+            )
+
+        if isinstance(operation, Reference):
+            raise TypeError(
+                f"Cannot remove message from operation '{operation_name}': "
+                "operation is stored as a reference, not an object."
+            )
+
+        # Check if message exists in operation's messages
+        if operation.messages is None:
+            raise ValueError("operation has no messages.")
+
+        # Find and remove the message reference
+        message_ref = Reference.to_component_message_name(message_name)
+        if message_ref not in operation.messages:
+            raise ValueError("message does not exist in operation's messages.")
+
+        operation.messages.remove(message_ref)
 
         return self
