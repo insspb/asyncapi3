@@ -6,7 +6,13 @@ import pytest
 
 from pydantic import BaseModel, TypeAdapter, ValidationError
 
-from asyncapi3.models.helpers import EmailStr, is_null, validate_patterned_key
+from asyncapi3.models.helpers import (
+    UNSET,
+    EmailStr,
+    is_null,
+    update_object_attributes,
+    validate_patterned_key,
+)
 
 
 class TestIsNull:
@@ -230,3 +236,95 @@ class TestValidatePatternedKey:
             validate_patterned_key(key, "test")
 
         assert str(exc_info.value) == expected_error
+
+
+class TestUpdateObjectAttributes:
+    """Tests for update_object_attributes function."""
+
+    def test_update_object_attributes_updates_provided_values(self) -> None:
+        """Test update_object_attributes updates attributes with provided values."""
+
+        class TestModel(BaseModel):
+            name: str | None = None
+            age: int | None = None
+            active: bool | None = None
+
+        obj = TestModel(name="John", age=25)
+
+        result = update_object_attributes(obj, name="Jane", age=30, active=True)
+
+        # Should return the same object
+        assert result is obj
+        assert result.name == "Jane"
+        assert result.age == 30
+        assert result.active is True
+
+    def test_update_object_attributes_skips_unset_values(self) -> None:
+        """Test update_object_attributes skips UNSET values."""
+
+        class TestModel(BaseModel):
+            name: str | None = None
+            age: int | None = None
+            active: bool | None = None
+
+        obj = TestModel(name="John", age=25, active=False)
+
+        result = update_object_attributes(
+            obj,
+            name="Jane",
+            age=UNSET,  # Should be skipped
+            active=UNSET,  # Should be skipped
+        )
+
+        # Should return the same object
+        assert result is obj
+        assert result.name == "Jane"
+        assert result.age == 25  # Unchanged
+        assert result.active is False  # Unchanged
+
+    def test_update_object_attributes_handles_none_values(self) -> None:
+        """Test update_object_attributes handles None values correctly."""
+
+        class TestModel(BaseModel):
+            name: str | None = None
+            description: str | None = None
+
+        obj = TestModel(name="John", description="Developer")
+
+        result = update_object_attributes(
+            obj,
+            name=None,  # Explicitly set to None
+            description=UNSET,  # Should be skipped
+        )
+
+        # Should return the same object
+        assert result is obj
+        assert result.name is None  # Explicitly set to None
+        assert result.description == "Developer"  # Unchanged
+
+    def test_update_object_attributes_with_empty_kwargs(self) -> None:
+        """Test update_object_attributes with no arguments."""
+
+        class TestModel(BaseModel):
+            name: str = "John"
+
+        obj = TestModel()
+
+        result = update_object_attributes(obj)
+
+        # Should return the same object unchanged
+        assert result is obj
+        assert result.name == "John"
+
+    def test_update_object_attributes_type_preservation(self) -> None:
+        """Test update_object_attributes preserves object type."""
+
+        class TestModel(BaseModel):
+            value: str
+
+        obj = TestModel(value="test")
+        result = update_object_attributes(obj, value="updated")
+
+        # Should return the same type
+        assert isinstance(result, TestModel)
+        assert result.value == "updated"
