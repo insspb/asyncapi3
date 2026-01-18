@@ -9,7 +9,7 @@ __all__ = ["AsyncAPI3Builder"]
 
 
 from types import EllipsisType
-from typing import Any, NoReturn
+from typing import Any, Literal, NoReturn
 
 import yaml
 
@@ -19,6 +19,7 @@ from asyncapi3.models.asyncapi import AsyncAPI3
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.bindings import (
     ChannelBindingsObject,
+    OperationBindingsObject,
     ServerBindingsObject,
 )
 from asyncapi3.models.channel import Channel, Channels, Parameters
@@ -33,7 +34,10 @@ from asyncapi3.models.helpers import (
 from asyncapi3.models.info import Contact, Info, License
 from asyncapi3.models.message import Messages
 from asyncapi3.models.operation import (
+    Operation,
+    OperationReply,
     Operations,
+    OperationTrait,
 )
 from asyncapi3.models.security import SecurityScheme
 from asyncapi3.models.server import Server, Servers, ServerVariable
@@ -623,5 +627,225 @@ class AsyncAPI3Builder:
             and name in self._components.channels
         ):
             del self._components.channels[name]
+
+        return self
+
+    # Operation methods
+    def update_or_create_operation(
+        self,
+        name: str,
+        action: Literal["send", "receive"] | EllipsisType = UNSET,
+        channel_name: str | EllipsisType = UNSET,
+        title: str | EllipsisType | None = UNSET,
+        summary: str | EllipsisType | None = UNSET,
+        description: str | EllipsisType | None = UNSET,
+        security: list[SecurityScheme | Reference] | EllipsisType | None = UNSET,
+        tags: Tags | EllipsisType | None = UNSET,
+        external_docs: ExternalDocumentation | Reference | EllipsisType | None = UNSET,
+        bindings: OperationBindingsObject | Reference | EllipsisType | None = UNSET,
+        traits: list[OperationTrait | Reference] | EllipsisType | None = UNSET,
+        messages: list[Reference] | EllipsisType | None = UNSET,
+        reply: OperationReply | Reference | EllipsisType | None = UNSET,
+        is_root_operation: bool = True,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add an operation to the specification or update an existing operation.
+
+        If the operation doesn't exist in components.operations, it will be created.
+        The operation is always stored in components.operations as an Operation object.
+        If is_root_operation=True, a Reference to the operation will be added to root
+        operations.
+
+        Args:
+            name: Operation name identifier (key in components.operations and
+                potentially operations).
+            action: Use send when it's expected that the application will send a message
+                to the given channel, and receive when the application should expect
+                receiving messages from the given channel.
+            channel_name: Channel name that this operation is performed on. Must exist
+                in components.channels.
+            title: A human-friendly title for the operation.
+            summary: A short summary of what the operation is about.
+            description: A verbose explanation of the operation. CommonMark syntax can
+                be used for rich text representation.
+            security: A declaration of which security schemes are associated with this
+                operation. Only one of the security scheme objects MUST be satisfied to
+                authorize an operation. In cases where Server Security also applies, it
+                MUST also be satisfied.
+            tags: A list of tags for logical grouping and categorization of operations.
+            external_docs: Additional external documentation for this operation.
+            bindings: A map where the keys describe the name of the protocol and the
+                values describe protocol-specific definitions for the operation.
+            traits: A list of traits to apply to the operation object. Traits MUST be
+                merged using traits merge mechanism. The resulting object MUST be a
+                valid Operation Object.
+            messages: A list of $ref pointers pointing to the supported Message Objects
+                that can be processed by this operation. It MUST contain a subset of
+                the messages defined in the channel referenced in this operation, and
+                MUST NOT point to a subset of message definitions located in the
+                Components Object or anywhere else. Every message processed by this
+                operation MUST be valid against one, and only one, of the message
+                objects referenced in this list.
+            reply: The definition of the reply in a request-reply operation.
+            is_root_operation: Whether to add a reference to this operation in root
+                operations.
+
+        Raises:
+            ValueError: If the operation name does not match the required pattern, if
+                action or channel_name are not provided when creating a new operation,
+                or if channel_name does not exist in components.channels.
+            TypeError: If attempting to update an operation that is stored as a
+                Reference object instead of an Operation object, or if operation name
+                or channel_name are not strings.
+        """
+        # Validate name format
+        validate_patterned_key(name, "operation")
+        channel: Reference | EllipsisType = UNSET
+
+        # Validate channel_name if provided
+        if channel_name is not UNSET:
+            validate_patterned_key(channel_name, "channel_name")
+            # Check if channel exists in components.channels
+            if (
+                self._components.channels is None
+                or channel_name not in self._components.channels
+            ):
+                raise ValueError(
+                    f"Cannot create/update operation '{name}': channel '{channel_name}'"
+                    " does not exist in components.channels. Add the channel first "
+                    "using update_channel()."
+                )
+            if is_root_operation:
+                channel = Reference.to_root_channel_name(channel_name)
+            else:
+                channel = Reference.to_component_channel_name(channel_name)
+
+        # Validate action value if set
+        if action is not UNSET and action not in ("send", "receive"):
+            raise ValueError(
+                f"action should be either 'send' or 'receive', got '{action}'"
+            )
+
+        # Initialize components.operations if not exists
+        if self._components.operations is None:
+            self._components.operations = Operations({})
+
+        # Check if an operation exists in components
+        operation = self._components.operations.root.get(name)
+
+        # For new operations, require action and channel_name
+        if operation is None:
+            if action is UNSET:
+                raise ValueError(
+                    f"Cannot create new operation '{name}': 'action' is required when "
+                    "creating an operation for the first time."
+                )
+
+            if channel_name is UNSET:
+                raise ValueError(
+                    f"Cannot create new operation '{name}': 'channel_name' is required "
+                    "when creating an operation for the first time."
+                )
+            # Create a new operation with channel reference
+            operation = Operation(action=action, channel=channel)
+
+        # For update case
+        if isinstance(operation, Reference):
+            raise TypeError(
+                f"The operation with name '{name}' is stored as reference. "
+                "Cannot update an operation reference, delete reference first."
+            )
+
+        # Update provided fields
+        update_object_attributes(
+            operation,
+            action=action,
+            channel=channel,
+            title=title,
+            summary=summary,
+            description=description,
+            security=security,
+            tags=tags,
+            external_docs=external_docs,
+            bindings=bindings,
+            traits=traits,
+            messages=messages,
+            reply=reply,
+        )
+
+        # Always store/update in components.operations
+        self._components.operations[name] = operation
+
+        # Add/remove reference in root operations
+        if is_root_operation:
+            self.add_root_operation_as_ref(name)
+        else:
+            self.remove_root_operation(name)
+
+        return self
+
+    def add_root_operation_as_ref(self, name: str) -> "AsyncAPI3Builder":
+        """
+        Add reference to components operation to root operations.
+
+        The operation must already exist in components.operations. This method only adds
+        a reference to it in the root operations section.
+
+        Args:
+            name: Operation name to add to root operations. Must exist in
+                components.operations.
+
+        Raises:
+            ValueError: If the operation name does not match the required pattern, or if
+                the operation does not exist in components.operations.
+            TypeError: If operation name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "operation")
+
+        # Check if operation exists in components
+        if (
+            self._components.operations is None
+            or name not in self._components.operations
+        ):
+            raise ValueError(
+                f"Cannot add operation '{name}' to root operations: "
+                "operation does not exist in components.operations. "
+                "Add the operation first using update_or_create_operation()."
+            )
+
+        # Add reference to root operations
+        self._operations[name] = Reference.to_root_operation_name(name)
+
+        return self
+
+    def remove_root_operation(
+        self,
+        name: str,
+        cascade: bool = False,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove an operation reference from root operations.
+
+        Args:
+            name: Operation name to remove from root operations.
+            cascade: If True, also remove the operation from components.operations.
+
+        Raises:
+            ValueError: If the operation name does not match the required pattern.
+            TypeError: If operation name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "operation")
+
+        if name in self._operations:
+            del self._operations[name]
+
+        if (
+            cascade
+            and self._components.operations is not None
+            and name in self._components.operations
+        ):
+            del self._components.operations[name]
 
         return self
