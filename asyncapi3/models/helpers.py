@@ -16,7 +16,7 @@ def is_null(value: Any) -> bool:
     return value is None
 
 
-def validate_patterned_key(key: str, object_name: str = "object") -> None:
+def validate_patterned_key(key: str | Any, object_name: str = "object") -> None:
     """
     Validate that a key matches the AsyncAPI patterned key pattern.
 
@@ -27,13 +27,19 @@ def validate_patterned_key(key: str, object_name: str = "object") -> None:
 
     Raises:
         ValueError: If the key does not match the required pattern.
+        TypeError: If the key is not a string.
     """
     pattern = re.compile(r"^[A-Za-z0-9_\-]+$")
-    if not pattern.match(key):
-        raise ValueError(
-            f"Field '{key}' does not match patterned object key pattern. "
-            "Keys must contain letters, digits, hyphens, and underscores."
-        )
+    try:
+        if not pattern.match(key):
+            raise ValueError(
+                f"Field '{key}' does not match patterned object key pattern. "
+                "Keys must contain letters, digits, hyphens, and underscores."
+            )
+    except TypeError as error:
+        raise TypeError(
+            f"Key '{key}' must be a string, got {type(key).__name__}"
+        ) from error
 
 
 class EmailStr(str):

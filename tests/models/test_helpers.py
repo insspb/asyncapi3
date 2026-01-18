@@ -4,7 +4,9 @@ from typing import Any
 
 import pytest
 
-from asyncapi3.models.helpers import EmailStr, is_null
+from pydantic import BaseModel, TypeAdapter, ValidationError
+
+from asyncapi3.models.helpers import EmailStr, is_null, validate_patterned_key
 
 
 class TestIsNull:
@@ -45,8 +47,6 @@ class TestEmailStr:
 
     def test_emailstr_valid(self) -> None:
         """Test EmailStr accepts valid email addresses."""
-        from pydantic import TypeAdapter
-
         adapter = TypeAdapter(EmailStr)
 
         valid_emails = [
@@ -82,8 +82,6 @@ class TestEmailStr:
     )
     def test_emailstr_invalid(self, invalid_email: str) -> None:
         """Test EmailStr rejects invalid email addresses."""
-        from pydantic import TypeAdapter, ValidationError
-
         adapter = TypeAdapter(EmailStr)
 
         with pytest.raises(ValidationError, match="Invalid email format"):
@@ -91,9 +89,6 @@ class TestEmailStr:
 
     def test_emailstr_json_schema(self) -> None:
         """Test EmailStr generates correct JSON schema with email format."""
-
-        from pydantic import BaseModel, TypeAdapter
-
         # Test direct TypeAdapter schema
         adapter = TypeAdapter(EmailStr)
         schema = adapter.json_schema()
@@ -146,8 +141,6 @@ class TestValidatePatternedKey:
     )
     def test_validate_patterned_key_accepts_valid_keys(self, key: str) -> None:
         """Test validate_patterned_key accepts valid patterned keys."""
-        from asyncapi3.models.helpers import validate_patterned_key
-
         # Should not raise any exception
         validate_patterned_key(key, "test")
 
@@ -192,8 +185,48 @@ class TestValidatePatternedKey:
         self, key: str, expected_error: str
     ) -> None:
         """Test validate_patterned_key rejects invalid patterned keys."""
-        from asyncapi3.models.helpers import validate_patterned_key
-
         with pytest.raises(ValueError) as exc_info:  # noqa: PT011
             validate_patterned_key(key, "test")
+        assert str(exc_info.value) == expected_error
+
+    @pytest.mark.parametrize(
+        ("key", "expected_error"),
+        [
+            (
+                123,
+                "Key '123' must be a string, got int",
+            ),
+            (
+                42.5,
+                "Key '42.5' must be a string, got float",
+            ),
+            (
+                True,
+                "Key 'True' must be a string, got bool",
+            ),
+            (
+                False,
+                "Key 'False' must be a string, got bool",
+            ),
+            (
+                ["list"],
+                "Key '['list']' must be a string, got list",
+            ),
+            (
+                {"dict": "value"},
+                "Key '{'dict': 'value'}' must be a string, got dict",
+            ),
+            (
+                None,
+                "Key 'None' must be a string, got NoneType",
+            ),
+        ],
+    )
+    def test_validate_patterned_key_rejects_non_string_types(
+        self, key: Any, expected_error: str
+    ) -> None:
+        """Test validate_patterned_key rejects non-string key types with TypeError."""
+        with pytest.raises(TypeError) as exc_info:
+            validate_patterned_key(key, "test")
+
         assert str(exc_info.value) == expected_error
