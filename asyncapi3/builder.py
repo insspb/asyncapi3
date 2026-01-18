@@ -158,7 +158,6 @@ class AsyncAPI3Builder:
 
     def validate(self) -> "AsyncAPI3Builder":
         """Ensure that all required objects are present and valid."""
-        # Check that info is provided and is a valid Info object (required field)
         self._validate_info()
 
         return self
@@ -192,7 +191,6 @@ class AsyncAPI3Builder:
 
     def get_yaml(self) -> str:
         """Return YAML representation of AsyncAPI 3.0 specification."""
-        # Convert to dict first, then to YAML
         data = self.spec.model_dump()
         return yaml.dump(
             data,
@@ -239,10 +237,8 @@ class AsyncAPI3Builder:
             return self
 
         try:
-            # Validate that id_value is a valid URI
             validated_id = AnyUrl(id_value)
         except ValidationError as e:
-            # Re-raise with a more user-friendly message
             raise ValueError(
                 f"Invalid ID format: '{id_value}'. ID must conform to URI format "
                 f"(RFC3986). "
@@ -294,6 +290,7 @@ class AsyncAPI3Builder:
                 Pass None to explicitly remove external documentation.
         """
         # Validate an info object before attempting to update it
+        # Protection from private value modification
         self._validate_info()
 
         update_object_attributes(
@@ -384,10 +381,8 @@ class AsyncAPI3Builder:
             TypeError: If attempting to update a server that is stored as a Reference
                 object instead of a Server object, or if server name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "server")
 
-        # Check if a server exists in components
         _components_servers = cast(Servers, self._components.servers)
         server = _components_servers.root.get(name)
 
@@ -398,7 +393,6 @@ class AsyncAPI3Builder:
                     f"Cannot create new server '{name}': both 'host' and 'protocol' "
                     "are required when creating a server for the first time."
                 )
-            # Create a new server
             server = Server(host=host, protocol=protocol)
 
         if isinstance(server, Reference):
@@ -407,7 +401,6 @@ class AsyncAPI3Builder:
                 "Cannot update a server reference, delete reference first."
             )
 
-        # Update provided fields
         update_object_attributes(
             server,
             host=host,
@@ -424,7 +417,6 @@ class AsyncAPI3Builder:
             bindings=bindings,
         )
 
-        # Always store/update in components.servers
         _components_servers[name] = server
 
         # Add/remove reference in root servers
@@ -450,10 +442,8 @@ class AsyncAPI3Builder:
                 the server does not exist in components.servers.
             TypeError: If server name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "server")
 
-        # Check if server exists in components
         _components_servers = cast(Servers, self._components.servers)
         if name not in _components_servers:
             raise ValueError(
@@ -462,7 +452,6 @@ class AsyncAPI3Builder:
                 "Add the server first using update_or_create_server()."
             )
 
-        # Add reference to root servers
         self._servers[name] = Reference.to_component_server_name(name)
 
         return self
@@ -483,7 +472,6 @@ class AsyncAPI3Builder:
             ValueError: If the server name does not match the required pattern.
             TypeError: If server name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "server")
 
         if name in self._servers:
@@ -557,14 +545,11 @@ class AsyncAPI3Builder:
             TypeError: If attempting to update a channel that is stored as a Reference
                 object instead of a Channel object, or if channel name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "channel")
 
-        # Check if a channel exists in components
         _components_channels = cast(Channels, self._components.channels)
         channel = _components_channels.root.get(name)
 
-        # New channel
         if channel is None:
             channel = Channel()
 
@@ -574,7 +559,6 @@ class AsyncAPI3Builder:
                 "Cannot update a channel reference, delete reference first."
             )
 
-        # Update provided fields
         update_object_attributes(
             channel,
             address=address,
@@ -589,7 +573,6 @@ class AsyncAPI3Builder:
             messages=messages,
         )
 
-        # Always store/update in components.channels
         _components_channels[name] = channel
 
         # Add/remove reference in root channels
@@ -616,10 +599,8 @@ class AsyncAPI3Builder:
                 the channel does not exist in components.channels.
             TypeError: If channel name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "channel")
 
-        # Check if channel exists in components
         _components_channels = cast(Channels, self._components.channels)
         if name not in _components_channels:
             raise ValueError(
@@ -628,7 +609,6 @@ class AsyncAPI3Builder:
                 "Add the channel first using update_or_create_channel()."
             )
 
-        # Add reference to root channels
         self._channels[name] = Reference.to_root_channel_name(name)
 
         return self
@@ -649,7 +629,6 @@ class AsyncAPI3Builder:
             ValueError: If the channel name does not match the required pattern.
             TypeError: If channel name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "channel")
 
         if name in self._channels:
@@ -732,14 +711,11 @@ class AsyncAPI3Builder:
                 Reference object instead of an Operation object, or if operation name
                 or channel_name are not strings.
         """
-        # Validate name format
         validate_patterned_key(name, "operation")
         channel: Reference | EllipsisType = UNSET
 
-        # Validate channel_name if provided
         if channel_name is not UNSET:
             validate_patterned_key(channel_name, "channel_name")
-            # Check if channel exists in components.channels
             if (
                 self._components.channels is None
                 or channel_name not in self._components.channels
@@ -754,13 +730,11 @@ class AsyncAPI3Builder:
             else:
                 channel = Reference.to_component_channel_name(channel_name)
 
-        # Validate action value if set
         if action is not UNSET and action not in ("send", "receive"):
             raise ValueError(
                 f"action should be either 'send' or 'receive', got '{action}'"
             )
 
-        # Check if an operation exists in components
         _components_operations = cast(Operations, self._components.operations)
         operation = _components_operations.root.get(name)
 
@@ -777,7 +751,6 @@ class AsyncAPI3Builder:
                     f"Cannot create new operation '{name}': 'channel_name' is required "
                     "when creating an operation for the first time."
                 )
-            # Create a new operation with channel reference
             operation = Operation(action=action, channel=channel)
 
         # For update case
@@ -787,7 +760,6 @@ class AsyncAPI3Builder:
                 "Cannot update an operation reference, delete reference first."
             )
 
-        # Update provided fields
         update_object_attributes(
             operation,
             action=action,
@@ -804,7 +776,6 @@ class AsyncAPI3Builder:
             reply=reply,
         )
 
-        # Always store/update in components.operations
         _components_operations[name] = operation
 
         # Add/remove reference in root operations
@@ -831,10 +802,8 @@ class AsyncAPI3Builder:
                 the operation does not exist in components.operations.
             TypeError: If operation name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "operation")
 
-        # Check if operation exists in components
         if (
             self._components.operations is None
             or name not in self._components.operations
@@ -845,7 +814,6 @@ class AsyncAPI3Builder:
                 "Add the operation first using update_or_create_operation()."
             )
 
-        # Add reference to root operations
         self._operations[name] = Reference.to_root_operation_name(name)
 
         return self
@@ -866,7 +834,6 @@ class AsyncAPI3Builder:
             ValueError: If the operation name does not match the required pattern.
             TypeError: If operation name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "operation")
 
         if name in self._operations:
@@ -935,16 +902,12 @@ class AsyncAPI3Builder:
             ValueError: If the message name does not match the required pattern.
             TypeError: If message name is not a string.
         """
-        # Validate name format
         validate_patterned_key(name, "message")
 
-        # Get messages component with proper typing
         _components_messages = cast(Messages, self._components.messages)
 
-        # Check if a message exists in components
         message = _components_messages.root.get(name)
 
-        # New message
         if message is None:
             message = Message(name=name)
 
@@ -954,7 +917,6 @@ class AsyncAPI3Builder:
                 "Cannot update a message reference, delete reference first."
             )
 
-        # Update provided fields
         update_object_attributes(
             message,
             payload=payload,
@@ -971,7 +933,6 @@ class AsyncAPI3Builder:
             traits=traits,
         )
 
-        # Always store/update in components.messages
         _components_messages[name] = message
 
         return self
@@ -994,14 +955,11 @@ class AsyncAPI3Builder:
             TypeError: If channel or message names are not strings, or if the channel
                 is stored as a reference.
         """
-        # Validate names format
         validate_patterned_key(channel_name, "channel")
         validate_patterned_key(message_name, "message")
 
-        # Get messages component with proper typing
         _components_messages = cast(Messages, self._components.messages)
 
-        # Check if message exists in components.messages
         if message_name not in _components_messages:
             raise ValueError(
                 f"Cannot add message '{message_name}' to channel: "
@@ -1009,12 +967,9 @@ class AsyncAPI3Builder:
                 "Add the message first using update_or_create_message()."
             )
 
-        # Get channels component with proper typing
         _components_channels = cast(Channels, self._components.channels)
 
-        # We keep all objects in components, so we do not care is it root channel or not
         channel = _components_channels.root.get(channel_name)
-        # Initialize channel if not exists
         if channel is None:
             raise ValueError(
                 f"Cannot add message '{message_name}' to channel: {channel_name} "
@@ -1026,7 +981,6 @@ class AsyncAPI3Builder:
                 "channel is stored as a reference, not an object."
             )
 
-        # Initialize messages dict if not exists
         if channel.messages is None:
             channel.messages = Messages({})
 
@@ -1053,7 +1007,6 @@ class AsyncAPI3Builder:
             TypeError: If channel or message names are not strings, or if the channel
                 is stored as a reference.
         """
-        # Validate names format
         validate_patterned_key(channel_name, "channel")
         validate_patterned_key(message_name, "message")
 
@@ -1071,11 +1024,9 @@ class AsyncAPI3Builder:
                 "channel is stored as a reference, not an object."
             )
 
-        # Check if message exists in channel's messages
         if channel.messages is None or message_name not in channel.messages:
             raise ValueError("message does not exist in channel's messages.")
 
-        # Remove message from channel
         del channel.messages[message_name]
 
         return self
@@ -1098,14 +1049,11 @@ class AsyncAPI3Builder:
             TypeError: If operation or message names are not strings, or if
                 the operation is stored as a reference.
         """
-        # Validate names format
         validate_patterned_key(operation_name, "operation")
         validate_patterned_key(message_name, "message")
 
-        # Get messages component with proper typing
         _components_messages = cast(Messages, self._components.messages)
 
-        # Check if message exists in components.messages
         if message_name not in _components_messages:
             raise ValueError(
                 f"Cannot add message '{message_name}' to operation: "
@@ -1113,7 +1061,6 @@ class AsyncAPI3Builder:
                 "Add the message first using update_or_create_message()."
             )
 
-        # Get operations component with proper typing
         _components_operations = cast(Operations, self._components.operations)
 
         # Find the operation
@@ -1131,13 +1078,10 @@ class AsyncAPI3Builder:
                 "operation is stored as a reference, not an object."
             )
 
-        # Initialize messages list if not exists
         if operation.messages is None:
             operation.messages = []
 
-        # Create reference to message
         message_ref = Reference.to_component_message_name(message_name)
-
         # Add message to operation (avoid duplicates)
         if message_ref not in operation.messages:
             operation.messages.append(message_ref)
@@ -1162,11 +1106,9 @@ class AsyncAPI3Builder:
             TypeError: If operation or message names are not strings, or if
                 the operation is stored as a reference.
         """
-        # Validate names format
         validate_patterned_key(operation_name, "operation")
         validate_patterned_key(message_name, "message")
 
-        # Get operations component with proper typing
         _components_operations = cast(Operations, self._components.operations)
 
         # Find the operation
@@ -1184,7 +1126,6 @@ class AsyncAPI3Builder:
                 "operation is stored as a reference, not an object."
             )
 
-        # Check if message exists in operation's messages
         if operation.messages is None:
             raise ValueError("operation has no messages.")
 
