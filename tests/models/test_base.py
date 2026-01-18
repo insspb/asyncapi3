@@ -205,6 +205,140 @@ class TestReference:
             or "extra_forbidden" in error_msg
         )
 
+    def test_to_root_server_name(self) -> None:
+        """Test to_root_server_name factory method."""
+        reference = Reference.to_root_server_name("production")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/servers/production"
+
+    def test_to_root_channel_name(self) -> None:
+        """Test to_root_channel_name factory method."""
+        reference = Reference.to_root_channel_name("userSignup")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/channels/userSignup"
+
+    def test_to_root_operation_name(self) -> None:
+        """Test to_root_operation_name factory method."""
+        reference = Reference.to_root_operation_name("sendMessage")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/operations/sendMessage"
+
+    def test_to_component_schema_name(self) -> None:
+        """Test to_component_schema_name factory method."""
+        reference = Reference.to_component_schema_name("Pet")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/schemas/Pet"
+
+    def test_to_component_server_name(self) -> None:
+        """Test to_component_server_name factory method."""
+        reference = Reference.to_component_server_name("production")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/servers/production"
+
+    def test_to_component_channel_name(self) -> None:
+        """Test to_component_channel_name factory method."""
+        reference = Reference.to_component_channel_name("userSignup")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/channels/userSignup"
+
+    def test_to_component_operation_name(self) -> None:
+        """Test to_component_operation_name factory method."""
+        reference = Reference.to_component_operation_name("sendMessage")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/operations/sendMessage"
+
+    def test_to_component_message_name(self) -> None:
+        """Test to_component_message_name factory method."""
+        reference = Reference.to_component_message_name("userSignUp")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/messages/userSignUp"
+
+    def test_to_component_security_scheme_name(self) -> None:
+        """Test to_component_security_scheme_name factory method."""
+        reference = Reference.to_component_security_scheme_name("oauth2")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/securitySchemes/oauth2"
+
+    def test_to_component_server_variable_name(self) -> None:
+        """Test to_component_server_variable_name factory method."""
+        reference = Reference.to_component_server_variable_name("port")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/serverVariables/port"
+
+    def test_to_component_parameter_name(self) -> None:
+        """Test to_component_parameter_name factory method."""
+        reference = Reference.to_component_parameter_name("userId")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/parameters/userId"
+
+    def test_to_component_correlation_id_name(self) -> None:
+        """Test to_component_correlation_id_name factory method."""
+        reference = Reference.to_component_correlation_id_name("defaultCorrelationId")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/correlationIds/defaultCorrelationId"
+
+    def test_to_component_reply_name(self) -> None:
+        """Test to_component_reply_name factory method."""
+        reference = Reference.to_component_reply_name("successReply")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/replies/successReply"
+
+    def test_to_component_reply_address_name(self) -> None:
+        """Test to_component_reply_address_name factory method."""
+        reference = Reference.to_component_reply_address_name("responseAddress")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/replyAddresses/responseAddress"
+
+    def test_to_component_external_doc_name(self) -> None:
+        """Test to_component_external_doc_name factory method."""
+        reference = Reference.to_component_external_doc_name("apiDocs")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/externalDocs/apiDocs"
+
+    def test_to_component_tag_name(self) -> None:
+        """Test to_component_tag_name factory method."""
+        reference = Reference.to_component_tag_name("deprecated")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/tags/deprecated"
+
+    def test_to_component_operation_trait_name(self) -> None:
+        """Test to_component_operation_trait_name factory method."""
+        reference = Reference.to_component_operation_trait_name(
+            "authenticatedOperation"
+        )
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/operationTraits/authenticatedOperation"
+
+    def test_to_component_message_trait_name(self) -> None:
+        """Test to_component_message_trait_name factory method."""
+        reference = Reference.to_component_message_trait_name("envelopedMessage")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/messageTraits/envelopedMessage"
+
+    def test_to_component_server_binding_name(self) -> None:
+        """Test to_component_server_binding_name factory method."""
+        reference = Reference.to_component_server_binding_name("mqttBinding")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/serverBindings/mqttBinding"
+
+    def test_to_component_channel_binding_name(self) -> None:
+        """Test to_component_channel_binding_name factory method."""
+        reference = Reference.to_component_channel_binding_name("kafkaBinding")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/channelBindings/kafkaBinding"
+
+    def test_to_component_operation_binding_name(self) -> None:
+        """Test to_component_operation_binding_name factory method."""
+        reference = Reference.to_component_operation_binding_name("httpBinding")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/operationBindings/httpBinding"
+
+    def test_to_component_message_binding_name(self) -> None:
+        """Test to_component_message_binding_name factory method."""
+        reference = Reference.to_component_message_binding_name("amqpBinding")
+        assert isinstance(reference, Reference)
+        assert reference.ref == "#/components/messageBindings/amqpBinding"
+
 
 class TestExternalDocumentation:
     """Tests for ExternalDocumentation model."""

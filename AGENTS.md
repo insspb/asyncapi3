@@ -147,6 +147,47 @@ The project uses [Ruff](https://github.com/astral-sh/ruff) for linting and forma
 - In Pydantic models: first model configuration (if any), then all field declarations,
   then validation functions
 
+#### 1. Function and Method Documentation
+
+**MANDATORY** for all public functions and methods (except test files):
+
+- All function arguments must be described in docstring
+- Use standard Google-style docstring format:
+
+```python
+def function_name(param1: Type, param2: Type = default) -> ReturnType:
+    """
+    Brief description of what the function does.
+
+    Args:
+        param1: Description of param1.
+        param2: Description of param2 with default value.
+
+    Returns:
+        Description of return value.
+
+    Raises:
+        ExceptionType: When this exception is raised.
+    """
+```
+
+**EXCEPTIONS:**
+
+- Test files (`test_*.py`) - simple one-line docstrings are allowed
+- Private methods (starting with `_`) - may have simplified documentation
+
+#### 2. Import Organization
+
+**MANDATORY** for all project files:
+
+- All imports must be at the beginning of the file, immediately after the module docstring
+
+**EXCEPTIONS:**
+
+- Import can be moved inside a function ONLY in the following cases:
+  - Preventing circular dependencies
+  - Correct mock operation in tests (e.g., `from unittest.mock import patch`)
+
 ### Markdown Documentation Rules
 
 The project uses markdownlint as `pre-commit` hook (`.markdownlint.jsonc`):
