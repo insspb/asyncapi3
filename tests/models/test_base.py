@@ -9,6 +9,7 @@ from pydantic import AnyUrl, ValidationError
 from pytest_cases import parametrize_with_cases
 
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tag
+from asyncapi3.models.base_models import ExtendableBaseModel
 
 
 # Reference Validation Test Cases
@@ -237,8 +238,6 @@ class TestExternalDocumentation:
 
     def test_external_documentation_inherit_from_extendable_base_model(self) -> None:
         """Test that ExternalDocumentation inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(ExternalDocumentation, ExtendableBaseModel)
         assert isinstance(
@@ -349,8 +348,6 @@ class TestTag:
 
     def test_tag_inherit_from_extendable_base_model(self) -> None:
         """Test that Tag inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(Tag, ExtendableBaseModel)
         assert isinstance(Tag(name="test"), ExtendableBaseModel)

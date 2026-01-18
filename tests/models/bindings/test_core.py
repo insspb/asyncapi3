@@ -5,6 +5,7 @@ import yaml
 
 from pydantic import ValidationError
 
+from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.bindings.core import (
     ChannelBindingsObject,
     MessageBindingsObject,
@@ -520,32 +521,24 @@ class TestBindingsExtensions:
 
     def test_server_bindings_inherit_from_extendable_base_model(self) -> None:
         """Test that ServerBindingsObject inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(ServerBindingsObject, ExtendableBaseModel)
         assert isinstance(ServerBindingsObject(), ExtendableBaseModel)
 
     def test_channel_bindings_inherit_from_extendable_base_model(self) -> None:
         """Test that ChannelBindingsObject inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(ChannelBindingsObject, ExtendableBaseModel)
         assert isinstance(ChannelBindingsObject(), ExtendableBaseModel)
 
     def test_operation_bindings_inherit_from_extendable_base_model(self) -> None:
         """Test that OperationBindingsObject inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(OperationBindingsObject, ExtendableBaseModel)
         assert isinstance(OperationBindingsObject(), ExtendableBaseModel)
 
     def test_message_bindings_inherit_from_extendable_base_model(self) -> None:
         """Test that MessageBindingsObject inherits from ExtendableBaseModel."""
-        from asyncapi3.models.base_models import ExtendableBaseModel
-
         # Check inheritance
         assert issubclass(MessageBindingsObject, ExtendableBaseModel)
         assert isinstance(MessageBindingsObject(), ExtendableBaseModel)
