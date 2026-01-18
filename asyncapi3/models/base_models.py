@@ -9,6 +9,8 @@ from typing import Generic, TypeVar
 
 from pydantic import BaseModel, ConfigDict, RootModel, model_validator
 
+from asyncapi3.models.helpers import validate_patterned_key
+
 T = TypeVar("T")
 
 
@@ -114,11 +116,6 @@ class PatternedRootModel(RootModel[dict[str, T]], Generic[T]):
         if not self.root:
             return self
 
-        extension_pattern = re.compile(r"^[A-Za-z0-9_\\-]+$")
         for field_name in self.root:
-            if not extension_pattern.match(field_name):
-                raise ValueError(
-                    f"Field '{field_name}' does not match patterned object key pattern."
-                    " Keys must contain letters, digits, hyphens, and underscores."
-                )
+            validate_patterned_key(field_name, "object")
         return self

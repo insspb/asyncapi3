@@ -5,6 +5,7 @@ from typing import Any
 import pytest
 import yaml
 
+from pydantic import ValidationError
 from pytest_cases import parametrize_with_cases
 
 from asyncapi3.models.bindings.solace import (
@@ -150,8 +151,6 @@ class TestSolaceServerBindings:
 
     def test_solace_server_bindings_client_name_too_long(self) -> None:
         """Test SolaceServerBindings validation error when clientName is too long."""
-        from pydantic import ValidationError
-
         # Create a client name that exceeds 160 bytes
         long_client_name = "a" * 161  # 161 characters
         with pytest.raises(ValidationError):
@@ -173,15 +172,11 @@ class TestSolaceServerBindings:
 
     def test_solace_server_bindings_python_extra_fields_error(self) -> None:
         """Test SolaceServerBindings Python validation error with extra fields."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceServerBindings(extra_field="value")
 
     def test_solace_server_bindings_yaml_extra_fields_error(self) -> None:
         """Test SolaceServerBindings YAML validation error with extra fields."""
-        from pydantic import ValidationError
-
         yaml_data = """
         solace:
           msgVpn: my-vpn
@@ -204,15 +199,11 @@ class TestSolaceChannelBindings:
 
     def test_solace_channel_bindings_python_validation_error(self) -> None:
         """Test SolaceChannelBindings Python validation error with any arguments."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceChannelBindings(some_field="value")
 
     def test_solace_channel_bindings_yaml_validation_error(self) -> None:
         """Test SolaceChannelBindings YAML validation error with any fields."""
-        from pydantic import ValidationError
-
         yaml_data = """
         solace:
           some_field: value
@@ -283,15 +274,11 @@ class TestSolaceOperationBindings:
 
     def test_solace_operation_bindings_priority_too_low(self) -> None:
         """Test SolaceOperationBindings validation error when priority is too low."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceOperationBindings(priority=-1)
 
     def test_solace_operation_bindings_priority_too_high(self) -> None:
         """Test SolaceOperationBindings validation error when priority is too high."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceOperationBindings(priority=256)
 
@@ -328,15 +315,11 @@ class TestSolaceOperationBindings:
 
     def test_solace_operation_bindings_python_extra_fields_error(self) -> None:
         """Test SolaceOperationBindings Python validation error with extra fields."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceOperationBindings(extra_field="value")
 
     def test_solace_operation_bindings_yaml_extra_fields_error(self) -> None:
         """Test SolaceOperationBindings YAML validation error with extra fields."""
-        from pydantic import ValidationError
-
         yaml_data = """
         solace:
           destinations: []
@@ -359,15 +342,11 @@ class TestSolaceMessageBindings:
 
     def test_solace_message_bindings_python_validation_error(self) -> None:
         """Test SolaceMessageBindings Python validation error with any arguments."""
-        from pydantic import ValidationError
-
         with pytest.raises(ValidationError):
             SolaceMessageBindings(some_field="value")
 
     def test_solace_message_bindings_yaml_validation_error(self) -> None:
         """Test SolaceMessageBindings YAML validation error with any fields."""
-        from pydantic import ValidationError
-
         yaml_data = """
         solace:
           some_field: value

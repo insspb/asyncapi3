@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased
+
+### ADDED
+
+- #8: Strict pylint rules for imports location and other style issues
+- #8: validate_patterned_key function for key validation in AsyncAPI models
+
+### FIXED
+
+- #8: Style issues
+
 ## [0.0.2] - 2026-01-14
 
 ### ADDED
