@@ -7,6 +7,7 @@ documents with validation, type safety and simplified usage.
 
 __all__ = ["AsyncAPI3Builder"]
 
+
 from types import EllipsisType
 from typing import Any, NoReturn
 
@@ -17,9 +18,10 @@ from pydantic import AnyUrl, HttpUrl, ValidationError
 from asyncapi3.models.asyncapi import AsyncAPI3
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.bindings import (
+    ChannelBindingsObject,
     ServerBindingsObject,
 )
-from asyncapi3.models.channel import Channels
+from asyncapi3.models.channel import Channel, Channels, Parameters
 from asyncapi3.models.components import (
     Components,
 )
@@ -29,6 +31,7 @@ from asyncapi3.models.helpers import (
     validate_patterned_key,
 )
 from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.message import Messages
 from asyncapi3.models.operation import (
     Operations,
 )
@@ -452,5 +455,173 @@ class AsyncAPI3Builder:
             and name in self._components.servers
         ):
             del self._components.servers[name]
+
+        return self
+
+    # Channel methods
+    def update_or_create_channel(
+        self,
+        name: str,
+        address: str | EllipsisType | None = UNSET,
+        title: str | EllipsisType | None = UNSET,
+        summary: str | EllipsisType | None = UNSET,
+        description: str | EllipsisType | None = UNSET,
+        servers: list[Reference] | EllipsisType | None = UNSET,
+        parameters: Parameters | EllipsisType | None = UNSET,
+        tags: Tags | EllipsisType | None = UNSET,
+        external_docs: ExternalDocumentation | Reference | EllipsisType | None = UNSET,
+        bindings: ChannelBindingsObject | Reference | EllipsisType | None = UNSET,
+        messages: Messages | EllipsisType | None = UNSET,
+        is_root_channel: bool = True,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a channel to the specification or update an existing channel.
+
+        If the channel doesn't exist in components.channels, it will be created.
+        The channel is always stored in components.channels as a Channel object.
+        If is_root_channel=True, a Reference to the channel will be added to root
+        channels.
+
+        Args:
+            name: Channel name identifier (key in components.channels and potentially
+                channels).
+            address: An optional string representation of this channel's address.
+                The address is typically the 'topic name', 'routing key', 'event type',
+                or 'path'.
+            title: A human-friendly title for the channel.
+            summary: A short summary of the channel.
+            description: An optional description of this channel. CommonMark syntax
+                can be used for rich text representation.
+            servers: An array of $ref pointers to the definition of the servers in which
+                this channel is available. If the channel is located in the root
+                Channels Object, it MUST point to a subset of server definitions
+                located in the root Servers Object, and MUST NOT point to a subset of
+                server definitions located in the Components Object or anywhere else.
+                If the channel is located in the Components Object, it MAY point to
+                Server Objects in any location.
+            parameters: A map of the parameters included in the channel address. It
+                MUST be present only when the address contains Channel Address
+                Expressions.
+            tags: A list of tags for logical grouping of channels.
+            external_docs: Additional external documentation for this channel.
+            bindings: A map where the keys describe the name of the protocol and the
+                values describe protocol-specific definitions for the channel.
+            messages: A map of the messages that will be sent to this channel by any
+                application at any time.
+            is_root_channel: Whether to add a reference to this channel in root
+                channels.
+
+        Raises:
+            ValueError: If the channel name does not match the required pattern, or if
+                address is not provided when creating a new channel.
+            TypeError: If attempting to update a channel that is stored as a Reference
+                object instead of a Channel object, or if channel name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "channel")
+
+        # Initialize components.channels if not exists
+        if self._components.channels is None:
+            self._components.channels = Channels({})
+
+        # Check if a channel exists in components
+        channel = self._components.channels.root.get(name)
+
+        # New channel
+        if channel is None:
+            channel = Channel()
+
+        if isinstance(channel, Reference):
+            raise TypeError(
+                f"The channel with name '{name}' is stored as reference. "
+                "Cannot update a channel reference, delete reference first."
+            )
+
+        # Update provided fields
+        update_object_attributes(
+            channel,
+            address=address,
+            title=title,
+            summary=summary,
+            description=description,
+            servers=servers,
+            parameters=parameters,
+            tags=tags,
+            external_docs=external_docs,
+            bindings=bindings,
+            messages=messages,
+        )
+
+        # Always store/update in components.channels
+        self._components.channels[name] = channel
+
+        # Add/remove reference in root channels
+        if is_root_channel:
+            self.add_root_channel_as_ref(name)
+        else:
+            self.remove_root_channel(name)
+
+        return self
+
+    def add_root_channel_as_ref(self, name: str) -> "AsyncAPI3Builder":
+        """
+        Add reference to components channel to root channels.
+
+        The channel must already exist in components.channels. This method only adds
+        a reference to it in the root channels section.
+
+        Args:
+            name: Channel name to add to root channels. Must exist in
+                components.channels.
+
+        Raises:
+            ValueError: If the channel name does not match the required pattern, or if
+                the channel does not exist in components.channels.
+            TypeError: If channel name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "channel")
+
+        # Check if channel exists in components
+        if self._components.channels is None or name not in self._components.channels:
+            raise ValueError(
+                f"Cannot add channel '{name}' to root channels: "
+                "channel does not exist in components.channels. "
+                "Add the channel first using update_or_create_channel()."
+            )
+
+        # Add reference to root channels
+        self._channels[name] = Reference.to_root_channel_name(name)
+
+        return self
+
+    def remove_root_channel(
+        self,
+        name: str,
+        cascade: bool = False,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a channel reference from root channels.
+
+        Args:
+            name: Channel name to remove from root channels.
+            cascade: If True, also remove the channel from components.channels.
+
+        Raises:
+            ValueError: If the channel name does not match the required pattern.
+            TypeError: If channel name is not a string.
+        """
+        # Validate name format
+        validate_patterned_key(name, "channel")
+
+        if name in self._channels:
+            del self._channels[name]
+
+        if (
+            cascade
+            and self._components.channels is not None
+            and name in self._components.channels
+        ):
+            del self._components.channels[name]
 
         return self
