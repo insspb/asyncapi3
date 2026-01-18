@@ -10,6 +10,7 @@ from pytest_mock import MockerFixture
 
 from asyncapi3.builder import AsyncAPI3Builder
 from asyncapi3.models.base import Reference
+from asyncapi3.models.channel import Channels
 from asyncapi3.models.info import Contact, Info, License
 from asyncapi3.models.server import Servers
 
@@ -552,3 +553,174 @@ class TestAsyncAPI3Builder:
             match="Field 'invalid@name' does not match patterned object key pattern",
         ):
             builder.add_root_server_as_ref("invalid@name")
+
+    # Channel method tests
+    def test_update_or_create_channel_creates_new_channel(self) -> None:
+        """Test update_or_create_channel creates a new channel when it doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        result = builder.update_or_create_channel("test-channel", address="test.topic")
+
+        assert result is builder  # Should return self for chaining
+        # Check channel was added to components
+        assert "test-channel" in builder._components.channels.root
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.address == "test.topic"
+        # Check reference was added to root channels
+        assert "test-channel" in builder._channels.root
+        ref = builder._channels.root["test-channel"]
+        assert ref.ref == "#/channels/test-channel"
+
+    def test_update_or_create_channel_can_create_channel_without_address(self) -> None:
+        """Test update_or_create_channel can create a channel without address."""
+        builder = AsyncAPI3Builder()
+
+        result = builder.update_or_create_channel("test-channel")
+
+        assert result is builder
+        # Channel should be created
+        assert "test-channel" in builder._components.channels.root
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.address is None
+
+    def test_update_or_create_channel_updates_existing_channel(self) -> None:
+        """Test update_or_create_channel updates an existing channel."""
+        builder = AsyncAPI3Builder()
+
+        # Create initial channel
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Update some fields
+        result = builder.update_or_create_channel("test-channel", description="Updated")
+
+        assert result is builder
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.address == "test.topic"  # Should remain unchanged
+        assert channel.description == "Updated"  # Should be updated
+
+    def test_update_or_create_channel_validates_name_pattern(self) -> None:
+        """Test update_or_create_channel validates channel name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.update_or_create_channel("invalid@name", address="test.topic")
+
+    def test_update_or_create_channel_with_is_root_channel_false(self) -> None:
+        """Test update_or_create_channel with is_root_channel=False doesn't add to root channels."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_channel(
+            "test-channel", address="test.topic", is_root_channel=False
+        )
+
+        # Channel should be in components
+        assert "test-channel" in builder._components.channels.root
+        # But not in root channels
+        assert "test-channel" not in builder._channels.root
+
+    def test_update_or_create_channel_fails_if_channel_stored_as_reference(
+        self,
+    ) -> None:
+        """Test update_or_create_channel raises TypeError if channel is stored as Reference."""
+
+        # Manually put a Reference in components.channels (simulating edge case)
+        builder = AsyncAPI3Builder()
+        builder._components.channels = Channels({})
+        builder._components.channels["bad-channel"] = (
+            Reference.to_component_channel_name("some-other-channel")
+        )
+
+        # Try to update - should raise TypeError
+        with pytest.raises(
+            TypeError,
+            match="The channel with name 'bad-channel' is stored as reference",
+        ):
+            builder.update_or_create_channel("bad-channel", address="test.topic")
+
+    def test_add_root_channel_as_ref_success(self) -> None:
+        """Test add_root_channel_as_ref successfully adds reference when channel exists."""
+        builder = AsyncAPI3Builder()
+
+        # Add channel to components only (without adding to root channels)
+        builder.update_or_create_channel(
+            "test-channel", address="test.topic", is_root_channel=False
+        )
+
+        # Add reference to root channels
+        result = builder.add_root_channel_as_ref("test-channel")
+
+        assert result is builder  # Should return self for chaining
+        # Channel should be in components
+        assert "test-channel" in builder._components.channels.root
+        # Reference should be added to root channels
+        assert "test-channel" in builder._channels.root
+        ref = builder._channels.root["test-channel"]
+        assert ref.ref == "#/channels/test-channel"
+
+    def test_add_root_channel_as_ref_channel_not_exists(self) -> None:
+        """Test add_root_channel_as_ref raises ValueError when channel doesn't exist in components."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"Cannot add channel 'nonexistent-channel' to root channels: "
+                r"channel does not exist in components\.channels\. "
+                r"Add the channel first using update_or_create_channel\(\)\."
+            ),
+        ):
+            builder.add_root_channel_as_ref("nonexistent-channel")
+
+    def test_add_root_channel_as_ref_invalid_name_pattern(self) -> None:
+        """Test add_root_channel_as_ref validates channel name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.add_root_channel_as_ref("invalid@name")
+
+    def test_remove_root_channel_removes_reference(self) -> None:
+        """Test remove_root_channel removes channel reference from root channels."""
+        builder = AsyncAPI3Builder()
+
+        # Add channel
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Remove from root channels
+        result = builder.remove_root_channel("test-channel")
+
+        assert result is builder
+        # Reference should be removed from root channels
+        assert "test-channel" not in builder._channels.root
+        # But channel should remain in components
+        assert "test-channel" in builder._components.channels.root
+
+    def test_remove_root_channel_validates_name_pattern(self) -> None:
+        """Test remove_root_channel validates channel name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.remove_root_channel("invalid@name")
+
+    def test_remove_root_channel_with_cascade_removes_from_components(self) -> None:
+        """Test remove_root_channel with cascade=True removes from both places."""
+        builder = AsyncAPI3Builder()
+
+        # Add channel
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Remove with cascade
+        result = builder.remove_root_channel("test-channel", cascade=True)
+
+        assert result is builder
+        # Should be removed from both places
+        assert "test-channel" not in builder._channels.root
+        assert "test-channel" not in builder._components.channels.root
