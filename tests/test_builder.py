@@ -1,6 +1,6 @@
 """Tests for AsyncAPI3Builder class."""
 
-from typing import Any
+from typing import Any, cast
 
 import pytest
 import yaml
@@ -12,12 +12,14 @@ from asyncapi3.builder import AsyncAPI3Builder
 from asyncapi3.models.base import Reference
 from asyncapi3.models.channel import Channels
 from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.message import Message, Messages
 from asyncapi3.models.operation import Operations
+from asyncapi3.models.schema import Schema
 from asyncapi3.models.server import Servers
 
 
-class TestAsyncAPI3Builder:
-    """Tests for AsyncAPI3Builder class."""
+class TestInitializationAndBasicMethods:
+    """Tests for initialization and basic methods of AsyncAPI3Builder."""
 
     def test_init_initializes_empty_builder(self) -> None:
         """Test that __init__ initializes all attributes to None/empty."""
@@ -429,7 +431,10 @@ class TestAsyncAPI3Builder:
         assert builder._info.description == "Updated Description"
         assert builder._info.version == "1.0.0"
 
-    # Server method tests
+
+class TestServerMethods:
+    """Tests for server-related methods in AsyncAPI3Builder."""
+
     def test_update_or_create_server_creates_new_server(self) -> None:
         """Test update_or_create_server creates a new server when it doesn't exist."""
         builder = AsyncAPI3Builder()
@@ -614,7 +619,10 @@ class TestAsyncAPI3Builder:
         ):
             builder.add_root_server_as_ref("invalid@name")
 
-    # Channel method tests
+
+class TestChannelMethods:
+    """Tests for channel-related methods in AsyncAPI3Builder."""
+
     def test_update_or_create_channel_creates_new_channel(self) -> None:
         """Test update_or_create_channel creates a new channel when it doesn't exist."""
         builder = AsyncAPI3Builder()
@@ -785,7 +793,10 @@ class TestAsyncAPI3Builder:
         assert "test-channel" not in builder._channels.root
         assert "test-channel" not in builder._components.channels.root
 
-    # Operation method tests
+
+class TestOperationMethods:
+    """Tests for operation-related methods in AsyncAPI3Builder."""
+
     def test_update_or_create_operation_creates_new_operation(self) -> None:
         """Test update_or_create_operation creates a new operation when it doesn't exist."""
         builder = AsyncAPI3Builder()
@@ -1068,3 +1079,372 @@ class TestAsyncAPI3Builder:
         # Should be removed from both places
         assert "test-operation" not in builder._operations.root
         assert "test-operation" not in builder._components.operations.root
+
+
+class TestMessageMethods:
+    """Tests for message-related methods in AsyncAPI3Builder."""
+
+    def test_update_or_create_message_creates_new_message(self) -> None:
+        """Test update_or_create_message creates a new message when it doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        result = builder.update_or_create_message(
+            "test-message",
+            title="Test Message",
+            description="A test message",
+            content_type="application/json",
+        )
+
+        assert result is builder  # Should return self for chaining
+        # Check message was added to components
+        messages = cast(Messages, builder._components.messages)
+        assert "test-message" in messages.root
+        message = messages.root["test-message"]
+        assert isinstance(message, Message)
+        assert message.name == "test-message"
+        assert message.title == "Test Message"
+        assert message.description == "A test message"
+        assert message.content_type == "application/json"
+
+    def test_update_or_create_message_updates_existing_message(self) -> None:
+        """Test update_or_create_message updates an existing message."""
+        builder = AsyncAPI3Builder()
+
+        # Create initial message
+        builder.update_or_create_message(
+            "test-message", title="Test Message", content_type="application/json"
+        )
+
+        # Update some fields
+        result = builder.update_or_create_message(
+            "test-message", description="Updated description", summary="Updated summary"
+        )
+
+        assert result is builder
+        messages = cast(Messages, builder._components.messages)
+        message = messages.root["test-message"]
+        assert message.title == "Test Message"  # Should remain unchanged
+        assert message.content_type == "application/json"  # Should remain unchanged
+        assert message.description == "Updated description"  # Should be updated
+        assert message.summary == "Updated summary"  # Should be updated
+
+    def test_update_or_create_message_with_schema_objects(self) -> None:
+        """Test update_or_create_message with Schema objects for payload and headers."""
+        builder = AsyncAPI3Builder()
+
+        payload_schema = Schema(type="object", properties={"key": {"type": "string"}})
+        headers_schema = Schema(
+            type="object", properties={"content-type": {"type": "string"}}
+        )
+
+        result = builder.update_or_create_message(
+            "test-message",
+            payload=payload_schema,
+            headers=headers_schema,
+        )
+
+        assert result is builder
+        messages = cast(Messages, builder._components.messages)
+        message = messages.root["test-message"]
+        assert message.payload == payload_schema
+        assert message.headers == headers_schema
+
+    def test_update_or_create_message_validates_name_pattern(self) -> None:
+        """Test update_or_create_message validates message name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError, match="does not match patterned object key pattern"
+        ):
+            builder.update_or_create_message("Invalid Name")
+
+    def test_update_or_create_message_fails_if_message_stored_as_reference(
+        self,
+    ) -> None:
+        """Test update_or_create_message fails if message is stored as reference."""
+        builder = AsyncAPI3Builder()
+
+        # Manually add a reference to components.messages
+        messages = cast(Messages, builder._components.messages)
+        messages.root["test-message"] = Reference(
+            ref="#/components/messages/other-message"
+        )
+
+        with pytest.raises(TypeError, match="Cannot update a message reference"):
+            builder.update_or_create_message("test-message", title="Test")
+
+    def test_add_message_to_channel_adds_message_reference(self) -> None:
+        """Test add_message_to_channel adds a message reference to channel's messages."""
+        builder = AsyncAPI3Builder()
+
+        # Create message and channel first
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+
+        result = builder.add_message_to_channel("test-channel", "test-message")
+
+        assert result is builder
+        # Check message reference was added to channel
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.messages is not None
+        assert "test-message" in channel.messages
+        message_ref = channel.messages["test-message"]
+        assert message_ref.ref == "#/components/messages/test-message"
+
+    def test_add_message_to_channel_fails_if_message_not_exists(self) -> None:
+        """Test add_message_to_channel fails if message doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_channel("test-channel")
+
+        with pytest.raises(
+            ValueError, match=r"message does not exist in components.messages"
+        ):
+            builder.add_message_to_channel("test-channel", "non-existent-message")
+
+    def test_add_message_to_channel_fails_if_channel_not_exists(self) -> None:
+        """Test add_message_to_channel fails if channel doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_message("test-message", title="Test Message")
+
+        with pytest.raises(
+            ValueError, match=r"channel does not exist in components.channels"
+        ):
+            builder.add_message_to_channel("non-existent-channel", "test-message")
+
+    def test_add_message_to_channel_fails_if_channel_is_reference(self) -> None:
+        """Test add_message_to_channel fails if channel is stored as reference."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_message("test-message", title="Test Message")
+        # Manually add a reference to components.channels
+        builder._components.channels.root["test-channel"] = Reference(
+            ref="#/components/channels/other-channel"
+        )
+
+        with pytest.raises(TypeError, match="channel is stored as a reference"):
+            builder.add_message_to_channel("test-channel", "test-message")
+
+    def test_remove_message_from_channel_removes_message_reference(self) -> None:
+        """Test remove_message_from_channel removes a message reference from channel."""
+        builder = AsyncAPI3Builder()
+
+        # Create message, channel and add message to channel
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.add_message_to_channel("test-channel", "test-message")
+
+        result = builder.remove_message_from_channel("test-channel", "test-message")
+
+        assert result is builder
+        # Check message reference was removed from channel
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.messages is None or "test-message" not in channel.messages
+
+    def test_remove_message_from_channel_fails_if_message_not_in_channel(self) -> None:
+        """Test remove_message_from_channel fails if message is not in channel."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_channel("test-channel")
+
+        with pytest.raises(
+            ValueError, match="message does not exist in channel's messages"
+        ):
+            builder.remove_message_from_channel("test-channel", "non-existent-message")
+
+    def test_add_message_to_operation_adds_message_reference(self) -> None:
+        """Test add_message_to_operation adds a message reference to operation's messages."""
+        builder = AsyncAPI3Builder()
+
+        # Create message, channel and operation first
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        result = builder.add_message_to_operation("test-operation", "test-message")
+
+        assert result is builder
+        # Check message reference was added to operation
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.messages is not None
+        assert len(operation.messages) == 1  # type: ignore[arg-type]
+        message_ref = operation.messages[0]
+        assert message_ref.ref == "#/components/messages/test-message"
+
+    def test_add_message_to_operation_avoids_duplicates(self) -> None:
+        """Test add_message_to_operation avoids adding duplicate message references."""
+        builder = AsyncAPI3Builder()
+
+        # Create message, channel and operation first
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        # Add message twice
+        builder.add_message_to_operation("test-operation", "test-message")
+        result = builder.add_message_to_operation("test-operation", "test-message")
+
+        assert result is builder
+        # Should still have only one reference
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.messages is not None
+        assert len(operation.messages) == 1  # type: ignore[arg-type]
+
+    def test_add_message_to_operation_fails_if_message_not_exists(self) -> None:
+        """Test add_message_to_operation fails if message doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        with pytest.raises(
+            ValueError, match=r"message does not exist in components.messages"
+        ):
+            builder.add_message_to_operation("test-operation", "non-existent-message")
+
+    def test_add_message_to_operation_fails_if_operation_not_exists(self) -> None:
+        """Test add_message_to_operation fails if operation doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_message("test-message", title="Test Message")
+
+        with pytest.raises(
+            ValueError, match=r"operation does not exist in components.operations"
+        ):
+            builder.add_message_to_operation("non-existent-operation", "test-message")
+
+    def test_add_message_to_operation_fails_if_operation_is_reference(self) -> None:
+        """Test add_message_to_operation fails if operation is stored as reference."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+        # Manually change operation to reference
+        builder._components.operations.root["test-operation"] = Reference(
+            ref="#/components/operations/other-operation"
+        )
+
+        with pytest.raises(TypeError, match="operation is stored as a reference"):
+            builder.add_message_to_operation("test-operation", "test-message")
+
+    def test_remove_message_from_operation_removes_message_reference(self) -> None:
+        """Test remove_message_from_operation removes a message reference from operation."""
+        builder = AsyncAPI3Builder()
+
+        # Create message, channel, operation and add message to operation
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+        builder.add_message_to_operation("test-operation", "test-message")
+
+        result = builder.remove_message_from_operation("test-operation", "test-message")
+
+        assert result is builder
+        # Check message reference was removed from operation
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.messages is None or len(operation.messages) == 0
+
+    def test_remove_message_from_operation_fails_if_message_not_in_operation(
+        self,
+    ) -> None:
+        """Test remove_message_from_operation fails if message is not in operation."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        with pytest.raises(ValueError, match="operation has no messages"):
+            builder.remove_message_from_operation(
+                "test-operation", "non-existent-message"
+            )
+
+    def test_remove_message_from_channel_fails_if_channel_not_exists(self) -> None:
+        """Test remove_message_from_channel fails if channel does not exist in components.channels."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match=r"Cannot remove message from channel 'non-existent-channel': channel does not exist in components.channels",
+        ):
+            builder.remove_message_from_channel("non-existent-channel", "test-message")
+
+    def test_remove_message_from_channel_fails_if_channel_is_reference(self) -> None:
+        """Test remove_message_from_channel fails if channel is stored as a reference."""
+        # Manually put a Reference in components.channels (simulating edge case)
+        builder = AsyncAPI3Builder()
+        builder._components.channels = Channels({})
+        builder._components.channels["reference-channel"] = (
+            Reference.to_component_channel_name("some-other-channel")
+        )
+
+        with pytest.raises(
+            TypeError,
+            match="Cannot remove message from channel 'reference-channel': channel is stored as a reference, not an object",
+        ):
+            builder.remove_message_from_channel("reference-channel", "test-message")
+
+    def test_remove_message_from_operation_fails_if_operation_not_exists(self) -> None:
+        """Test remove_message_from_operation fails if operation does not exist in components.operations."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match=r"Cannot remove message from operation 'non-existent-operation': operation does not exist in components.operations",
+        ):
+            builder.remove_message_from_operation(
+                "non-existent-operation", "test-message"
+            )
+
+    def test_remove_message_from_operation_fails_if_operation_is_reference(
+        self,
+    ) -> None:
+        """Test remove_message_from_operation fails if operation is stored as a reference."""
+        # Manually put a Reference in components.operations (simulating edge case)
+        builder = AsyncAPI3Builder()
+        builder._components.operations = Operations({})
+        builder._components.operations["reference-operation"] = (
+            Reference.to_component_operation_name("some-other-operation")
+        )
+
+        with pytest.raises(
+            TypeError,
+            match="Cannot remove message from operation 'reference-operation': operation is stored as a reference, not an object",
+        ):
+            builder.remove_message_from_operation("reference-operation", "test-message")
+
+    def test_remove_message_from_operation_fails_if_message_not_in_operation_messages(
+        self,
+    ) -> None:
+        """Test remove_message_from_operation fails if message exists but is not in operation's messages."""
+        builder = AsyncAPI3Builder()
+
+        # Create message, channel and operation first
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.update_or_create_channel("test-channel")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        # Add a different message to the operation
+        builder.update_or_create_message("different-message", title="Different Message")
+        builder.add_message_to_operation("test-operation", "different-message")
+
+        # Try to remove a message that exists but is not in the operation's messages
+        with pytest.raises(
+            ValueError, match="message does not exist in operation's messages"
+        ):
+            builder.remove_message_from_operation("test-operation", "test-message")
