@@ -4,6 +4,7 @@
 [![Python versions](https://img.shields.io/pypi/pyversions/asyncapi3)](https://pypi.org/project/asyncapi3/)
 [![codecov](https://codecov.io/gh/insspb/asyncapi3/branch/main/graph/badge.svg)](https://codecov.io/gh/insspb/asyncapi3)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Pydantic v2](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/pydantic/pydantic/main/docs/badge/v2.json)](https://pydantic.dev)
 
 **asyncapi3** is a complete Python implementation for working with
 [AsyncAPI 3.0 Specification](https://github.com/asyncapi/spec/tree/master/spec/asyncapi.md)
