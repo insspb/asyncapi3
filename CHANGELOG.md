@@ -6,6 +6,7 @@
 
 - #8: Strict pylint rules for imports location and other style issues
 - #8: validate_patterned_key function for key validation in AsyncAPI models
+- #9: PyPi changelog link + Pydantic v2 badge
 
 ### FIXED
 

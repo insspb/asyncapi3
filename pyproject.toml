@@ -36,6 +36,7 @@ classifiers = [
 [project.urls]
 Repository = "https://github.com/insspb/asyncapi3"
 Issues = "https://github.com/insspb/asyncapi3/issues"
+Changelog = "https://github.com/insspb/asyncapi3/blob/main/CHANGELOG.md"
 
 [build-system]
 requires = ["hatchling", "hatch-vcs"]
