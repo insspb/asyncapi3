@@ -12,6 +12,7 @@ from asyncapi3.builder import AsyncAPI3Builder
 from asyncapi3.models.base import Reference
 from asyncapi3.models.channel import Channels
 from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.operation import Operations
 from asyncapi3.models.server import Servers
 
 
@@ -724,3 +725,287 @@ class TestAsyncAPI3Builder:
         # Should be removed from both places
         assert "test-channel" not in builder._channels.root
         assert "test-channel" not in builder._components.channels.root
+
+    # Operation method tests
+    def test_update_or_create_operation_creates_new_operation(self) -> None:
+        """Test update_or_create_operation creates a new operation when it doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first (required for operation)
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        result = builder.update_or_create_operation(
+            "test-operation",
+            action="send",
+            channel_name="test-channel",
+        )
+
+        assert result is builder  # Should return self for chaining
+        # Check operation was added to components
+        assert "test-operation" in builder._components.operations.root
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.action == "send"
+        assert operation.channel.ref == "#/channels/test-channel"
+        # Check reference was added to root operations
+        assert "test-operation" in builder._operations.root
+        ref = builder._operations.root["test-operation"]
+        assert ref.ref == "#/operations/test-operation"
+
+    def test_update_or_create_operation_updates_existing_operation(self) -> None:
+        """Test update_or_create_operation updates an existing operation."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Create initial operation
+        builder.update_or_create_operation(
+            "test-operation",
+            action="send",
+            channel_name="test-channel",
+        )
+
+        # Update some fields
+        result = builder.update_or_create_operation(
+            "test-operation", title="Updated title"
+        )
+
+        assert result is builder
+        operation = builder._components.operations.root["test-operation"]
+        # Should remain unchanged
+        assert operation.action == "send"
+        assert operation.channel.ref == "#/channels/test-channel"
+        # Should be updated
+        assert operation.title == "Updated title"
+
+    def test_update_or_create_operation_requires_action_for_new_operation(self) -> None:
+        """Test update_or_create_operation requires action for new operations."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Test missing action (channel exists)
+        with pytest.raises(
+            ValueError, match="Cannot create new operation 'test-operation'"
+        ):
+            builder.update_or_create_operation(
+                "test-operation", channel_name="test-channel"
+            )
+
+    def test_update_or_create_operation_requires_channel_name_for_new_operation(
+        self,
+    ) -> None:
+        """Test update_or_create_operation requires channel_name for new operations."""
+        builder = AsyncAPI3Builder()
+
+        # Test missing channel_name
+        with pytest.raises(
+            ValueError, match="Cannot create new operation 'test-operation'"
+        ):
+            builder.update_or_create_operation("test-operation", action="send")
+
+    def test_update_or_create_operation_requires_existing_channel(self) -> None:
+        """Test update_or_create_operation requires channel to exist in components.channels."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError, match="channel 'nonexistent-channel' does not exist"
+        ):
+            builder.update_or_create_operation(
+                "test-operation", action="send", channel_name="nonexistent-channel"
+            )
+
+    def test_update_or_create_operation_validates_action_value(self) -> None:
+        """Test update_or_create_operation validates action value."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        with pytest.raises(
+            ValueError, match="action should be either 'send' or 'receive'"
+        ):
+            builder.update_or_create_operation(
+                "test-operation",
+                action="invalid",  # type: ignore[arg-type]
+                channel_name="test-channel",
+            )
+
+    def test_update_or_create_operation_validates_name_pattern(self) -> None:
+        """Test update_or_create_operation validates operation name pattern."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.update_or_create_operation(
+                "invalid@name",
+                action="send",
+                channel_name="test-channel",
+            )
+
+    def test_update_or_create_operation_validates_channel_name_pattern(self) -> None:
+        """Test update_or_create_operation validates channel_name pattern."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@channel' does not match patterned object key pattern",
+        ):
+            builder.update_or_create_operation(
+                "test-operation",
+                action="send",
+                channel_name="invalid@channel",  # type: ignore[arg-type]
+            )
+
+    def test_update_or_create_operation_with_is_root_operation_false(self) -> None:
+        """Test update_or_create_operation with is_root_operation=False doesn't add to root operations."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        builder.update_or_create_operation(
+            "test-operation",
+            action="send",
+            channel_name="test-channel",
+            is_root_operation=False,
+        )
+
+        # Operation should be in components
+        assert "test-operation" in builder._components.operations.root
+        # But not in root operations
+        assert "test-operation" not in builder._operations.root
+
+    def test_update_or_create_operation_fails_if_operation_stored_as_reference(
+        self,
+    ) -> None:
+        """Test update_or_create_operation raises TypeError if operation is stored as Reference."""
+
+        # Manually put a Reference in components.operations (simulating edge case)
+        builder = AsyncAPI3Builder()
+        builder._components.operations = Operations({})
+        builder._components.operations["bad-operation"] = (
+            Reference.to_component_operation_name("some-other-operation")
+        )
+
+        # Create a channel first
+        builder.update_or_create_channel("dummy-channel", address="test.topic")
+
+        # Try to update - should raise TypeError
+        with pytest.raises(
+            TypeError,
+            match="The operation with name 'bad-operation' is stored as reference",
+        ):
+            builder.update_or_create_operation(
+                "bad-operation", action="send", channel_name="dummy-channel"
+            )
+
+    def test_add_root_operation_as_ref_success(self) -> None:
+        """Test add_root_operation_as_ref successfully adds reference when operation exists."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Add operation to components only (without adding to root operations)
+        builder.update_or_create_operation(
+            "test-operation",
+            action="send",
+            channel_name="test-channel",
+            is_root_operation=False,
+        )
+
+        # Add reference to root operations
+        result = builder.add_root_operation_as_ref("test-operation")
+
+        assert result is builder  # Should return self for chaining
+        # Operation should be in components
+        assert "test-operation" in builder._components.operations.root
+        # Reference should be added to root operations
+        assert "test-operation" in builder._operations.root
+        ref = builder._operations.root["test-operation"]
+        assert ref.ref == "#/operations/test-operation"
+
+    def test_add_root_operation_as_ref_operation_not_exists(self) -> None:
+        """Test add_root_operation_as_ref raises ValueError when operation doesn't exist in components."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match=(
+                r"Cannot add operation 'nonexistent-operation' to root operations: "
+                r"operation does not exist in components\.operations\. "
+                r"Add the operation first using update_or_create_operation\(\)\."
+            ),
+        ):
+            builder.add_root_operation_as_ref("nonexistent-operation")
+
+    def test_add_root_operation_as_ref_invalid_name_pattern(self) -> None:
+        """Test add_root_operation_as_ref validates operation name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.add_root_operation_as_ref("invalid@name")
+
+    def test_remove_root_operation_removes_reference(self) -> None:
+        """Test remove_root_operation removes operation reference from root operations."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Add operation
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        # Remove from root operations
+        result = builder.remove_root_operation("test-operation")
+
+        assert result is builder
+        # Reference should be removed from root operations
+        assert "test-operation" not in builder._operations.root
+        # But operation should remain in components
+        assert "test-operation" in builder._components.operations.root
+
+    def test_remove_root_operation_validates_name_pattern(self) -> None:
+        """Test remove_root_operation validates operation name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@name' does not match patterned object key pattern",
+        ):
+            builder.remove_root_operation("invalid@name")
+
+    def test_remove_root_operation_with_cascade_removes_from_components(self) -> None:
+        """Test remove_root_operation with cascade=True removes from both places."""
+        builder = AsyncAPI3Builder()
+
+        # Create a channel first
+        builder.update_or_create_channel("test-channel", address="test.topic")
+
+        # Add operation
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        # Remove with cascade
+        result = builder.remove_root_operation("test-operation", cascade=True)
+
+        assert result is builder
+        # Should be removed from both places
+        assert "test-operation" not in builder._operations.root
+        assert "test-operation" not in builder._components.operations.root
