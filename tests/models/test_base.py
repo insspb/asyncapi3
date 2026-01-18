@@ -296,7 +296,7 @@ class TestTag:
         data = yaml.safe_load(yaml_data)
         tag = Tag.model_validate(data)
         assert tag is not None
-        assert tag.name == "user" or tag.name == "e-commerce"
+        assert tag.name in ("user", "e-commerce")
 
     @parametrize_with_cases(
         "tag,expected",
