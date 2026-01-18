@@ -214,7 +214,7 @@ def case_channel_with_parameters() -> str:
 def case_channel_serialization_empty() -> tuple[Channel, dict]:
     """Channel serialization empty."""
     channel = Channel()
-    expected: dict[str, Any] = {}
+    expected: dict[str, Any] = {"address": None}
     return channel, expected
 
 
