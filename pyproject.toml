@@ -112,6 +112,7 @@ ignore = [
     "RUF015",  # Prefer next({iterable}) over single element slice
     "RUF059",  # Unpacked variable {name} is never used
     "SIM105",  # Use contextlib.suppress when possible (Excluded as slow comparable to regular pass)
+    "PLR2004", # Magic values
 ]
 
 # В пункте select приведён список ВСЕХ поддерживаемых правил в ruff.
@@ -156,11 +157,11 @@ select = [
 #    "PERF",    # Perflint
 #    "PGH",     # pygrep-hooks
 #    "PIE",     # flake8-pie
-#    "PL",      # Pylint
-#    "PLC",     # Convention
-#    "PLE",     # Error
-#    "PLR",     # Refactor
-#    "PLW",     # Warning
+    "PL",       # Pylint
+    "PLC",      # Convention
+    "PLE",      # Error
+    "PLR",      # Refactor
+    "PLW",      # Warning
     "PT",       # flake8-pytest-style
     "PTH",      # flake8-use-pathlib
 #    "PYI",     # flake8-pyi
