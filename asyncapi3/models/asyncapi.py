@@ -4,14 +4,40 @@ __all__ = ["AsyncAPI3"]
 
 import re
 
-from pydantic import AnyUrl, Field, field_validator
+from collections.abc import Callable
+from typing import Any
 
+from pydantic import AnyUrl, Field, HttpUrl, field_validator
+from pydantic.json_schema import SkipJsonSchema
+
+from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.base_models import ExtendableBaseModel
-from asyncapi3.models.channel import Channels
-from asyncapi3.models.components import Components
+from asyncapi3.models.channel import Channels, Parameters
+from asyncapi3.models.components import (
+    ChannelBindings,
+    Components,
+    CorrelationIDs,
+    ExternalDocs,
+    MessageBindings,
+    MessageTraits,
+    OperationBindings,
+    OperationTraits,
+    Replies,
+    ReplyAddresses,
+    Schemas,
+    SecuritySchemes,
+    ServerBindings,
+    ServerVariables,
+)
+from asyncapi3.models.components import (
+    Tags as TagsDict,
+)
 from asyncapi3.models.helpers import is_null
-from asyncapi3.models.info import Info
-from asyncapi3.models.operation import Operations
+from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.message import Messages
+from asyncapi3.models.operation import (
+    Operations,
+)
 from asyncapi3.models.server import Servers
 
 
@@ -92,6 +118,107 @@ class AsyncAPI3(ExtendableBaseModel):
             "MAY NOT be used by the implemented Application."
         ),
     )
+    extra_converters: SkipJsonSchema[list[Callable[[], Any]] | None] = Field(
+        default=None,
+        exclude=True,
+        description=(
+            "List of callables that can be used to convert specific fields in the "
+            "AsyncAPI model. Usually such converters require cross-model references. "
+            "Applied before model validation and `extra_validators`."
+        ),
+    )
+    extra_validators: SkipJsonSchema[list[Callable[[], Any]] | None] = Field(
+        default=None,
+        exclude=True,
+        description=(
+            "List of callables that can be used to validate specific fields in the "
+            "AsyncAPI model. Usually such validators require cross-model references. "
+            "Applied after model validation and `extra_converters`."
+        ),
+    )
+
+    @classmethod
+    def as_builder(
+        cls,
+        /,
+        title: str = "Sample APP",
+        version: str = "0.0.1",
+        description: str | None = None,
+        terms_of_service: HttpUrl | str | None = None,
+        contact: Contact | None = None,
+        license: License | None = None,  # noqa: A002
+        tags: Tags | None = None,
+        external_docs: ExternalDocumentation | Reference | None = None,
+        **kwargs: Any,
+    ) -> "AsyncAPI3":
+        """
+        Create an AsyncAPI3 instance with default parameters for simplified object
+        building.
+
+        This method provides a convenient way to create an AsyncAPI specification with
+        default values for common fields, while allowing customization of key metadata.
+        All collection fields (servers, channels, operations, components) are
+        initialized as empty collections, providing a clean starting point for
+        specification building.
+
+        Args:
+            title: The title of the application (defaults to "Sample APP")
+            version: The version of the API (defaults to "0.0.1")
+            description: A description of the application
+            terms_of_service: A URL to the Terms of Service for the API
+            contact: Contact information for the API
+            license: License information for the API
+            tags: A list of tags for API documentation
+            external_docs: External documentation references
+            **kwargs: Additional keyword arguments passed to AsyncAPI3 constructor
+
+        Returns:
+            AsyncAPI3: A new AsyncAPI3 instance with default parameters set
+        """
+        info = Info(
+            title=title,
+            version=version,
+            description=description,
+            terms_of_service=terms_of_service,
+            contact=contact,
+            license=license,
+            tags=tags,
+            external_docs=external_docs,
+        )
+
+        components = Components(
+            schemas=Schemas({}),
+            servers=Servers({}),
+            channels=Channels({}),
+            operations=Operations({}),
+            messages=Messages({}),
+            security_schemes=SecuritySchemes({}),
+            server_variables=ServerVariables({}),
+            parameters=Parameters({}),
+            correlation_ids=CorrelationIDs({}),
+            replies=Replies({}),
+            reply_addresses=ReplyAddresses({}),
+            external_docs=ExternalDocs({}),
+            tags=TagsDict({}),
+            operation_traits=OperationTraits({}),
+            message_traits=MessageTraits({}),
+            server_bindings=ServerBindings({}),
+            channel_bindings=ChannelBindings({}),
+            operation_bindings=OperationBindings({}),
+            message_bindings=MessageBindings({}),
+        )
+
+        init_params = {
+            "info": info,
+            "servers": Servers({}),
+            "channels": Channels({}),
+            "operations": Operations({}),
+            "components": components,
+            **kwargs,
+        }
+        spec = cls(**init_params)
+
+        return spec
 
     @field_validator("asyncapi")
     @classmethod
