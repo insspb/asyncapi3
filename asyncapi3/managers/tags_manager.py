@@ -8,10 +8,10 @@ import logging
 
 from typing import TYPE_CHECKING
 
-from asyncapi3.managers.protocols import ProcessorProtocol
 from asyncapi3.models.base import Reference, Tag
 from asyncapi3.models.components import Components, Tags
 from asyncapi3.models.operation import OperationTrait
+from asyncapi3.protocols import ProcessorProtocol
 
 if TYPE_CHECKING:
     from asyncapi3.models.asyncapi import AsyncAPI3
