@@ -21,7 +21,7 @@ from asyncapi3.managers import (
 #     ChannelParametersManager,
 #     ChannelsManager,
 #     OperationsManager,
-#     ServersManager,
+    ServersManager,
     TagsManager,
 )
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
@@ -257,7 +257,7 @@ class AsyncAPI3(ExtendableBaseModel):
                 # Safe to merge values
                 TagsManager,  # Only name has meaning
                 # Values defined with names (core objects (L1))
-                # ServersManager,
+                ServersManager,
                 # ChannelsManager,
                 # OperationsManager,
                 # ChannelMessagesManager,
