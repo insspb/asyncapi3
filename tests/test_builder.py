@@ -11,6 +11,7 @@ from pytest_mock import MockerFixture
 from asyncapi3.builder import AsyncAPI3Builder
 from asyncapi3.models.base import Reference
 from asyncapi3.models.channel import Channels
+from asyncapi3.models.components import Tags as TagsDict
 from asyncapi3.models.info import Contact, Info, License
 from asyncapi3.models.message import Message, Messages
 from asyncapi3.models.operation import Operations
@@ -1448,3 +1449,301 @@ class TestMessageMethods:
             ValueError, match="message does not exist in operation's messages"
         ):
             builder.remove_message_from_operation("test-operation", "test-message")
+
+
+class TestTagMethods:
+    """Tests for tag-related methods in AsyncAPI3Builder."""
+
+    def test_update_or_create_tag_creates_new_tag(self) -> None:
+        """Test update_or_create_tag creates a new tag when it doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        result = builder.update_or_create_tag(
+            "test-tag",
+            description="Test tag description",
+        )
+
+        assert result is builder  # Should return self for chaining
+        # Check tag was added to components
+        assert "test-tag" in builder._components.tags.root
+        tag = builder._components.tags.root["test-tag"]
+        assert tag.name == "test-tag"
+        assert tag.description == "Test tag description"
+
+    def test_update_or_create_tag_updates_existing_tag(self) -> None:
+        """Test update_or_create_tag updates an existing tag."""
+        builder = AsyncAPI3Builder()
+
+        # Create initial tag
+        builder.update_or_create_tag("test-tag", description="Initial description")
+
+        # Update the tag
+        result = builder.update_or_create_tag(
+            "test-tag", description="Updated description"
+        )
+
+        assert result is builder
+        tag = builder._components.tags.root["test-tag"]
+        assert tag.name == "test-tag"
+        assert tag.description == "Updated description"
+
+    def test_update_or_create_tag_validates_name_pattern(self) -> None:
+        """Test update_or_create_tag validates tag name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@tag' does not match patterned object key pattern",
+        ):
+            builder.update_or_create_tag("invalid@tag")
+
+    def test_add_tag_to_server(self) -> None:
+        """Test add_tag_to_server adds a tag reference to a server."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and server
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        result = builder.add_tag_to_server("test-server", "test-tag")
+
+        assert result is builder
+        server = builder._components.servers.root["test-server"]
+        assert server.tags is not None
+        assert len(server.tags) == 1
+        tag_ref = server.tags[0]
+        assert tag_ref.ref == "#/components/tags/test-tag"
+
+    def test_add_tag_to_server_tag_not_exists(self) -> None:
+        """Test add_tag_to_server raises error when tag doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        with pytest.raises(ValueError, match=r"tag does not exist in components.tags"):
+            builder.add_tag_to_server("test-server", "nonexistent-tag")
+
+    def test_add_tag_to_server_server_not_exists(self) -> None:
+        """Test add_tag_to_server raises error when server doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        builder.update_or_create_tag("test-tag")
+
+        with pytest.raises(
+            ValueError, match=r"server does not exist in components.servers"
+        ):
+            builder.add_tag_to_server("nonexistent-server", "test-tag")
+
+    def test_remove_tag_from_server(self) -> None:
+        """Test remove_tag_from_server removes a tag reference from a server."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and server, add tag to server
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+        builder.add_tag_to_server("test-server", "test-tag")
+
+        result = builder.remove_tag_from_server("test-server", "test-tag")
+
+        assert result is builder
+        server = builder._components.servers.root["test-server"]
+        assert server.tags is None or len(server.tags) == 0
+
+    def test_add_tag_to_channel(self) -> None:
+        """Test add_tag_to_channel adds a tag reference to a channel."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and channel
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_channel("test-channel", address="test-address")
+
+        result = builder.add_tag_to_channel("test-channel", "test-tag")
+
+        assert result is builder
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.tags is not None
+        assert len(channel.tags) == 1
+        tag_ref = channel.tags[0]
+        assert tag_ref.ref == "#/components/tags/test-tag"
+
+    def test_remove_tag_from_channel(self) -> None:
+        """Test remove_tag_from_channel removes a tag reference from a channel."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and channel, add tag to channel
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_channel("test-channel", address="test-address")
+        builder.add_tag_to_channel("test-channel", "test-tag")
+
+        result = builder.remove_tag_from_channel("test-channel", "test-tag")
+
+        assert result is builder
+        channel = builder._components.channels.root["test-channel"]
+        assert channel.tags is None or len(channel.tags) == 0
+
+    def test_add_tag_to_operation(self) -> None:
+        """Test add_tag_to_operation adds a tag reference to an operation."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag, channel and operation
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_channel("test-channel", address="test-address")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+
+        result = builder.add_tag_to_operation("test-operation", "test-tag")
+
+        assert result is builder
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.tags is not None
+        assert len(operation.tags) == 1
+        tag_ref = operation.tags[0]
+        assert tag_ref.ref == "#/components/tags/test-tag"
+
+    def test_remove_tag_from_operation(self) -> None:
+        """Test remove_tag_from_operation removes a tag reference from an operation."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag, channel and operation, add tag to operation
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_channel("test-channel", address="test-address")
+        builder.update_or_create_operation(
+            "test-operation", action="send", channel_name="test-channel"
+        )
+        builder.add_tag_to_operation("test-operation", "test-tag")
+
+        result = builder.remove_tag_from_operation("test-operation", "test-tag")
+
+        assert result is builder
+        operation = builder._components.operations.root["test-operation"]
+        assert operation.tags is None or len(operation.tags) == 0
+
+    def test_add_tag_to_message(self) -> None:
+        """Test add_tag_to_message adds a tag reference to a message."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and message
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_message("test-message", title="Test Message")
+
+        result = builder.add_tag_to_message("test-message", "test-tag")
+
+        assert result is builder
+        message = builder._components.messages.root["test-message"]
+        assert message.tags is not None
+        assert len(message.tags) == 1
+        tag_ref = message.tags[0]
+        assert tag_ref.ref == "#/components/tags/test-tag"
+
+    def test_remove_tag_from_message(self) -> None:
+        """Test remove_tag_from_message removes a tag reference from a message."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and message, add tag to message
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_message("test-message", title="Test Message")
+        builder.add_tag_to_message("test-message", "test-tag")
+
+        result = builder.remove_tag_from_message("test-message", "test-tag")
+
+        assert result is builder
+        message = builder._components.messages.root["test-message"]
+        assert message.tags is None or len(message.tags) == 0
+
+    def test_add_tag_to_info(self) -> None:
+        """Test add_tag_to_info adds a tag reference to info."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag
+        builder.update_or_create_tag("test-tag")
+
+        result = builder.add_tag_to_info("test-tag")
+
+        assert result is builder
+        assert builder._info.tags is not None
+        assert len(builder._info.tags) == 1
+        tag_ref = builder._info.tags[0]
+        assert tag_ref.ref == "#/components/tags/test-tag"
+
+    def test_remove_tag_from_info(self) -> None:
+        """Test remove_tag_from_info removes a tag reference from info."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and add to info
+        builder.update_or_create_tag("test-tag")
+        builder.add_tag_to_info("test-tag")
+
+        result = builder.remove_tag_from_info("test-tag")
+
+        assert result is builder
+        assert builder._info.tags is None or len(builder._info.tags) == 0
+
+    def test_add_duplicate_tag_to_server(self) -> None:
+        """Test adding the same tag to server multiple times doesn't create duplicates."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag and server
+        builder.update_or_create_tag("test-tag")
+        builder.update_or_create_server(
+            "test-server", host="localhost:5672", protocol="amqp"
+        )
+
+        # Add the same tag twice
+        builder.add_tag_to_server("test-server", "test-tag")
+        builder.add_tag_to_server("test-server", "test-tag")
+
+        server = builder._components.servers.root["test-server"]
+        assert server.tags is not None
+        assert len(server.tags) == 1  # Should only have one instance
+
+    def test_get_tag_ref(self) -> None:
+        """Test get_tag_ref returns a reference to a tag object in components."""
+        builder = AsyncAPI3Builder()
+
+        # Create tag
+        builder.update_or_create_tag("test-tag", description="Test tag")
+
+        result = builder.get_tag_ref("test-tag")
+
+        assert isinstance(result, Reference)
+        assert result.ref == "#/components/tags/test-tag"
+
+    def test_get_tag_ref_returns_external_reference(self) -> None:
+        """Test get_tag_ref returns external reference when tag is stored as Reference."""
+        builder = AsyncAPI3Builder()
+        external_ref = Reference(ref="https://example.com/external-tag")
+
+        # Manually add a reference tag to components
+        _components_tags = cast(TagsDict, builder._components.tags)
+        _components_tags["external-tag"] = external_ref
+
+        result = builder.get_tag_ref("external-tag")
+
+        assert result is external_ref
+        assert result.ref == "https://example.com/external-tag"
+
+    def test_get_tag_ref_tag_not_exists(self) -> None:
+        """Test get_tag_ref raises error when tag doesn't exist."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError, match=r"Tag 'nonexistent-tag' does not exist in components.tags"
+        ):
+            builder.get_tag_ref("nonexistent-tag")
+
+    def test_get_tag_ref_validates_name_pattern(self) -> None:
+        """Test get_tag_ref validates tag name pattern."""
+        builder = AsyncAPI3Builder()
+
+        with pytest.raises(
+            ValueError,
+            match="Field 'invalid@tag' does not match patterned object key pattern",
+        ):
+            builder.get_tag_ref("invalid@tag")
