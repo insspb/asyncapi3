@@ -16,7 +16,7 @@ import yaml
 from pydantic import AnyUrl, HttpUrl, ValidationError
 
 from asyncapi3.models.asyncapi import AsyncAPI3
-from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
+from asyncapi3.models.base import ExternalDocumentation, Reference, Tag, Tags
 from asyncapi3.models.bindings import (
     ChannelBindingsObject,
     MessageBindingsObject,
@@ -331,6 +331,63 @@ class AsyncAPI3Builder:
         self._info = info
         return self
 
+    def add_tag_to_info(
+        self,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag reference to the info's tags.
+
+        Args:
+            tag_name: Name of the tag to add.
+
+        Raises:
+            ValueError: If the tag name does not match the required pattern, or if
+                the tag does not exist.
+            TypeError: If tag name is not a string.
+        """
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to info: "
+                "tag does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        if self._info.tags is None:
+            self._info.tags = []
+
+        tag_ref = Reference.to_component_tag_name(tag_name)
+        if tag_ref not in self._info.tags:
+            self._info.tags.append(tag_ref)
+
+        return self
+
+    def remove_tag_from_info(
+        self,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a tag reference from the info's tags.
+
+        Args:
+            tag_name: Name of the tag to remove.
+
+        Raises:
+            ValueError: If the tag name does not match the required pattern.
+            TypeError: If tag name is not a string.
+        """
+        validate_patterned_key(tag_name, "tag")
+
+        if self._info.tags is not None:
+            tag_ref = Reference.to_component_tag_name(tag_name)
+            if tag_ref in self._info.tags:
+                self._info.tags.remove(tag_ref)
+
+        return self
+
     # Server methods
     def update_or_create_server(
         self,
@@ -483,6 +540,101 @@ class AsyncAPI3Builder:
             and name in self._components.servers
         ):
             del self._components.servers[name]
+
+        return self
+
+    def add_tag_to_server(
+        self,
+        server_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag reference to a server's tags.
+
+        Args:
+            server_name: Name of the server to add the tag to.
+            tag_name: Name of the tag to add.
+
+        Raises:
+            ValueError: If the server or tag names do not match the required
+                pattern, or if the server/tag does not exist.
+            TypeError: If server or tag names are not strings, or if the server
+                is stored as a reference.
+        """
+        validate_patterned_key(server_name, "server")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to server: "
+                "tag does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        _components_servers = cast(Servers, self._components.servers)
+
+        server = _components_servers.root.get(server_name)
+        if server is None:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to server: {server_name} "
+                "server does not exist in components.servers."
+            )
+        if isinstance(server, Reference):
+            raise TypeError(
+                f"Cannot add tag to server '{server_name}': "
+                "server is stored as a reference, not an object."
+            )
+
+        if server.tags is None:
+            server.tags = []
+
+        tag_ref = Reference.to_component_tag_name(tag_name)
+        if tag_ref not in server.tags:
+            server.tags.append(tag_ref)
+
+        return self
+
+    def remove_tag_from_server(
+        self,
+        server_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a tag reference from a server's tags.
+
+        Args:
+            server_name: Name of the server to remove the tag from.
+            tag_name: Name of the tag to remove.
+
+        Raises:
+            ValueError: If the server or tag names do not match the required
+                pattern, or if the server/tag does not exist.
+            TypeError: If server or tag names are not strings, or if the server
+                is stored as a reference.
+        """
+        validate_patterned_key(server_name, "server")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_servers = cast(Servers, self._components.servers)
+
+        server = _components_servers.root.get(server_name)
+        if server is None:
+            raise ValueError(
+                f"Cannot remove tag '{tag_name}' from server: {server_name} "
+                "server does not exist in components.servers."
+            )
+        if isinstance(server, Reference):
+            raise TypeError(
+                f"Cannot remove tag from server '{server_name}': "
+                "server is stored as a reference, not an object."
+            )
+
+        if server.tags is not None:
+            tag_ref = Reference.to_component_tag_name(tag_name)
+            if tag_ref in server.tags:
+                server.tags.remove(tag_ref)
 
         return self
 
@@ -640,6 +792,101 @@ class AsyncAPI3Builder:
             and name in self._components.channels
         ):
             del self._components.channels[name]
+
+        return self
+
+    def add_tag_to_channel(
+        self,
+        channel_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag reference to a channel's tags.
+
+        Args:
+            channel_name: Name of the channel to add the tag to.
+            tag_name: Name of the tag to add.
+
+        Raises:
+            ValueError: If the channel or tag names do not match the required
+                pattern, or if the channel/tag does not exist.
+            TypeError: If channel or tag names are not strings, or if the channel
+                is stored as a reference.
+        """
+        validate_patterned_key(channel_name, "channel")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to channel: "
+                "tag does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        _components_channels = cast(Channels, self._components.channels)
+
+        channel = _components_channels.root.get(channel_name)
+        if channel is None:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to channel: {channel_name} "
+                "channel does not exist in components.channels."
+            )
+        if isinstance(channel, Reference):
+            raise TypeError(
+                f"Cannot add tag to channel '{channel_name}': "
+                "channel is stored as a reference, not an object."
+            )
+
+        if channel.tags is None:
+            channel.tags = []
+
+        tag_ref = Reference.to_component_tag_name(tag_name)
+        if tag_ref not in channel.tags:
+            channel.tags.append(tag_ref)
+
+        return self
+
+    def remove_tag_from_channel(
+        self,
+        channel_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a tag reference from a channel's tags.
+
+        Args:
+            channel_name: Name of the channel to remove the tag from.
+            tag_name: Name of the tag to remove.
+
+        Raises:
+            ValueError: If the channel or tag names do not match the required
+                pattern, or if the channel/tag does not exist.
+            TypeError: If channel or tag names are not strings, or if the channel
+                is stored as a reference.
+        """
+        validate_patterned_key(channel_name, "channel")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_channels = cast(Channels, self._components.channels)
+
+        channel = _components_channels.root.get(channel_name)
+        if channel is None:
+            raise ValueError(
+                f"Cannot remove tag '{tag_name}' from channel: {channel_name} "
+                "channel does not exist in components.channels."
+            )
+        if isinstance(channel, Reference):
+            raise TypeError(
+                f"Cannot remove tag from channel '{channel_name}': "
+                "channel is stored as a reference, not an object."
+            )
+
+        if channel.tags is not None:
+            tag_ref = Reference.to_component_tag_name(tag_name)
+            if tag_ref in channel.tags:
+                channel.tags.remove(tag_ref)
 
         return self
 
@@ -848,6 +1095,101 @@ class AsyncAPI3Builder:
 
         return self
 
+    def add_tag_to_operation(
+        self,
+        operation_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag reference to an operation's tags.
+
+        Args:
+            operation_name: Name of the operation to add the tag to.
+            tag_name: Name of the tag to add.
+
+        Raises:
+            ValueError: If the operation or tag names do not match the required
+                pattern, or if the operation/tag does not exist.
+            TypeError: If operation or tag names are not strings, or if the operation
+                is stored as a reference.
+        """
+        validate_patterned_key(operation_name, "operation")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to operation: "
+                "tag does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        _components_operations = cast(Operations, self._components.operations)
+
+        operation = _components_operations.root.get(operation_name)
+        if operation is None:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to operation: {operation_name} "
+                "operation does not exist in components.operations."
+            )
+        if isinstance(operation, Reference):
+            raise TypeError(
+                f"Cannot add tag to operation '{operation_name}': "
+                "operation is stored as a reference, not an object."
+            )
+
+        if operation.tags is None:
+            operation.tags = []
+
+        tag_ref = Reference.to_component_tag_name(tag_name)
+        if tag_ref not in operation.tags:
+            operation.tags.append(tag_ref)
+
+        return self
+
+    def remove_tag_from_operation(
+        self,
+        operation_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a tag reference from an operation's tags.
+
+        Args:
+            operation_name: Name of the operation to remove the tag from.
+            tag_name: Name of the tag to remove.
+
+        Raises:
+            ValueError: If the operation or tag names do not match the required
+                pattern, or if the operation/tag does not exist.
+            TypeError: If operation or tag names are not strings, or if the operation
+                is stored as a reference.
+        """
+        validate_patterned_key(operation_name, "operation")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_operations = cast(Operations, self._components.operations)
+
+        operation = _components_operations.root.get(operation_name)
+        if operation is None:
+            raise ValueError(
+                f"Cannot remove tag '{tag_name}' from operation: {operation_name} "
+                "operation does not exist in components.operations."
+            )
+        if isinstance(operation, Reference):
+            raise TypeError(
+                f"Cannot remove tag from operation '{operation_name}': "
+                "operation is stored as a reference, not an object."
+            )
+
+        if operation.tags is not None:
+            tag_ref = Reference.to_component_tag_name(tag_name)
+            if tag_ref in operation.tags:
+                operation.tags.remove(tag_ref)
+
+        return self
+
     # Message methods
     def update_or_create_message(
         self,
@@ -936,6 +1278,185 @@ class AsyncAPI3Builder:
         _components_messages[name] = message
 
         return self
+
+    def add_tag_to_message(
+        self,
+        message_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag reference to a message's tags.
+
+        Args:
+            message_name: Name of the message to add the tag to.
+            tag_name: Name of the tag to add.
+
+        Raises:
+            ValueError: If the message or tag names do not match the required
+                pattern, or if the message/tag does not exist.
+            TypeError: If message or tag names are not strings, or if the message
+                is stored as a reference.
+        """
+        validate_patterned_key(message_name, "message")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to message: "
+                "tag does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        _components_messages = cast(Messages, self._components.messages)
+
+        message = _components_messages.root.get(message_name)
+        if message is None:
+            raise ValueError(
+                f"Cannot add tag '{tag_name}' to message: {message_name} "
+                "message does not exist in components.messages."
+            )
+        if isinstance(message, Reference):
+            raise TypeError(
+                f"Cannot add tag to message '{message_name}': "
+                "message is stored as a reference, not an object."
+            )
+
+        if message.tags is None:
+            message.tags = []
+
+        tag_ref = Reference.to_component_tag_name(tag_name)
+        if tag_ref not in message.tags:
+            message.tags.append(tag_ref)
+
+        return self
+
+    def remove_tag_from_message(
+        self,
+        message_name: str,
+        tag_name: str,
+    ) -> "AsyncAPI3Builder":
+        """
+        Remove a tag reference from a message's tags.
+
+        Args:
+            message_name: Name of the message to remove the tag from.
+            tag_name: Name of the tag to remove.
+
+        Raises:
+            ValueError: If the message or tag names do not match the required
+                pattern, or if the message/tag does not exist.
+            TypeError: If message or tag names are not strings, or if the message
+                is stored as a reference.
+        """
+        validate_patterned_key(message_name, "message")
+        validate_patterned_key(tag_name, "tag")
+
+        _components_messages = cast(Messages, self._components.messages)
+
+        message = _components_messages.root.get(message_name)
+        if message is None:
+            raise ValueError(
+                f"Cannot remove tag '{tag_name}' from message: {message_name} "
+                "message does not exist in components.messages."
+            )
+        if isinstance(message, Reference):
+            raise TypeError(
+                f"Cannot remove tag from message '{message_name}': "
+                "message is stored as a reference, not an object."
+            )
+
+        if message.tags is not None:
+            tag_ref = Reference.to_component_tag_name(tag_name)
+            if tag_ref in message.tags:
+                message.tags.remove(tag_ref)
+
+        return self
+
+    def update_or_create_tag(
+        self,
+        name: str,
+        description: str | EllipsisType | None = UNSET,
+        external_docs: ExternalDocumentation | Reference | EllipsisType | None = UNSET,
+    ) -> "AsyncAPI3Builder":
+        """
+        Add a tag to the specification or update an existing tag.
+
+        If the tag doesn't exist in components.tags, it will be created.
+
+        Args:
+            name: The name of the tag.
+            description: A short description for the tag. CommonMark syntax can be
+                used for rich text representation.
+            external_docs: Additional external documentation for this tag.
+
+        Raises:
+            ValueError: If the tag name does not match the required pattern.
+            TypeError: If attempting to update a tag that is stored as a Reference
+                object instead of a Tag object, or if tag name is not a string.
+        """
+        validate_patterned_key(name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+
+        tag = _components_tags.root.get(name)
+
+        if tag is None:
+            tag = Tag(name=name)
+
+        if isinstance(tag, Reference):
+            raise TypeError(
+                f"The tag with name '{name}' is stored as reference. "
+                "Cannot update a tag reference, delete reference first."
+            )
+
+        update_object_attributes(
+            tag,
+            description=description,
+            external_docs=external_docs,
+        )
+
+        _components_tags[name] = tag
+
+        return self
+
+    def get_tag_ref(self, tag_name: str) -> Reference:
+        """
+        Get a reference to a tag from components.tags.
+
+        This method checks that the tag exists in components.tags. If the tag is stored
+        as a Reference object (pointing to an external tag), returns that reference.
+        If the tag is a Tag object, returns a reference to it in components.tags.
+
+        Args:
+            tag_name: Name of the tag to get reference for.
+
+        Returns:
+            Reference to the tag. If the tag in components is a Reference object,
+            returns that reference. Otherwise, returns a reference to the tag
+            in components.
+
+        Raises:
+            ValueError: If the tag name does not match the required pattern, or if
+                the tag does not exist in components.tags.
+            TypeError: If tag name is not a string.
+        """
+        validate_patterned_key(tag_name, "tag")
+
+        _components_tags = cast(TagsDict, self._components.tags)
+        if tag_name not in _components_tags:
+            raise ValueError(
+                f"Tag '{tag_name}' does not exist in components.tags. "
+                "Add the tag first using update_or_create_tag()."
+            )
+
+        tag = _components_tags.root[tag_name]
+
+        if isinstance(tag, Reference):
+            return tag
+
+        return Reference.to_component_tag_name(tag_name)
 
     def add_message_to_channel(
         self,
