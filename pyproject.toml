@@ -113,6 +113,8 @@ ignore = [
     "RUF015",  # Prefer next({iterable}) over single element slice
     "RUF059",  # Unpacked variable {name} is never used
     "SIM105",  # Use contextlib.suppress when possible (Excluded as slow comparable to regular pass)
+    "RET504", # Annecessary assigment before return statement
+    "PLR0913", # too-many-arguments
     "PLR2004", # Magic values
 ]
 
