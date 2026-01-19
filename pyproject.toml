@@ -58,6 +58,7 @@ dev = [
     "pytest>=9.0.2",
     "pytest-cases>=3.9.1",
     "pytest-cov>=7.0.0",
+    "pytest-mock>=3.14.0",
 ]
 
 [tool.mypy]
@@ -186,6 +187,9 @@ select = [
 ]
 
 [tool.ruff.lint.per-file-ignores]
+"asyncapi3/builder.py" = [
+    "PLR0913", # too-many-arguments
+]
 "asyncapi3/models/bindings/__init__.py" = ["RUF022"]
 "__init__.py" = [
     "F401",     # unused import
