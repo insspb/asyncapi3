@@ -31,6 +31,14 @@ class Reference(NonExtendableBaseModel):
         description="The reference string.",
     )
 
+    def __hash__(self) -> int:
+        """
+        Return hash of the reference string.
+
+        This method is required for deduplication in object managers.
+        """
+        return self.ref.__hash__()
+
     # Reference factory methods - single source of truth for AsyncAPI 3.0 paths
     # All reference creation should go through these methods for consistency
 
