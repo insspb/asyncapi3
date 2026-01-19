@@ -571,6 +571,8 @@ class TestAsyncAPI3:
             operations=custom_operations,
             components=custom_components,
             default_content_type="application/xml",
+            extra_converters=[],
+            extra_validators=[],
         )
 
         # Verify that parameters were properly overridden

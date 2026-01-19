@@ -83,6 +83,7 @@ class TestTagsManager:
                     "tags": [shared_tag],  # Same tag instance
                 },
             },
+            extra_converters=[TagsManager],
         )
 
         spec_data = spec.model_dump()
@@ -236,6 +237,7 @@ class TestTagsManager:
                     "tags": [tag2],  # Tag with same name but different content
                 },
             },
+            extra_converters=[TagsManager],
         )
 
         # Check that warning was logged
