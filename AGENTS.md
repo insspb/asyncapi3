@@ -19,9 +19,34 @@ NOTE: All paths declared from project root.
 - `asyncapi3/` - main library code
 - `asyncapi3/models/` - Pydantic models for AsyncAPI 3 specification
 - `asyncapi3/models/bindings/` - Pydantic models for bindings specifications
+- `asyncapi3/validators/` - reference validation functions and validator classes
 - `asyncapi3/__init__.py` - Package exports
 - `tests/` - project tests:
 - `tests/fixtures/` - Test fixtures (JSON/YAML specs)
+
+## Validation Functions
+
+The project includes common validation functions in `asyncapi3/validators/common.py`
+that are used by all reference validators:
+
+- **`is_external_ref(ref_value: str, context: str) -> bool`**: Checks if a reference
+  is external (starts with "http" or other protocols) and logs a warning. Returns
+  `True` if external (validation skipped), `False` if internal.
+
+- **`validate_component_exists(spec, ref_value, component_path, context) -> None`**:
+  Validates that a reference points to an existing component in `spec.components.{component_path}`.
+  Raises `ValueError` if component doesn't exist.
+
+- **`validate_root_channel_ref(spec: AsyncAPI3, ref_value: str, context: str) -> None`**:
+  Validates that a reference points to a channel in the root `spec.channels` object.
+  Raises `ValueError` if the channel doesn't exist.
+
+- **`validate_root_operation_ref(spec: AsyncAPI3, ref_value: str, context: str) -> None`**:
+  Validates that a reference points to an operation in the root `spec.operations` object.
+  Raises `ValueError` if the operation doesn't exist.
+
+All reference validators inherit from `ProcessorProtocol` and use these common functions
+to validate references throughout AsyncAPI specifications.
 
 ## Specification Location
 
@@ -1263,6 +1288,8 @@ Before submitting code, ensure:
   `spec/asyncapi-json-schema/definitions/3.0.0/` to verify field structures and types
 - [ ] (Optional) Check JSON schema examples in `spec/asyncapi-json-schema/examples/3.0.0/`
   for valid test cases
+- [ ] **For validators**: Use common validation functions from
+  `asyncapi3/validators/common.py`
 - [ ] Implement the Pydantic model in `asyncapi3/models/`
 - [ ] Add `description` from spec to `Field()`
 - [ ] All Pydantic fields use `Field` with descriptions from spec
