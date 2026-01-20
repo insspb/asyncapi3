@@ -56,27 +56,27 @@ from asyncapi3.models.server import Servers
 from asyncapi3.protocols import ProcessorProtocol
 
 # TODO:
-# from asyncapi3.validators import (
-#     ChannelBindingsRefValidator,
-#     ChannelsRefValidator,
-#     CorrelationIdsRefValidator,
-#     ExternalDocsRefValidator,
-#     MessageBindingsRefValidator,
-#     MessagesRefValidator,
-#     MessageTraitsRefValidator,
-#     OperationBindingsRefValidator,
-#     OperationsRefValidator,
-#     OperationTraitsRefValidator,
-#     ParametersRefValidator,
-#     RepliesRefValidator,
-#     ReplyAddressesRefValidator,
-#     SchemasRefValidator,
-#     SecuritySchemesRefValidator,
-#     ServerBindingsRefValidator,
-#     ServersRefValidator,
-#     ServerVariablesRefValidator,
-#     TagsRefValidator,
-# )
+from asyncapi3.validators import (
+    # ChannelBindingsRefValidator,
+    # ChannelsRefValidator,
+    # CorrelationIdsRefValidator,
+    # ExternalDocsRefValidator,
+    # MessageBindingsRefValidator,
+    # MessagesRefValidator,
+    # MessageTraitsRefValidator,
+    # OperationBindingsRefValidator,
+    # OperationsRefValidator,
+    # OperationTraitsRefValidator,
+    # ParametersRefValidator,
+    # RepliesRefValidator,
+    # ReplyAddressesRefValidator,
+    # SchemasRefValidator,
+    # SecuritySchemesRefValidator,
+    # ServerBindingsRefValidator,
+    # ServersRefValidator,
+    # ServerVariablesRefValidator,
+    TagsRefValidator,
+)
 
 
 class AsyncAPI3(ExtendableBaseModel):
@@ -285,7 +285,7 @@ class AsyncAPI3(ExtendableBaseModel):
                 # ServerBindingsRefValidator,
                 # ServersRefValidator,
                 # ServerVariablesRefValidator,
-                # TagsRefValidator,
+                TagsRefValidator,
             ],
             **kwargs,
         }
