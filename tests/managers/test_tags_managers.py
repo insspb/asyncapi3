@@ -123,6 +123,14 @@ class TestTagsManager:
         spec = AsyncAPI3.as_builder(
             title="Test API",
             tags=[ref],  # Already a reference
+            components={
+                "tags": {
+                    "existing_tag": {
+                        "name": "existing_tag",
+                        "description": "Existing tag",
+                    },
+                },
+            },
         )
 
         spec_data = spec.model_dump()
