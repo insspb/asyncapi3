@@ -1,6 +1,6 @@
 """Tests for AsyncAPI3 root model."""
 
-from typing import Any
+from typing import Any, Literal
 
 import pytest
 import yaml
@@ -330,6 +330,51 @@ def case_asyncapi_serialization_with_components() -> tuple[AsyncAPI3, dict]:
 class TestAsyncAPI3:
     """Tests for AsyncAPI3 model."""
 
+    def test_as_builder_default(self) -> None:
+        """Test AsyncAPI3.as_builder() with default parameters."""
+        builder = AsyncAPI3.as_builder()
+        assert builder is not None
+        assert builder.asyncapi == "3.0.0"
+        assert builder.info.title == "Sample APP"
+        assert builder.info.version == "0.0.1"
+        assert len(builder.servers.root) == 0
+        assert len(builder.channels.root) == 0
+        assert len(builder.operations.root) == 0
+        assert builder.components is not None
+
+    def test_as_builder_serialization_default(self) -> None:
+        """Test AsyncAPI3.as_builder() serialization with default parameters."""
+        builder = AsyncAPI3.as_builder()
+        expected = {
+            "asyncapi": "3.0.0",
+            "info": {"title": "Sample APP", "version": "0.0.1"},
+            "servers": {},
+            "channels": {},
+            "operations": {},
+            "components": {
+                "schemas": {},
+                "servers": {},
+                "channels": {},
+                "operations": {},
+                "messages": {},
+                "securitySchemes": {},
+                "serverVariables": {},
+                "parameters": {},
+                "correlationIds": {},
+                "replies": {},
+                "replyAddresses": {},
+                "externalDocs": {},
+                "tags": {},
+                "operationTraits": {},
+                "messageTraits": {},
+                "serverBindings": {},
+                "channelBindings": {},
+                "operationBindings": {},
+                "messageBindings": {},
+            },
+        }
+        assert builder.model_dump() == expected
+
     @parametrize_with_cases(
         "yaml_data",
         cases=[
@@ -486,3 +531,69 @@ class TestAsyncAPI3:
         assert asyncapi.__pydantic_extra__["x-custom-extension"] == "custom value"
         assert "x-another-extension" in asyncapi.__pydantic_extra__
         assert asyncapi.__pydantic_extra__["x-another-extension"] == {"nested": "value"}
+
+    @pytest.mark.parametrize(
+        "mode",
+        ["validation", "serialization"],
+        ids=["validation_mode", "serialization_mode"],
+    )
+    def test_asyncapi3_json_schema_generation(
+        self,
+        mode: Literal["validation", "serialization"],
+    ) -> None:
+        """Test AsyncAPI3 JSON schema generation works without errors for both modes."""
+        schema = AsyncAPI3.model_json_schema(mode=mode)
+
+        # Basic validation that schema was generated successfully
+        assert isinstance(schema, dict)
+
+    def test_as_builder_parameter_override(self) -> None:
+        """Test AsyncAPI3.as_builder() parameter override functionality."""
+        # Test overriding all main parameters
+        custom_servers = {"prod": Server(host="kafka.example.com", protocol="kafka")}
+        custom_channels = {"test": Channel(address="test/channel")}
+        custom_operations = {
+            "test_op": Operation(
+                action="send", channel=Reference(ref="#/channels/test")
+            )
+        }
+        custom_components = Components(
+            messages={"test_msg": Message(payload=Schema(type="string"))}
+        )
+
+        builder = AsyncAPI3.as_builder(
+            title="Custom Title",
+            version="2.0.0",
+            description="Custom description",
+            asyncapi="3.0.1",  # Override default asyncapi version
+            servers=custom_servers,
+            channels=custom_channels,
+            operations=custom_operations,
+            components=custom_components,
+            default_content_type="application/xml",
+        )
+
+        # Verify that parameters were properly overridden
+        assert builder.asyncapi == "3.0.1"
+        assert builder.info.title == "Custom Title"
+        assert builder.info.version == "2.0.0"
+        assert builder.info.description == "Custom description"
+        assert builder.default_content_type == "application/xml"
+
+        # Verify collection overrides
+        assert len(builder.servers.root) == 1
+        assert "prod" in builder.servers.root
+        assert builder.servers.root["prod"].host == "kafka.example.com"
+
+        assert len(builder.channels.root) == 1
+        assert "test" in builder.channels.root
+        assert builder.channels.root["test"].address == "test/channel"
+
+        assert len(builder.operations.root) == 1
+        assert "test_op" in builder.operations.root
+        assert builder.operations.root["test_op"].action == "send"
+
+        # Verify components override
+        assert builder.components.messages is not None
+        assert "test_msg" in builder.components.messages
+        assert builder.components.messages["test_msg"].payload.type == "string"

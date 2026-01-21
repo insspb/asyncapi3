@@ -4,15 +4,79 @@ __all__ = ["AsyncAPI3"]
 
 import re
 
-from pydantic import AnyUrl, Field, field_validator
+from typing import Any
 
+from pydantic import (
+    AnyUrl,
+    Field,
+    HttpUrl,
+    field_validator,
+    model_validator,
+)
+from pydantic.json_schema import SkipJsonSchema
+
+# TODO:
+# from asyncapi3.managers import (
+#     ChannelMessagesManager,
+#     ChannelParametersManager,
+#     ChannelsManager,
+#     OperationsManager,
+#     ServersManager,
+#     TagsManager,
+# )
+from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.base_models import ExtendableBaseModel
-from asyncapi3.models.channel import Channels
-from asyncapi3.models.components import Components
+from asyncapi3.models.channel import Channels, Parameters
+from asyncapi3.models.components import (
+    ChannelBindings,
+    Components,
+    CorrelationIDs,
+    ExternalDocs,
+    MessageBindings,
+    MessageTraits,
+    OperationBindings,
+    OperationTraits,
+    Replies,
+    ReplyAddresses,
+    Schemas,
+    SecuritySchemes,
+    ServerBindings,
+    ServerVariables,
+)
+from asyncapi3.models.components import (
+    Tags as TagsDict,
+)
 from asyncapi3.models.helpers import is_null
-from asyncapi3.models.info import Info
-from asyncapi3.models.operation import Operations
+from asyncapi3.models.info import Contact, Info, License
+from asyncapi3.models.message import Messages
+from asyncapi3.models.operation import (
+    Operations,
+)
 from asyncapi3.models.server import Servers
+from asyncapi3.protocols import ProcessorProtocol
+
+# TODO:
+# from asyncapi3.validators import (
+#     ChannelBindingsRefValidator,
+#     ChannelsRefValidator,
+#     CorrelationIdsRefValidator,
+#     ExternalDocsRefValidator,
+#     MessageBindingsRefValidator,
+#     MessagesRefValidator,
+#     MessageTraitsRefValidator,
+#     OperationBindingsRefValidator,
+#     OperationsRefValidator,
+#     OperationTraitsRefValidator,
+#     ParametersRefValidator,
+#     RepliesRefValidator,
+#     ReplyAddressesRefValidator,
+#     SchemasRefValidator,
+#     SecuritySchemesRefValidator,
+#     ServerBindingsRefValidator,
+#     ServersRefValidator,
+#     ServerVariablesRefValidator,
+#     TagsRefValidator,
+# )
 
 
 class AsyncAPI3(ExtendableBaseModel):
@@ -92,6 +156,142 @@ class AsyncAPI3(ExtendableBaseModel):
             "MAY NOT be used by the implemented Application."
         ),
     )
+    extra_converters: SkipJsonSchema[list[type[ProcessorProtocol]] | None] = Field(
+        default=None,
+        exclude=True,
+        description=(
+            "List of managers that can be used to convert specific fields in the "
+            "AsyncAPI model. Usually such converters require cross-model references. "
+            "Applied after basic types validation, but before `extra_validators`."
+        ),
+    )
+    extra_validators: SkipJsonSchema[list[type[ProcessorProtocol]] | None] = Field(
+        default=None,
+        exclude=True,
+        description=(
+            "List of processors that can be used to validate specific fields in the "
+            "AsyncAPI model. Usually such processors require cross-model references. "
+            "Applied after model validation and `extra_converters`."
+        ),
+    )
+
+    @classmethod
+    def as_builder(
+        cls,
+        /,
+        title: str = "Sample APP",
+        version: str = "0.0.1",
+        description: str | None = None,
+        terms_of_service: HttpUrl | str | None = None,
+        contact: Contact | None = None,
+        license: License | None = None,  # noqa: A002
+        tags: Tags | None = None,
+        external_docs: ExternalDocumentation | Reference | None = None,
+        **kwargs: Any,
+    ) -> "AsyncAPI3":
+        """
+        Create an AsyncAPI3 instance with default parameters for simplified object
+        building.
+
+        This method provides a convenient way to create an AsyncAPI specification with
+        default values for common fields, while allowing customization of key metadata.
+        All collection fields (servers, channels, operations, components) are
+        initialized as empty collections, providing a clean starting point for
+        specification building.
+
+        Args:
+            title: The title of the application (defaults to "Sample APP")
+            version: The version of the API (defaults to "0.0.1")
+            description: A description of the application
+            terms_of_service: A URL to the Terms of Service for the API
+            contact: Contact information for the API
+            license: License information for the API
+            tags: A list of tags for API documentation
+            external_docs: External documentation references
+            **kwargs: Additional keyword arguments passed to AsyncAPI3 constructor
+
+        Returns:
+            AsyncAPI3: A new AsyncAPI3 instance with default parameters set
+        """
+        info = Info(
+            title=title,
+            version=version,
+            description=description,
+            terms_of_service=terms_of_service,
+            contact=contact,
+            license=license,
+            tags=tags,
+            external_docs=external_docs,
+        )
+
+        components = Components(
+            schemas=Schemas({}),
+            servers=Servers({}),
+            channels=Channels({}),
+            operations=Operations({}),
+            messages=Messages({}),
+            security_schemes=SecuritySchemes({}),
+            server_variables=ServerVariables({}),
+            parameters=Parameters({}),
+            correlation_ids=CorrelationIDs({}),
+            replies=Replies({}),
+            reply_addresses=ReplyAddresses({}),
+            external_docs=ExternalDocs({}),
+            tags=TagsDict({}),
+            operation_traits=OperationTraits({}),
+            message_traits=MessageTraits({}),
+            server_bindings=ServerBindings({}),
+            channel_bindings=ChannelBindings({}),
+            operation_bindings=OperationBindings({}),
+            message_bindings=MessageBindings({}),
+        )
+
+        init_params = {
+            "info": info,
+            "servers": Servers({}),
+            "channels": Channels({}),  # list[Reference] -> root.servers
+            # operations Reference -> root.channel(condition);
+            # operations list[Reference] -> channel.messages(condition)
+            "operations": Operations({}),
+            "components": components,
+            "extra_converters": [
+                # TODO:
+                # Safe to merge values
+                # TagsManager,  # Only name has meaning
+                # Values defined with names (core objects (L1))
+                # ServersManager,
+                # ChannelsManager,
+                # OperationsManager,
+                # ChannelMessagesManager,
+                # ChannelParametersManager,
+            ],
+            "extra_validators": [
+                # TODO:
+                # ChannelBindingsRefValidator,
+                # ChannelsRefValidator,
+                # CorrelationIdsRefValidator,
+                # ExternalDocsRefValidator,
+                # MessageBindingsRefValidator,
+                # MessagesRefValidator,
+                # MessageTraitsRefValidator,
+                # OperationBindingsRefValidator,
+                # OperationsRefValidator,
+                # OperationTraitsRefValidator,
+                # ParametersRefValidator,
+                # RepliesRefValidator,
+                # ReplyAddressesRefValidator,
+                # SchemasRefValidator,
+                # SecuritySchemesRefValidator,
+                # ServerBindingsRefValidator,
+                # ServersRefValidator,
+                # ServerVariablesRefValidator,
+                # TagsRefValidator,
+            ],
+            **kwargs,
+        }
+        spec = cls(**init_params)
+
+        return spec
 
     @field_validator("asyncapi")
     @classmethod
@@ -114,3 +314,24 @@ class AsyncAPI3(ExtendableBaseModel):
             )
 
         return version
+
+    @model_validator(mode="after")
+    def run_extra_processors(self) -> "AsyncAPI3":
+        """Run all extra processors after model validation."""
+        self._run_extra_converters()
+        self._run_extra_validators()
+        return self
+
+    def _run_extra_converters(self) -> None:
+        """Run extra converters for cross-model optimizations."""
+        if self.extra_converters:
+            for converter_cls in self.extra_converters:
+                processor = converter_cls()
+                processor(self)
+
+    def _run_extra_validators(self) -> None:
+        """Run extra validators after converters."""
+        if self.extra_validators:
+            for validator_cls in self.extra_validators:
+                processor = validator_cls()
+                processor(self)
