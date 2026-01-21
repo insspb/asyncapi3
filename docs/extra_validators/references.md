@@ -73,9 +73,9 @@ Example:
 
 ### Statistics section
 
-- **Total fields with Reference**: 142
-- **Validated fields**: 7
-- **Non-validated fields**: 135
+- **Total fields with Reference**: int
+- **Validated fields**: int
+- **Non-validated fields**: int
 
 ## `asyncapi3/models/asyncapi.py`
 
@@ -606,17 +606,18 @@ Example:
   - [x] External values with warning
   - [x] `#/components/tags/{tag_name}`
 - [x] Verified fields:
-  - [x] `root.info.tags`
-  - [x] `root.servers[].tags`
-  - [x] `root.channels[].tags`
-  - [x] `root.channels[].messages[].tags`
-  - [x] `root.operations[].tags`
-  - [x] `root.operations[].reply.messages[].tags` (indirectly via referenced
+  - [x] `AsyncAPI3.info.tags`
+  - [x] `AsyncAPI3.servers[].tags`
+  - [x] `AsyncAPI3.channels[].tags`
+  - [x] `AsyncAPI3.channels[].messages[].tags`
+  - [x] `AsyncAPI3.operations[].tags`
+  - [x] `AsyncAPI3.operations[].reply.messages[].tags` (indirectly via referenced
     channel)
-  - [x] `root.components.messages[].tags`
-  - [x] `root.components.channels[].tags`
-  - [x] `root.components.operations[].tags`
-  - [x] `root.components.servers[].tags`
-  - [x] `root.components.operationTraits[].tags`
-  - [x] `root.components.messageTraits[].tags`
-  - [x] `root.components.channels[].messages[].tags`
+  - [x] `AsyncAPI3.components.messages[].tags`
+  - [x] `AsyncAPI3.components.channels[].tags`
+  - [x] `AsyncAPI3.components.operations[].tags`
+  - [x] `AsyncAPI3.components.servers[].tags`
+  - [x] `AsyncAPI3.components.operationTraits[].tags`
+  - [x] `AsyncAPI3.components.messageTraits[].tags`
+  - [x] `AsyncAPI3.components.channels[].messages[].tags`
+  - [ ] `AsyncAPI3.components.tags[].tags
