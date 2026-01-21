@@ -252,7 +252,6 @@ class AsyncAPI3(ExtendableBaseModel):
             "operations": Operations({}),
             "components": components,
             "extra_converters": [
-                # TODO:
                 # Safe to merge values
                 TagsManager,  # Only name has meaning
                 # Values defined with names (core objects (L1))
