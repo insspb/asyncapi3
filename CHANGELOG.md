@@ -12,6 +12,10 @@
 - #15: Processor protocol for AsyncAPI specification converters and validators
 - #15: `AsyncAPI3.as_builder()` method for simplified specification creation with
   default parameters
+- #16: `TagsRefValidator` for comprehensive tag reference validation across all
+  AsyncAPI 3.0 specification objects
+- #16: Stub files for future validators
+- #16: Complete docs for extra validators
 
 ### CHANGED
 
