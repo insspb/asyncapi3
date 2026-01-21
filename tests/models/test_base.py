@@ -339,6 +339,21 @@ class TestReference:
         assert isinstance(reference, Reference)
         assert reference.ref == "#/components/messageBindings/amqpBinding"
 
+    def test_reference_hash(self) -> None:
+        """Test Reference __hash__ method."""
+        ref1 = Reference(ref="#/components/schemas/Pet")
+        ref2 = Reference(ref="#/components/schemas/Pet")
+        ref3 = Reference(ref="#/components/schemas/User")
+
+        # Same ref should have same hash
+        assert hash(ref1) == hash(ref2)
+        # Different refs should have different hashes (in most cases)
+        assert hash(ref1) != hash(ref3)
+
+        # Hash should equal hash of the ref string
+        assert hash(ref1) == hash("#/components/schemas/Pet")
+        assert hash(ref3) == hash("#/components/schemas/User")
+
 
 class TestExternalDocumentation:
     """Tests for ExternalDocumentation model."""
