@@ -598,3 +598,158 @@ class TestTagsRefValidator:
                 },
                 extra_validators=[TagsRefValidator],
             )
+
+    def test_tags_ref_validator_validates_components_servers_tags_refs(self) -> None:
+        """Test TagsRefValidator validates tag references in components servers."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            components={
+                "servers": {
+                    "prod": {
+                        "host": "api.example.com",
+                        "protocol": "https",
+                        "tags": [{"$ref": "#/components/tags/prod"}],
+                    },
+                },
+                "tags": {
+                    "prod": {
+                        "name": "prod",
+                        "description": "Production environment",
+                    },
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_validates_components_operation_traits_tags_refs(
+        self,
+    ) -> None:
+        """Test TagsRefValidator validates tag references in components operation traits."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            components={
+                "operationTraits": {
+                    "testTrait": {
+                        "tags": [{"$ref": "#/components/tags/prod"}],
+                    },
+                },
+                "tags": {
+                    "prod": {
+                        "name": "prod",
+                        "description": "Production environment",
+                    },
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_validates_components_message_traits_tags_refs(
+        self,
+    ) -> None:
+        """Test TagsRefValidator validates tag references in components message traits."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            components={
+                "messageTraits": {
+                    "testTrait": {
+                        "tags": [{"$ref": "#/components/tags/prod"}],
+                    },
+                },
+                "tags": {
+                    "prod": {
+                        "name": "prod",
+                        "description": "Production environment",
+                    },
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_validates_channels_messages_tags_refs(self) -> None:
+        """Test TagsRefValidator validates tag references in messages of root channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            channels={
+                "test": {
+                    "address": "/test",
+                    "messages": {
+                        "testMsg": {
+                            "payload": {"type": "string"},
+                            "tags": [{"$ref": "#/components/tags/prod"}],
+                        },
+                    },
+                },
+            },
+            components={
+                "tags": {
+                    "prod": {
+                        "name": "prod",
+                        "description": "Production environment",
+                    },
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_validates_components_channels_messages_tags_refs(
+        self,
+    ) -> None:
+        """Test TagsRefValidator validates tag references in messages of components channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            components={
+                "channels": {
+                    "test": {
+                        "address": "/test",
+                        "messages": {
+                            "testMsg": {
+                                "payload": {"type": "string"},
+                                "tags": [{"$ref": "#/components/tags/prod"}],
+                            },
+                        },
+                    },
+                },
+                "tags": {
+                    "prod": {
+                        "name": "prod",
+                        "description": "Production environment",
+                    },
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_raises_error_for_nested_message_tags(self) -> None:
+        """Test TagsRefValidator raises error for invalid tag reference in nested message."""
+        with pytest.raises(ValueError, match="does not exist in components/tags"):
+            AsyncAPI3(
+                asyncapi="3.0.0",
+                info={"title": "Test API", "version": "1.0.0"},
+                channels={
+                    "test": {
+                        "address": "/test",
+                        "messages": {
+                            "testMsg": {
+                                "payload": {"type": "string"},
+                                "tags": [{"$ref": "#/components/tags/nonexistent"}],
+                            },
+                        },
+                    },
+                },
+                components={
+                    "tags": {
+                        "prod": {"name": "prod"},
+                    },
+                },
+                extra_validators=[TagsRefValidator],
+            )
