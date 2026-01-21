@@ -8,6 +8,10 @@
 - #8: validate_patterned_key function for key validation in AsyncAPI models
 - #9: PyPi changelog link + Pydantic v2 badge
 
+### CHANGED
+
+- #13: Relaxed linting and coverage rules to allow faster development
+
 ### FIXED
 
 - #8: Style issues
