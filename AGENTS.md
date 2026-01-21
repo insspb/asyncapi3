@@ -1128,6 +1128,60 @@ Tags = list[Tag | Reference]
 Models exported via `__all__` should also be imported and re-exported in
 `asyncapi3/models/__init__.py` for package-level access.
 
+## Reference Extra Validators Implementation
+
+AsyncAPI 3.0 uses `Reference` objects extensively. To ensure data integrity, we
+implement extra validators that run after basic Pydantic validation.
+
+### Workflow for Implementing/Updating Validators
+
+When you need to implement a new validator or update an existing one (e.g., adding
+more fields to check), follow these steps:
+
+1. **Validator Location**: All reference validators are located in
+    `asyncapi3/validators/`.
+2. **Implementation**:
+    - Each validator must implement the `ProcessorProtocol` (from
+      `asyncapi3.protocols`).
+    - It must have a `__call__(self, spec: AsyncAPI3) -> AsyncAPI3` method.
+    - Use `spec` to traverse the model and validate `Reference` objects against
+      their expected targets in `components`.
+3. **Registration**:
+    - Add the validator class to `asyncapi3/validators/__init__.py`.
+    - Add the validator to the `extra_validators` list in `AsyncAPI3.as_builder`
+      method within `asyncapi3/models/asyncapi.py` (if it should be enabled by
+      default).
+4. **Documentation**:
+    - Update `docs/extra_validators/references.md`.
+    - **CRITICAL**: This document has a dual structure. You MUST update both:
+        1. The **Per model section**: Mark the specific fields in the model
+            definitions (e.g., `## asyncapi3/models/info.py`).
+        2. The **Per validator section**: Mark the fields in the validator's
+            own section at the end of the document (e.g.,
+            `## asyncapi3/validators/tags_ref_validator.py`).
+    - Use checkboxes `[ ]` and `[x]` to mark progress.
+    - Ensure the "Statistics section" remains accurate if new fields are added.
+5. **Testing**:
+    - Create or update tests in `tests/validators/test_<validator_name>.py`.
+    - Use `pytest` and `pytest-cases` for comprehensive testing of valid and
+      invalid references.
+
+### Files to Review and Update
+
+- `asyncapi3/validators/`: Directory for validator implementations.
+- `asyncapi3/validators/__init__.py`: Package exports for validators.
+- `asyncapi3/models/asyncapi.py`: `AsyncAPI3` root model where validators are
+  registered.
+- `docs/extra_validators/references.md`: Source of truth for validation status and
+  requirements.
+- `tests/validators/`: Directory for validator tests.
+
+### Validation Status Tracking
+
+Always refer to `docs/extra_validators/references.md` to see the current state of
+reference validation. If you implement validation for a field, make sure to mark it
+as `[x]` in this document.
+
 ## Development Workflow
 
 1. **Read the specification**: Always refer to `spec/asyncapi/spec/asyncapi.md` when
