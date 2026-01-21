@@ -7,6 +7,8 @@
 - #8: Strict pylint rules for imports location and other style issues
 - #8: validate_patterned_key function for key validation in AsyncAPI models
 - #9: PyPi changelog link + Pydantic v2 badge
+- #14: `Reference` model is now hashable and has special methods for easy references
+  creation
 
 ### CHANGED
 
