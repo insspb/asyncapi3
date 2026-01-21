@@ -70,7 +70,7 @@ class TagsRefValidator(ProcessorProtocol):
         for tag in tags:
             if not isinstance(tag, Reference):
                 continue
-            self._validate_tag_ref(spec, tag, context)
+            self.validate_tag_ref(spec, tag, context)
 
     def _validate_tags_in_collection(
         self,
@@ -196,7 +196,7 @@ class TagsRefValidator(ProcessorProtocol):
                     f"message '{message_name}' in components channel '{channel_name}'",
                 )
 
-    def _validate_tag_ref(
+    def validate_tag_ref(
         self,
         spec: AsyncAPI3,
         tag_ref: Reference,
@@ -217,12 +217,12 @@ class TagsRefValidator(ProcessorProtocol):
         ref_value = tag_ref.ref
 
         if ref_value.startswith("#"):
-            self._validate_internal_tag_ref(spec, tag_ref, context)
+            self.validate_internal_tag_ref(spec, tag_ref, context)
             return
 
-        self._validate_external_tag_ref(spec, tag_ref, context)
+        self.validate_external_tag_ref(spec, tag_ref, context)
 
-    def _validate_external_tag_ref(
+    def validate_external_tag_ref(
         self,
         spec: AsyncAPI3,
         tag_ref: Reference,
@@ -244,7 +244,7 @@ class TagsRefValidator(ProcessorProtocol):
             "Cannot validate external references."
         )
 
-    def _validate_internal_tag_ref(
+    def validate_internal_tag_ref(
         self,
         spec: AsyncAPI3,
         tag_ref: Reference,
