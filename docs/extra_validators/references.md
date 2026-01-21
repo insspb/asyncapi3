@@ -170,13 +170,14 @@ Example:
   - [ ] Validated by `ChannelsRefValidator`
 - [ ] `messages`: `list[Reference] | None`
   - [ ] Validated by `MessagesRefValidator`
+  - [x] `tags` validated by `TagsRefValidator` (indirectly via referenced channel)
 
 ### OperationTrait
 
 - [ ] `security`: `list[SecurityScheme | Reference] | None`
   - [ ] Validated by `SecuritySchemesRefValidator`
-- [ ] `tags`: `Tags | None` (`list[Tag | Reference]`)
-  - [ ] Validated by `TagsRefValidator`
+- [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
+  - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
   - [ ] Validated by `ExternalDocsRefValidator`
 - [ ] `bindings`: `OperationBindingsObject | Reference | None`
@@ -209,8 +210,8 @@ Example:
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `correlation_id`: `CorrelationID | Reference | None`
   - [ ] Validated by `CorrelationIdsRefValidator`
-- [ ] `tags`: `Tags | None` (`list[Tag | Reference]`)
-  - [ ] Validated by `TagsRefValidator`
+- [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
+  - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
   - [ ] Validated by `ExternalDocsRefValidator`
 - [ ] `bindings`: `MessageBindingsObject | Reference | None`
@@ -246,7 +247,7 @@ Example:
   - [ ] `Server` values:
     - [ ] `variables`: `ServerVariablesRefValidator`
     - [ ] `security`: `SecuritySchemesRefValidator`
-    - [ ] `tags`: `TagsRefValidator`
+    - [x] `tags`: `TagsRefValidator`
     - [ ] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `ServerBindingsRefValidator`
 - [ ] `channels`: `Channels | None` (dict[str, Channel | Reference])
@@ -292,14 +293,14 @@ Example:
 - [ ] `reply_addresses`: `ReplyAddresses | None` (dict[str, OperationReplyAddress | Reference])
 - [ ] `external_docs`: `ExternalDocs | None` (dict[str, ExternalDocumentation | Reference])
 - [ ] `tags`: `TagsDict | None` (dict[str, Tag | Reference])
-  - [ ] `Reference` values: `TagsRefValidator`
+  - [x] `Reference` values: `TagsRefValidator`
   - [ ] `Tag` values:
     - [ ] `external_docs`: `ExternalDocsRefValidator`
 - [ ] `operation_traits`: `OperationTraits | None` (dict[str, OperationTrait | Reference])
   - [ ] `Reference` values: `OperationTraitsRefValidator`
   - [ ] `OperationTrait` values:
     - [ ] `security`: `SecuritySchemesRefValidator`
-    - [ ] `tags`: `TagsRefValidator`
+    - [x] `tags`: `TagsRefValidator`
     - [ ] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `OperationBindingsRefValidator`
 - [ ] `message_traits`: `MessageTraits | None` (dict[str, MessageTrait | Reference])
@@ -307,7 +308,7 @@ Example:
   - [ ] `MessageTrait` values:
     - [ ] `headers`: `SchemasRefValidator`
     - [ ] `correlation_id`: `CorrelationIdsRefValidator`
-    - [ ] `tags`: `TagsRefValidator`
+    - [x] `tags`: `TagsRefValidator`
     - [ ] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `MessageBindingsRefValidator`
 - [ ] `server_bindings`: `ServerBindings | None`
@@ -444,6 +445,9 @@ Example:
 
 ### ExternalDocsRefValidator
 
+- [ ] Allowed values:
+  - [ ] External values with warning
+  - [ ] `#/components/externalDocs/{external_doc_name}`
 - [ ] Verified fields:
   - [ ] `root.info.external_docs`
   - [ ] `root.servers[].external_docs`
@@ -599,20 +603,20 @@ Example:
 ### TagsRefValidator
 
 - [x] Allowed values:
+  - [x] External values with warning
   - [x] `#/components/tags/{tag_name}`
 - [x] Verified fields:
   - [x] `root.info.tags`
   - [x] `root.servers[].tags`
   - [x] `root.channels[].tags`
+  - [x] `root.channels[].messages[].tags`
   - [x] `root.operations[].tags`
+  - [x] `root.operations[].reply.messages[].tags` (indirectly via referenced
+    channel)
   - [x] `root.components.messages[].tags`
   - [x] `root.components.channels[].tags`
   - [x] `root.components.operations[].tags`
-- [ ] Not verified fields:
-  - [ ] `root.components.servers[].tags`
-  - [ ] `root.components.operationTraits[].tags`
-  - [ ] `root.components.messageTraits[].tags`
-  - [ ] `root.channels[].messages[].tags`
-  - [ ] `root.components.channels[].messages[].tags`
-  - [ ] `root.operations[].reply.messages[].tags` (indirectly via referenced
-    channel)
+  - [x] `root.components.servers[].tags`
+  - [x] `root.components.operationTraits[].tags`
+  - [x] `root.components.messageTraits[].tags`
+  - [x] `root.components.channels[].messages[].tags`
