@@ -9,6 +9,9 @@
 - #9: PyPi changelog link + Pydantic v2 badge
 - #14: `Reference` model is now hashable and has special methods for easy references
   creation
+- #15: Processor protocol for AsyncAPI specification converters and validators
+- #15: `AsyncAPI3.as_builder()` method for simplified specification creation with
+  default parameters
 
 ### CHANGED
 
