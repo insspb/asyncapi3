@@ -22,6 +22,14 @@ class TagsRefValidator(ProcessorProtocol):
     This validator checks that all tag references are valid:
     - Tag references in info, channels, operations, servers, and messages
       must point to existing tags in components/tags
+
+    Allowed reference values:
+    - External references (not starting with "#"): logged as warning only
+    - Internal references: must point to "#/components/tags/{key}"
+
+    The validator can be customized by overriding these methods:
+    - _validate_external_tag_ref(): customize handling of external references
+    - _validate_internal_tag_ref(): customize validation logic for internal references
     """
 
     def __call__(self, spec: AsyncAPI3) -> AsyncAPI3:
@@ -143,12 +151,55 @@ class TagsRefValidator(ProcessorProtocol):
         """
         ref_value = tag_ref.ref
 
-        if not ref_value.startswith("#"):
-            logging.warning(
-                f"{context.capitalize()} tag reference '{ref_value}' is external. "
-                "Cannot validate external references."
-            )
+        if ref_value.startswith("#"):
+            self._validate_internal_tag_ref(spec, tag_ref, context)
             return
+
+        self._validate_external_tag_ref(spec, tag_ref, context)
+
+    def _validate_external_tag_ref(
+        self,
+        spec: AsyncAPI3,
+        tag_ref: Reference,
+        context: str,
+    ) -> None:
+        """
+        Validate an external tag reference.
+
+        This method can be overridden to provide custom validation
+        for external references.
+
+        Args:
+            spec: The AsyncAPI3 specification
+            tag_ref: The external tag reference to validate
+            context: Context string for error messages
+        """
+        logging.warning(
+            f"{context.capitalize()} tag reference '{tag_ref.ref}' is external. "
+            "Cannot validate external references."
+        )
+
+    def _validate_internal_tag_ref(
+        self,
+        spec: AsyncAPI3,
+        tag_ref: Reference,
+        context: str,
+    ) -> None:
+        """
+        Validate an internal tag reference.
+
+        This method can be overridden to provide custom validation logic
+        for internal references.
+
+        Args:
+            spec: The AsyncAPI3 specification
+            tag_ref: The internal tag reference to validate
+            context: Context string for error messages
+
+        Raises:
+            ValueError: If the tag reference is invalid
+        """
+        ref_value = tag_ref.ref
 
         if not ref_value.startswith("#/components/tags/"):
             raise ValueError(
