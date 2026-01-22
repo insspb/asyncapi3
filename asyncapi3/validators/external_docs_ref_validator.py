@@ -43,13 +43,25 @@ class ExternalDocsRefValidator(ProcessorProtocol):
         self.validate_servers_external_docs_refs(spec)
         self.validate_channels_external_docs_refs(spec)
         self.validate_channels_messages_external_docs_refs(spec)
+        self.validate_channels_messages_headers_external_docs_refs(spec)
+        self.validate_channels_messages_payload_external_docs_refs(spec)
+        self.validate_channels_messages_tags_external_docs_refs(spec)
+        self.validate_channels_messages_traits_external_docs_refs(spec)
+        self.validate_channels_messages_traits_headers_external_docs_refs(spec)
+        self.validate_channels_messages_traits_tags_external_docs_refs(spec)
         self.validate_operations_external_docs_refs(spec)
+        self.validate_operations_tags_external_docs_refs(spec)
+        self.validate_operations_traits_external_docs_refs(spec)
+        self.validate_operations_traits_tags_external_docs_refs(spec)
 
         # Validate externalDocs in all component collections
         self.validate_components_channels_external_docs_refs(spec)
         self.validate_components_external_docs_external_docs_refs(spec)  # self
-        self.validate_components_message_traits_external_docs_refs(spec)
         self.validate_components_messages_external_docs_refs(spec)
+        self.validate_components_messages_headers_external_docs_refs(spec)
+        self.validate_components_messages_payload_external_docs_refs(spec)
+        self.validate_components_message_traits_external_docs_refs(spec)
+        self.validate_components_message_traits_headers_external_docs_refs(spec)
         self.validate_components_operations_external_docs_refs(spec)
         self.validate_components_operation_traits_external_docs_refs(spec)
         self.validate_components_servers_external_docs_refs(spec)
@@ -103,11 +115,174 @@ class ExternalDocsRefValidator(ProcessorProtocol):
                     spec, msg, f"message '{msg_name}' in channel '{channel_name}'"
                 )
 
+    def validate_channels_messages_headers_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in headers of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.headers:
+                    continue
+                self._validate_ref_field(
+                    spec,
+                    msg.headers,
+                    f"headers in message '{msg_name}' in channel '{channel_name}'",
+                )
+
+    def validate_channels_messages_payload_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in payload of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.payload:
+                    continue
+                self._validate_ref_field(
+                    spec,
+                    msg.payload,
+                    f"payload in message '{msg_name}' in channel '{channel_name}'",
+                )
+
+    def validate_channels_messages_tags_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in tags of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.tags:
+                    continue
+                self._validate_tags_external_docs_refs(
+                    spec,
+                    msg.tags,
+                    f"tags in message '{msg_name}' in channel '{channel_name}'",
+                )
+
+    def validate_channels_messages_traits_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in traits of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.traits:
+                    continue
+                for trait_idx, trait in enumerate(msg.traits):
+                    if isinstance(trait, Reference):
+                        continue
+                    self._validate_ref_field(
+                        spec,
+                        trait,
+                        f"trait {trait_idx} in message '{msg_name}' in "
+                        f"channel '{channel_name}'",
+                    )
+
+    def validate_channels_messages_traits_headers_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in headers of traits of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.traits:
+                    continue
+                for trait_idx, trait in enumerate(msg.traits):
+                    if isinstance(trait, Reference) or not trait.headers:
+                        continue
+                    self._validate_ref_field(
+                        spec,
+                        trait.headers,
+                        f"headers in trait {trait_idx} in message '{msg_name}' in "
+                        f"channel '{channel_name}'",
+                    )
+
+    def validate_channels_messages_traits_tags_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in tags of traits of messages within channels."""
+        if not spec.channels:
+            return
+        for channel_name, channel in spec.channels.root.items():
+            if isinstance(channel, Reference) or not channel.messages:
+                continue
+            for msg_name, msg in channel.messages.root.items():
+                if isinstance(msg, Reference) or not msg.traits:
+                    continue
+                for trait_idx, trait in enumerate(msg.traits):
+                    if isinstance(trait, Reference) or not trait.tags:
+                        continue
+                    self._validate_tags_external_docs_refs(
+                        spec,
+                        trait.tags,
+                        f"tags in trait {trait_idx} in message '{msg_name}' in "
+                        f"channel '{channel_name}'",
+                    )
+
     def validate_operations_external_docs_refs(self, spec: AsyncAPI3) -> None:
         """Validate externalDocs in operations."""
         if not spec.operations:
             return
         self._validate_external_docs_collection(spec.operations.root, spec, "operation")
+
+    def validate_operations_tags_external_docs_refs(self, spec: AsyncAPI3) -> None:
+        """Validate externalDocs in tags of operations."""
+        if not spec.operations:
+            return
+        for op_name, operation in spec.operations.root.items():
+            if isinstance(operation, Reference) or not operation.tags:
+                continue
+            self._validate_tags_external_docs_refs(
+                spec, operation.tags, f"tags in operation '{op_name}'"
+            )
+
+    def validate_operations_traits_external_docs_refs(self, spec: AsyncAPI3) -> None:
+        """Validate externalDocs in traits of operations."""
+        if not spec.operations:
+            return
+        for op_name, operation in spec.operations.root.items():
+            if isinstance(operation, Reference) or not operation.traits:
+                continue
+            for trait_idx, trait in enumerate(operation.traits):
+                if isinstance(trait, Reference):
+                    continue
+                self._validate_ref_field(
+                    spec, trait, f"trait {trait_idx} in operation '{op_name}'"
+                )
+
+    def validate_operations_traits_tags_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in tags of traits of operations."""
+        if not spec.operations:
+            return
+        for op_name, operation in spec.operations.root.items():
+            if isinstance(operation, Reference) or not operation.traits:
+                continue
+            for trait_idx, trait in enumerate(operation.traits):
+                if isinstance(trait, Reference) or not trait.tags:
+                    continue
+                self._validate_tags_external_docs_refs(
+                    spec,
+                    trait.tags,
+                    f"tags in trait {trait_idx} in operation '{op_name}'",
+                )
 
     def validate_components_channels_external_docs_refs(self, spec: AsyncAPI3) -> None:
         """Validate externalDocs in components channels."""
@@ -146,6 +321,32 @@ class ExternalDocsRefValidator(ProcessorProtocol):
             context_prefix="components",
         )
 
+    def validate_components_messages_headers_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in headers of components messages."""
+        if not spec.components or not spec.components.messages:
+            return
+        for msg_name, msg in spec.components.messages.root.items():
+            if isinstance(msg, Reference) or not msg.headers:
+                continue
+            self._validate_ref_field(
+                spec, msg.headers, f"headers in components message '{msg_name}'"
+            )
+
+    def validate_components_messages_payload_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in payload of components messages."""
+        if not spec.components or not spec.components.messages:
+            return
+        for msg_name, msg in spec.components.messages.root.items():
+            if isinstance(msg, Reference) or not msg.payload:
+                continue
+            self._validate_ref_field(
+                spec, msg.payload, f"payload in components message '{msg_name}'"
+            )
+
     def validate_components_message_traits_external_docs_refs(
         self, spec: AsyncAPI3
     ) -> None:
@@ -158,6 +359,21 @@ class ExternalDocsRefValidator(ProcessorProtocol):
             item_type="message trait",
             context_prefix="components",
         )
+
+    def validate_components_message_traits_headers_external_docs_refs(
+        self, spec: AsyncAPI3
+    ) -> None:
+        """Validate externalDocs in headers of components message traits."""
+        if not spec.components or not spec.components.message_traits:
+            return
+        for trait_name, trait in spec.components.message_traits.root.items():
+            if isinstance(trait, Reference) or not trait.headers:
+                continue
+            self._validate_ref_field(
+                spec,
+                trait.headers,
+                f"headers in components message trait '{trait_name}'",
+            )
 
     def validate_components_operations_external_docs_refs(
         self, spec: AsyncAPI3
@@ -334,3 +550,15 @@ class ExternalDocsRefValidator(ProcessorProtocol):
             if isinstance(item, Reference):
                 continue
             self._validate_ref_field(spec, item, f"{prefix}{item_type} '{name}'")
+
+    def _validate_tags_external_docs_refs(
+        self,
+        spec: AsyncAPI3,
+        tags: list[Any],
+        context: str,
+    ) -> None:
+        """Validate externalDocs references in a list of tags."""
+        for tag_idx, tag in enumerate(tags):
+            if isinstance(tag, Reference):
+                continue
+            self._validate_ref_field(spec, tag, f"tag {tag_idx} in {context}")
