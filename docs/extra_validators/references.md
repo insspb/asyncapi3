@@ -115,7 +115,9 @@ Example:
 ### Tag
 
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 
 ## `asyncapi3/models/info.py`
 
@@ -126,7 +128,9 @@ Example:
     - [x] External values with warning
     - [x] `#/components/tags/{key}`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 
 ## `asyncapi3/models/server.py`
 
@@ -139,7 +143,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator` (when in `root.servers`)
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `ServerBindingsObject | Reference | None`
   - [ ] Validated by `ServerBindingsRefValidator`
 
@@ -156,7 +162,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `ChannelBindingsObject | Reference | None`
   - [ ] Validated by `ChannelBindingsRefValidator`
 
@@ -179,7 +187,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `OperationBindingsObject | Reference | None`
   - [ ] Validated by `OperationBindingsRefValidator`
 
@@ -192,7 +202,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `OperationBindingsObject | Reference | None`
   - [ ] Validated by `OperationBindingsRefValidator`
 - [ ] `traits`: `list[OperationTrait | Reference] | None`
@@ -213,7 +225,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `MessageBindingsObject | Reference | None`
   - [ ] Validated by `MessageBindingsRefValidator`
 
@@ -228,7 +242,9 @@ Example:
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [x] External values with warning
+    - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `MessageBindingsObject | Reference | None`
   - [ ] Validated by `MessageBindingsRefValidator`
 - [ ] `traits`: `list[MessageTrait | Reference] | None`
@@ -325,7 +341,9 @@ Example:
 ### Schema
 
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
-  - [ ] Validated by `ExternalDocsRefValidator`
+  - [ ] Validated by `ExternalDocsRefValidator`; Allows the following values:
+    - [ ] External values with warning
+    - [ ] `#/components/externalDocs/{external_doc_name}`
 
 ## `asyncapi3/models/bindings/http.py`
 
@@ -445,20 +463,37 @@ Example:
 
 ### ExternalDocsRefValidator
 
-- [ ] Allowed values:
-  - [ ] External values with warning
-  - [ ] `#/components/externalDocs/{external_doc_name}`
-- [ ] Verified fields:
-  - [ ] `root.info.external_docs`
-  - [ ] `root.servers[].external_docs`
-  - [ ] `root.channels[].external_docs`
-  - [ ] `root.operations[].external_docs`
-  - [ ] `root.messages[].external_docs`
-  - [ ] `root.operationTraits[].external_docs`
-  - [ ] `root.messageTraits[].external_docs`
-  - [ ] `root.tags[].external_docs`
-  - [ ] `root.components.externalDocs`
-  - [ ] `root.schemas[].external_docs`
+- [x] Allowed values:
+  - [x] External values with warning
+  - [x] `#/components/externalDocs/{external_doc_name}`
+- [x] Verified fields:
+  - [x] `AsyncAPI3.info.external_docs`
+  - [x] `AsyncAPI3.info.tags[].external_docs`
+  - [x] `AsyncAPI3.servers[].external_docs`
+  - [x] `AsyncAPI3.channels[].external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].headers.external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].payload.external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].tags.external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].traits[].external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].traits[].headers.external_docs`
+  - [ ] `AsyncAPI3.channels[].messages[].traits[].tags[].external_docs`
+  - [x] `AsyncAPI3.operations[].external_docs`
+  - [ ] `AsyncAPI3.operations[].tags[].external_docs`
+  - [ ] `AsyncAPI3.operations[].traits[].external_docs`
+  - [ ] `AsyncAPI3.operations[].traits[].tags[].external_docs`
+  - [x] `AsyncAPI3.components.channels[].external_docs`
+  - [x] `AsyncAPI3.components.external_docs`
+  - [x] `AsyncAPI3.components.messages[].external_docs`
+  - [ ] `AsyncAPI3.components.messages[].headers.external_docs`
+  - [ ] `AsyncAPI3.components.messages[].payload.external_docs`
+  - [x] `AsyncAPI3.components.message_traits[].external_docs`
+  - [ ] `AsyncAPI3.components.message_traits[].headers.external_docs`
+  - [x] `AsyncAPI3.components.operations[].external_docs`
+  - [x] `AsyncAPI3.components.operation_traits[].external_docs`
+  - [x] `AsyncAPI3.components.servers[].external_docs`
+  - [x] `AsyncAPI3.components.tags[].external_docs`
+  - [x] `AsyncAPI3.components.schemas[].external_docs`
 
 ## `asyncapi3/validators/message_bindings_ref_validator.py`
 
