@@ -1133,6 +1133,14 @@ Models exported via `__all__` should also be imported and re-exported in
 AsyncAPI 3.0 uses `Reference` objects extensively. To ensure data integrity, we
 implement extra validators that run after basic Pydantic validation.
 
+Currently, only **TagsRefValidator** and **ExternalDocsRefValidator** are fully
+implemented. All other validators are stubs that require implementation.
+
+### Validator Implementation Status
+
+- ✅ **Implemented**: `TagsRefValidator`, `ExternalDocsRefValidator`
+- ❌ **Stubs** (require implementation): All other validators in `asyncapi3/validators/`
+
 ### Workflow for Implementing/Updating Validators
 
 When you need to implement a new validator or update an existing one (e.g., adding
@@ -1152,15 +1160,12 @@ more fields to check), follow these steps:
       method within `asyncapi3/models/asyncapi.py` (if it should be enabled by
       default).
 4. **Documentation**:
-    - Update `docs/extra_validators/references.md`.
-    - **CRITICAL**: This document has a dual structure. You MUST update both:
-        1. The **Per model section**: Mark the specific fields in the model
-            definitions (e.g., `## asyncapi3/models/info.py`).
-        2. The **Per validator section**: Mark the fields in the validator's
-            own section at the end of the document (e.g.,
-            `## asyncapi3/validators/tags_ref_validator.py`).
-    - Use checkboxes `[ ]` and `[x]` to mark progress.
-    - Ensure the "Statistics section" remains accurate if new fields are added.
+    - Update `docs/extra_validators/references.md` in the **Per Field data** section.
+    - Mark implemented fields as `[x]` in the appropriate logical sections.
+    - Update the **Per Model file data** section (legacy, organized by files).
+    - Update the **Per Validator data** section with the complete list of fields
+      that the validator checks.
+    - Use checkboxes `[ ]` and `[x]` to mark implementation status.
 5. **Testing**:
     - Create or update tests in `tests/validators/test_<validator_name>.py`.
     - Use `pytest` and `pytest-cases` for comprehensive testing of valid and
@@ -1173,14 +1178,26 @@ more fields to check), follow these steps:
 - `asyncapi3/models/asyncapi.py`: `AsyncAPI3` root model where validators are
   registered.
 - `docs/extra_validators/references.md`: Source of truth for validation status and
-  requirements.
+  requirements (has three sections: **Per Field data**, **Per Model file data**,
+  **Per Validator data**).
 - `tests/validators/`: Directory for validator tests.
 
 ### Validation Status Tracking
 
+The `docs/extra_validators/references.md` document has three main sections:
+
+1. **Per Field data**: Organized by logical AsyncAPI structure (Root Level, Components,
+   Bindings). Shows where `Reference` fields can appear and which validators handle them.
+
+2. **Per Model file data**: Legacy section organized by model files. Contains the same
+   information as Per Field data but grouped by source code files instead of logical structure.
+
+3. **Per Validator data**: Lists each validator and all fields it validates, with
+   implementation status.
+
 Always refer to `docs/extra_validators/references.md` to see the current state of
 reference validation. If you implement validation for a field, make sure to mark it
-as `[x]` in this document.
+as `[x]` in both the **Per Field data** and **Per Validator data** sections of this document.
 
 ## Development Workflow
 
@@ -1270,6 +1287,10 @@ Before submitting code, ensure:
 - [ ] Code follows snake_case naming (variables/functions) and CamelCase (classes)
 - [ ] All comments and documentation are in English
 - [ ] Tests are in `tests/` directory using pytest
+- [ ] (If implementing a validator) Update `docs/extra_validators/references.md`:
+  - [ ] Mark implemented fields as `[x]` in **Per Field data** section
+  - [ ] Mark implemented fields as `[x]` in **Per Model file data** section (legacy)
+  - [ ] Update the validator's field list in **Per Validator data** section
 - [ ] (If required) Add tests in `tests/`:
   - [ ] Tests are organized in classes grouped by model type
   - [ ] Tests use examples from specification documentation
