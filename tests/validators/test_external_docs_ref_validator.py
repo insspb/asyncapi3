@@ -383,3 +383,386 @@ class TestExternalDocsRefValidator:
             extra_validators=[ExternalDocsRefValidator],
         )
         assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_headers_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message headers within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "payload": {"type": "string"},
+                            "headers": {
+                                "type": "object",
+                                "externalDocs": {
+                                    "$ref": "#/components/externalDocs/header_docs"
+                                },
+                            },
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "header_docs": {"url": "https://example.com/header"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_payload_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message payload within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "headers": {"type": "object"},
+                            "payload": {
+                                "type": "string",
+                                "externalDocs": {
+                                    "$ref": "#/components/externalDocs/payload_docs"
+                                },
+                            },
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "payload_docs": {"url": "https://example.com/payload"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_tags_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message tags within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "payload": {"type": "string"},
+                            "tags": [
+                                {
+                                    "name": "tag1",
+                                    "externalDocs": {
+                                        "$ref": "#/components/externalDocs/tag_docs"
+                                    },
+                                }
+                            ],
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "tag_docs": {"url": "https://example.com/tag"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_traits_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message traits within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "payload": {"type": "string"},
+                            "traits": [
+                                {
+                                    "externalDocs": {
+                                        "$ref": "#/components/externalDocs/trait_docs"
+                                    },
+                                }
+                            ],
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "trait_docs": {"url": "https://example.com/trait"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_traits_headers_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message trait headers within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "payload": {"type": "string"},
+                            "traits": [
+                                {
+                                    "headers": {
+                                        "type": "object",
+                                        "externalDocs": {
+                                            "$ref": "#/components/externalDocs/trait_header_docs"
+                                        },
+                                    }
+                                }
+                            ],
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "trait_header_docs": {"url": "https://example.com/trait_header"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_channels_messages_traits_tags_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in message trait tags within channels."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            channels={
+                "test": {
+                    "address": "test",
+                    "messages": {
+                        "msg": {
+                            "payload": {"type": "string"},
+                            "traits": [
+                                {
+                                    "tags": [
+                                        {
+                                            "name": "trait_tag",
+                                            "externalDocs": {
+                                                "$ref": "#/components/externalDocs/trait_tag_docs"
+                                            },
+                                        }
+                                    ]
+                                }
+                            ],
+                        }
+                    },
+                }
+            },
+            components={
+                "externalDocs": {
+                    "trait_tag_docs": {"url": "https://example.com/trait_tag"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_operations_tags_refs(self) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in operation tags."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            operations={
+                "op1": {
+                    "action": "receive",
+                    "channel": {"$ref": "#/channels/test"},
+                    "tags": [
+                        {
+                            "name": "op_tag",
+                            "externalDocs": {
+                                "$ref": "#/components/externalDocs/op_tag_docs"
+                            },
+                        }
+                    ],
+                }
+            },
+            channels={"test": {"address": "test"}},
+            components={
+                "externalDocs": {
+                    "op_tag_docs": {"url": "https://example.com/op_tag"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_operations_traits_refs(self) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in operation traits."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            operations={
+                "op1": {
+                    "action": "receive",
+                    "channel": {"$ref": "#/channels/test"},
+                    "traits": [
+                        {
+                            "externalDocs": {
+                                "$ref": "#/components/externalDocs/op_trait_docs"
+                            },
+                        }
+                    ],
+                }
+            },
+            channels={"test": {"address": "test"}},
+            components={
+                "externalDocs": {
+                    "op_trait_docs": {"url": "https://example.com/op_trait"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_operations_traits_tags_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in operation trait tags."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            operations={
+                "op1": {
+                    "action": "receive",
+                    "channel": {"$ref": "#/channels/test"},
+                    "traits": [
+                        {
+                            "tags": [
+                                {
+                                    "name": "op_trait_tag",
+                                    "externalDocs": {
+                                        "$ref": "#/components/externalDocs/op_trait_tag_docs"
+                                    },
+                                }
+                            ]
+                        }
+                    ],
+                }
+            },
+            channels={"test": {"address": "test"}},
+            components={
+                "externalDocs": {
+                    "op_trait_tag_docs": {"url": "https://example.com/op_trait_tag"},
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_components_messages_headers_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in components message headers."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            components={
+                "messages": {
+                    "m1": {
+                        "payload": {"type": "string"},
+                        "headers": {
+                            "type": "object",
+                            "externalDocs": {
+                                "$ref": "#/components/externalDocs/comp_msg_header_docs"
+                            },
+                        },
+                    }
+                },
+                "externalDocs": {
+                    "comp_msg_header_docs": {
+                        "url": "https://example.com/comp_msg_header"
+                    },
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_components_messages_payload_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in components message payload."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            components={
+                "messages": {
+                    "m1": {
+                        "headers": {"type": "object"},
+                        "payload": {
+                            "type": "string",
+                            "externalDocs": {
+                                "$ref": "#/components/externalDocs/comp_msg_payload_docs"
+                            },
+                        },
+                    }
+                },
+                "externalDocs": {
+                    "comp_msg_payload_docs": {
+                        "url": "https://example.com/comp_msg_payload"
+                    },
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
+
+    def test_external_docs_ref_validator_validates_components_message_traits_headers_refs(
+        self,
+    ) -> None:
+        """Test ExternalDocsRefValidator validates externalDocs references in components message trait headers."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test", "version": "1.0"},
+            components={
+                "messageTraits": {
+                    "mt1": {
+                        "headers": {
+                            "type": "object",
+                            "externalDocs": {
+                                "$ref": "#/components/externalDocs/comp_mt_header_docs"
+                            },
+                        },
+                    }
+                },
+                "externalDocs": {
+                    "comp_mt_header_docs": {
+                        "url": "https://example.com/comp_mt_header"
+                    },
+                },
+            },
+            extra_validators=[ExternalDocsRefValidator],
+        )
+        assert spec is not None
