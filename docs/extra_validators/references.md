@@ -620,4 +620,4 @@ Example:
   - [x] `AsyncAPI3.components.operationTraits[].tags`
   - [x] `AsyncAPI3.components.messageTraits[].tags`
   - [x] `AsyncAPI3.components.channels[].messages[].tags`
-  - [ ] `AsyncAPI3.components.tags[].tags
+  - [x] `AsyncAPI3.components.tags[]` (Reference objects in components tags collection)

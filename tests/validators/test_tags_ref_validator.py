@@ -753,3 +753,32 @@ class TestTagsRefValidator:
                 },
                 extra_validators=[TagsRefValidator],
             )
+
+    def test_tags_ref_validator_validates_components_tags_refs(self) -> None:
+        """Test TagsRefValidator validates tag references in components tags."""
+        spec = AsyncAPI3(
+            asyncapi="3.0.0",
+            info={"title": "Test API", "version": "1.0.0"},
+            components={
+                "tags": {
+                    "prod": {"$ref": "#/components/tags/base"},
+                    "base": {"name": "base", "description": "Base tag"},
+                },
+            },
+            extra_validators=[TagsRefValidator],
+        )
+        assert spec is not None
+
+    def test_tags_ref_validator_invalid_components_tags_ref(self) -> None:
+        """Test TagsRefValidator raises error for invalid components tags reference."""
+        with pytest.raises(ValueError, match="does not exist in components/tags"):
+            AsyncAPI3(
+                asyncapi="3.0.0",
+                info={"title": "Test API", "version": "1.0.0"},
+                components={
+                    "tags": {
+                        "prod": {"$ref": "#/components/tags/nonexistent"},
+                    },
+                },
+                extra_validators=[TagsRefValidator],
+            )

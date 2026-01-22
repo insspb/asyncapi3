@@ -57,6 +57,7 @@ class TagsRefValidator(ProcessorProtocol):
         self._validate_components_operation_traits_tags_refs(spec)
         self._validate_components_message_traits_tags_refs(spec)
         self._validate_components_channels_messages_tags_refs(spec)
+        self._validate_components_tags_refs(spec)
 
         return spec
 
@@ -195,6 +196,14 @@ class TagsRefValidator(ProcessorProtocol):
                     message.tags,
                     f"message '{message_name}' in components channel '{channel_name}'",
                 )
+
+    def _validate_components_tags_refs(self, spec: AsyncAPI3) -> None:
+        """Validate tag references in components tags."""
+        if not spec.components or not spec.components.tags:
+            return
+        for tag_name, tag in spec.components.tags.root.items():
+            if isinstance(tag, Reference):
+                self.validate_tag_ref(spec, tag, f"components tag '{tag_name}'")
 
     def validate_tag_ref(
         self,
