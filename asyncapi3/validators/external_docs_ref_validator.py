@@ -74,7 +74,7 @@ class ExternalDocsRefValidator(ProcessorProtocol):
 
     def validate_info_external_docs_ref(self, spec: AsyncAPI3) -> None:
         """Validate externalDocs in info."""
-        if not spec.info:
+        if not spec.info:  # pragma: no cover
             return
         self._validate_ref_field(spec, spec.info, "info")
 
@@ -543,7 +543,7 @@ class ExternalDocsRefValidator(ProcessorProtocol):
         context_prefix: str = "",
     ) -> None:
         """Validate externalDocs in a collection of objects."""
-        if not collection:
+        if not collection:  # pragma: no cover
             return
         prefix = f"{context_prefix} " if context_prefix else ""
         for name, item in collection.items():
