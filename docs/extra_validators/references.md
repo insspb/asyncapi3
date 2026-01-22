@@ -28,9 +28,9 @@ All lines should have checkbox marks for use as a TODO list.
 Example:
 
 ```markdown
-## `asyncapi3/models/info.py`
+### `asyncapi3/models/info.py`
 
-### Info
+#### Info
 
 - [ ] `tags`: Tags | None (list[Tag | Reference])
   - [ ] Validated by `TagsRefValidator`; Allows the following values:
@@ -40,7 +40,7 @@ Example:
   - [ ] Not validated yet
 ```
 
-### Per validator sections
+## Per validator sections
 
 Shortly describes validator behavior and a list of checked fields location.
 
@@ -53,33 +53,29 @@ Shortly describes validator behavior and a list of checked fields location.
 Example:
 
 ```markdown
-## `asyncapi3/validators/tags_ref_validator.py)`
+### `asyncapi3/validators/tags_ref_validator.py)`
 
-### TagsRefValidator
+#### TagsRefValidator
 
 - [ ] Allowed values:
   - [ ] `#/components/tags/{tag_name}`
 - [ ] Verified fields:
-  - [ ] `root.info.tags`
-  - [ ] `root.servers.tags`
-  - [ ] `root.channels.tags`
-  - [ ] `root.operations.tags`
-  - [ ] `components.messages.tags`
-  - [ ] `components.channels.tags`
-  - [ ] `components.operations.tags`
+  - [ ] `AsyncAPI3.info.tags`
+  - [ ] `AsyncAPI3.servers.tags`
+  - [ ] `AsyncAPI3.channels.tags`
+  - [ ] `AsyncAPI3.operations.tags`
+  - [ ] `AsyncAPI3.components.messages.tags`
+  - [ ] `AsyncAPI3.components.channels.tags`
+  - [ ] `AsyncAPI3.components.operations.tags`
 - [ ] Not verified fields:
   - `field.name`
 ```
 
-### Statistics section
+## Per Model data
 
-- **Total fields with Reference**: int
-- **Validated fields**: int
-- **Non-validated fields**: int
+### `asyncapi3/models/asyncapi.py`
 
-## `asyncapi3/models/asyncapi.py`
-
-### AsyncAPI3
+#### AsyncAPI3
 
 - [ ] `servers`: `Servers | None` (dict[str, Server | Reference])
   - [ ] `Reference` values: `ServersRefValidator`
@@ -87,7 +83,7 @@ Example:
     - [ ] `variables`: `ServerVariablesRefValidator`
     - [ ] `security`: `SecuritySchemesRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `ServerBindingsRefValidator`
 - [ ] `channels`: `Channels | None` (dict[str, Channel | Reference])
   - [ ] `Reference` values: `ChannelsRefValidator`
@@ -96,7 +92,7 @@ Example:
     - [ ] `servers`: `ServersRefValidator`
     - [ ] `parameters`: `ParametersRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `ChannelBindingsRefValidator`
 - [ ] `operations`: `Operations | None` (dict[str, Operation | Reference])
   - [ ] `Reference` values: `OperationsRefValidator`
@@ -104,54 +100,54 @@ Example:
     - [ ] `channel`: `ChannelsRefValidator`
     - [ ] `security`: `SecuritySchemesRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `OperationBindingsRefValidator`
     - [ ] `traits`: `OperationTraitsRefValidator`
     - [ ] `messages`: `MessagesRefValidator`
     - [ ] `reply`: `RepliesRefValidator`
 
-## `asyncapi3/models/base.py`
+### `asyncapi3/models/base.py`
 
-### Tag
+#### Tag
 
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 
-## `asyncapi3/models/info.py`
+### `asyncapi3/models/info.py`
 
-### Info
+#### Info
 
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/tags/{key}`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 
-## `asyncapi3/models/server.py`
+### `asyncapi3/models/server.py`
 
-### Server
+#### Server
 
 - [ ] `variables`: `dict[str, ServerVariable | Reference] | None`
   - [ ] Validated by `ServerVariablesRefValidator`
 - [ ] `security`: `list[SecurityScheme | Reference] | None`
   - [ ] Validated by `SecuritySchemesRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
-  - [x] Validated by `TagsRefValidator` (when in `root.servers`)
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+  - [x] Validated by `TagsRefValidator` (when in `AsyncAPI3.servers`)
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `ServerBindingsObject | Reference | None`
   - [ ] Validated by `ServerBindingsRefValidator`
 
-## `asyncapi3/models/channel.py`
+### `asyncapi3/models/channel.py`
 
-### Channel
+#### Channel
 
 - [ ] `messages`: `Messages | None` (dict[str, Message | Reference])
   - [ ] Validated by `MessagesRefValidator`
@@ -161,16 +157,16 @@ Example:
   - [ ] Validated by `ParametersRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `ChannelBindingsObject | Reference | None`
   - [ ] Validated by `ChannelBindingsRefValidator`
 
-## `asyncapi3/models/operation.py`
+### `asyncapi3/models/operation.py`
 
-### OperationReply
+#### OperationReply
 
 - [ ] `address`: `OperationReplyAddress | Reference | None`
   - [ ] Validated by `ReplyAddressesRefValidator`
@@ -180,20 +176,20 @@ Example:
   - [ ] Validated by `MessagesRefValidator`
   - [x] `tags` validated by `TagsRefValidator` (indirectly via referenced channel)
 
-### OperationTrait
+#### OperationTrait
 
 - [ ] `security`: `list[SecurityScheme | Reference] | None`
   - [ ] Validated by `SecuritySchemesRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `OperationBindingsObject | Reference | None`
   - [ ] Validated by `OperationBindingsRefValidator`
 
-### Operation
+#### Operation
 
 - [ ] `channel`: `Reference`
   - [ ] Validated by `ChannelsRefValidator`
@@ -201,7 +197,7 @@ Example:
   - [ ] Validated by `SecuritySchemesRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
@@ -214,9 +210,9 @@ Example:
 - [ ] `reply`: `OperationReply | Reference | None`
   - [ ] Validated by `RepliesRefValidator`
 
-## `asyncapi3/models/message.py`
+### `asyncapi3/models/message.py`
 
-### MessageTrait
+#### MessageTrait
 
 - [ ] `headers`: `MultiFormatSchema | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
@@ -224,14 +220,14 @@ Example:
   - [ ] Validated by `CorrelationIdsRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
 - [ ] `bindings`: `MessageBindingsObject | Reference | None`
   - [ ] Validated by `MessageBindingsRefValidator`
 
-### Message
+#### Message
 
 - [ ] `headers`: `MultiFormatSchema | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
@@ -241,7 +237,7 @@ Example:
   - [ ] Validated by `CorrelationIdsRefValidator`
 - [x] `tags`: `Tags | None` (`list[Tag | Reference]`)
   - [x] Validated by `TagsRefValidator`
-- [ ] `external_docs`: `ExternalDocumentation | Reference | None`
+- [x] `external_docs`: `ExternalDocumentation | Reference | None`
   - [x] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [x] External values with warning
     - [x] `#/components/externalDocs/{external_doc_name}`
@@ -250,21 +246,21 @@ Example:
 - [ ] `traits`: `list[MessageTrait | Reference] | None`
   - [ ] Validated by `MessageTraitsRefValidator`
 
-## `asyncapi3/models/components.py`
+### `asyncapi3/models/components.py`
 
-### Components
+#### Components
 
 - [ ] `schemas`: `Schemas | None` (dict[str, MultiFormatSchema | Schema | Reference])
   - [ ] `Reference` values: `SchemasRefValidator`
   - [ ] `Schema` values:
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
 - [ ] `servers`: `Servers | None` (dict[str, Server | Reference])
   - [ ] `Reference` values: `ServersRefValidator`
   - [ ] `Server` values:
     - [ ] `variables`: `ServerVariablesRefValidator`
     - [ ] `security`: `SecuritySchemesRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `ServerBindingsRefValidator`
 - [ ] `channels`: `Channels | None` (dict[str, Channel | Reference])
   - [ ] `Reference` values: `ChannelsRefValidator`
@@ -273,7 +269,7 @@ Example:
     - [ ] `servers`: `ServersRefValidator`
     - [ ] `parameters`: `ParametersRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `ChannelBindingsRefValidator`
 - [ ] `operations`: `Operations | None` (dict[str, Operation | Reference])
   - [ ] `Reference` values: `OperationsRefValidator`
@@ -281,7 +277,7 @@ Example:
     - [ ] `channel`: `ChannelsRefValidator`
     - [ ] `security`: `SecuritySchemesRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `OperationBindingsRefValidator`
     - [ ] `traits`: `OperationTraitsRefValidator`
     - [ ] `messages`: `MessagesRefValidator`
@@ -293,7 +289,7 @@ Example:
     - [ ] `payload`: `SchemasRefValidator`
     - [ ] `correlation_id`: `CorrelationIdsRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `MessageBindingsRefValidator`
     - [ ] `traits`: `MessageTraitsRefValidator`
 - [ ] `security_schemes`: `SecuritySchemes | None` (dict[str, SecurityScheme | Reference])
@@ -311,13 +307,13 @@ Example:
 - [ ] `tags`: `TagsDict | None` (dict[str, Tag | Reference])
   - [x] `Reference` values: `TagsRefValidator`
   - [ ] `Tag` values:
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
 - [ ] `operation_traits`: `OperationTraits | None` (dict[str, OperationTrait | Reference])
   - [ ] `Reference` values: `OperationTraitsRefValidator`
   - [ ] `OperationTrait` values:
     - [ ] `security`: `SecuritySchemesRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `OperationBindingsRefValidator`
 - [ ] `message_traits`: `MessageTraits | None` (dict[str, MessageTrait | Reference])
   - [ ] `Reference` values: `MessageTraitsRefValidator`
@@ -325,7 +321,7 @@ Example:
     - [ ] `headers`: `SchemasRefValidator`
     - [ ] `correlation_id`: `CorrelationIdsRefValidator`
     - [x] `tags`: `TagsRefValidator`
-    - [ ] `external_docs`: `ExternalDocsRefValidator`
+    - [x] `external_docs`: `ExternalDocsRefValidator`
     - [ ] `bindings`: `MessageBindingsRefValidator`
 - [ ] `server_bindings`: `ServerBindings | None`
   (dict[str, ServerBindingsObject | Reference])
@@ -336,132 +332,134 @@ Example:
 - [ ] `message_bindings`: `MessageBindings | None`
   (dict[str, MessageBindingsObject | Reference])
 
-## `asyncapi3/models/schema.py`
+### `asyncapi3/models/schema.py`
 
-### Schema
+#### Schema
 
 - [ ] `external_docs`: `ExternalDocumentation | Reference | None`
   - [ ] Validated by `ExternalDocsRefValidator`; Allows the following values:
     - [ ] External values with warning
     - [ ] `#/components/externalDocs/{external_doc_name}`
 
-## `asyncapi3/models/bindings/http.py`
+### `asyncapi3/models/bindings/http.py`
 
-### HTTPOperationBindings
+#### HTTPOperationBindings
 
 - [ ] `query`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-### HTTPMessageBindings
+#### HTTPMessageBindings
 
 - [ ] `headers`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/mqtt.py`
+### `asyncapi3/models/bindings/mqtt.py`
 
-### MQTTServerBindings
+#### MQTTServerBindings
 
 - [ ] `session_expiry_interval`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `maximum_packet_size`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-### MQTTOperationBindings
+#### MQTTOperationBindings
 
 - [ ] `message_expiry_interval`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-### MQTTMessageBindings
+#### MQTTMessageBindings
 
 - [ ] `correlation_data`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `response_topic`: `str | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/kafka.py`
+### `asyncapi3/models/bindings/kafka.py`
 
-### KafkaOperationBindings
+#### KafkaOperationBindings
 
 - [ ] `group_id`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `client_id`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-### KafkaMessageBindings
+#### KafkaMessageBindings
 
 - [ ] `key`: `Schema | Reference | dict[str, Any] | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/websockets.py`
+### `asyncapi3/models/bindings/websockets.py`
 
-### WebSocketsChannelBindings
+#### WebSocketsChannelBindings
 
 - [ ] `query`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `headers`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/mqtt5.py`
+### `asyncapi3/models/bindings/mqtt5.py`
 
-### MQTT5ServerBindings
+#### MQTT5ServerBindings
 
 - [ ] `session_expiry_interval`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/jms.py`
+### `asyncapi3/models/bindings/jms.py`
 
-### JMSMessageBindings
-
-- [ ] `headers`: `Schema | Reference | None`
-  - [ ] Validated by `SchemasRefValidator`
-
-## `asyncapi3/models/bindings/anypointmq.py`
-
-### AnypointMQMessageBindings
+#### JMSMessageBindings
 
 - [ ] `headers`: `Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/models/bindings/solace.py`
+### `asyncapi3/models/bindings/anypointmq.py`
 
-### SolaceOperationBindings
+#### AnypointMQMessageBindings
+
+- [ ] `headers`: `Schema | Reference | None`
+  - [ ] Validated by `SchemasRefValidator`
+
+### `asyncapi3/models/bindings/solace.py`
+
+#### SolaceOperationBindings
 
 - [ ] `time_to_live`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 - [ ] `priority`: `int | Schema | Reference | None`
   - [ ] Validated by `SchemasRefValidator`
 
-## `asyncapi3/validators/channel_bindings_ref_validator.py`
+## Per Validator data
 
-### ChannelBindingsRefValidator
+### `asyncapi3/validators/channel_bindings_ref_validator.py`
 
-- [ ] Verified fields:
-  - [ ] `root.channels[].bindings`
-  - [ ] `root.components.channels[].bindings`
-  - [ ] `root.components.channelBindings`
-
-## `asyncapi3/validators/channels_ref_validator.py`
-
-### ChannelsRefValidator
+#### ChannelBindingsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.channels`
-  - [ ] `root.operations[].channel`
-  - [ ] `root.operations[].reply.channel`
-  - [ ] `root.components.channels`
+  - [ ] `AsyncAPI3.channels[].bindings`
+  - [ ] `AsyncAPI3.components.channels[].bindings`
+  - [ ] `AsyncAPI3.components.channelBindings`
 
-## `asyncapi3/validators/correlation_ids_ref_validator.py`
+### `asyncapi3/validators/channels_ref_validator.py`
 
-### CorrelationIdsRefValidator
+#### ChannelsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.messages[].correlation_id`
-  - [ ] `root.messageTraits[].correlation_id`
-  - [ ] `root.components.correlationIds`
+  - [ ] `AsyncAPI3.channels`
+  - [ ] `AsyncAPI3.operations[].channel`
+  - [ ] `AsyncAPI3.operations[].reply.channel`
+  - [ ] `AsyncAPI3.components.channels`
 
-## `asyncapi3/validators/external_docs_ref_validator.py`
+### `asyncapi3/validators/correlation_ids_ref_validator.py`
 
-### ExternalDocsRefValidator
+#### CorrelationIdsRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.messages[].correlation_id`
+  - [ ] `AsyncAPI3.messageTraits[].correlation_id`
+  - [ ] `AsyncAPI3.components.correlationIds`
+
+### `asyncapi3/validators/external_docs_ref_validator.py`
+
+#### ExternalDocsRefValidator
 
 - [x] Allowed values:
   - [x] External values with warning
@@ -472,114 +470,114 @@ Example:
   - [x] `AsyncAPI3.servers[].external_docs`
   - [x] `AsyncAPI3.channels[].external_docs`
   - [x] `AsyncAPI3.channels[].messages[].external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].headers.external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].payload.external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].tags.external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].traits[].external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].traits[].headers.external_docs`
-  - [ ] `AsyncAPI3.channels[].messages[].traits[].tags[].external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].headers.external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].payload.external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].tags.external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].traits[].external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].traits[].headers.external_docs`
+  - [x] `AsyncAPI3.channels[].messages[].traits[].tags[].external_docs`
   - [x] `AsyncAPI3.operations[].external_docs`
-  - [ ] `AsyncAPI3.operations[].tags[].external_docs`
-  - [ ] `AsyncAPI3.operations[].traits[].external_docs`
-  - [ ] `AsyncAPI3.operations[].traits[].tags[].external_docs`
+  - [x] `AsyncAPI3.operations[].tags[].external_docs`
+  - [x] `AsyncAPI3.operations[].traits[].external_docs`
+  - [x] `AsyncAPI3.operations[].traits[].tags[].external_docs`
   - [x] `AsyncAPI3.components.channels[].external_docs`
   - [x] `AsyncAPI3.components.external_docs`
   - [x] `AsyncAPI3.components.messages[].external_docs`
-  - [ ] `AsyncAPI3.components.messages[].headers.external_docs`
-  - [ ] `AsyncAPI3.components.messages[].payload.external_docs`
+  - [x] `AsyncAPI3.components.messages[].headers.external_docs`
+  - [x] `AsyncAPI3.components.messages[].payload.external_docs`
   - [x] `AsyncAPI3.components.message_traits[].external_docs`
-  - [ ] `AsyncAPI3.components.message_traits[].headers.external_docs`
+  - [x] `AsyncAPI3.components.message_traits[].headers.external_docs`
   - [x] `AsyncAPI3.components.operations[].external_docs`
   - [x] `AsyncAPI3.components.operation_traits[].external_docs`
   - [x] `AsyncAPI3.components.servers[].external_docs`
   - [x] `AsyncAPI3.components.tags[].external_docs`
   - [x] `AsyncAPI3.components.schemas[].external_docs`
 
-## `asyncapi3/validators/message_bindings_ref_validator.py`
+### `asyncapi3/validators/message_bindings_ref_validator.py`
 
-### MessageBindingsRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.messages[].bindings`
-  - [ ] `root.messageTraits[].bindings`
-  - [ ] `root.components.messageBindings`
-
-## `asyncapi3/validators/message_traits_ref_validator.py`
-
-### MessageTraitsRefValidator
+#### MessageBindingsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.messages[].traits`
-  - [ ] `root.components.messageTraits`
+  - [ ] `AsyncAPI3.messages[].bindings`
+  - [ ] `AsyncAPI3.messageTraits[].bindings`
+  - [ ] `AsyncAPI3.components.messageBindings`
 
-## `asyncapi3/validators/messages_ref_validator.py`
+### `asyncapi3/validators/message_traits_ref_validator.py`
 
-### MessagesRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.channels[].messages`
-  - [ ] `root.operations[].messages`
-  - [ ] `root.operations[].reply.messages`
-  - [ ] `root.components.messages`
-
-## `asyncapi3/validators/operation_bindings_ref_validator.py`
-
-### OperationBindingsRefValidator
+#### MessageTraitsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.operations[].bindings`
-  - [ ] `root.operationTraits[].bindings`
-  - [ ] `root.components.operationBindings`
+  - [ ] `AsyncAPI3.messages[].traits`
+  - [ ] `AsyncAPI3.components.messageTraits`
 
-## `asyncapi3/validators/operation_traits_ref_validator.py`
+### `asyncapi3/validators/messages_ref_validator.py`
 
-### OperationTraitsRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.operations[].traits`
-  - [ ] `root.components.operationTraits`
-
-## `asyncapi3/validators/operations_ref_validator.py`
-
-### OperationsRefValidator
+#### MessagesRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.operations`
-  - [ ] `root.components.operations`
+  - [ ] `AsyncAPI3.channels[].messages`
+  - [ ] `AsyncAPI3.operations[].messages`
+  - [ ] `AsyncAPI3.operations[].reply.messages`
+  - [ ] `AsyncAPI3.components.messages`
 
-## `asyncapi3/validators/parameters_ref_validator.py`
+### `asyncapi3/validators/operation_bindings_ref_validator.py`
 
-### ParametersRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.channels[].parameters`
-  - [ ] `root.components.parameters`
-
-## `asyncapi3/validators/replies_ref_validator.py`
-
-### RepliesRefValidator
+#### OperationBindingsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.operations[].reply`
-  - [ ] `root.components.replies`
+  - [ ] `AsyncAPI3.operations[].bindings`
+  - [ ] `AsyncAPI3.operationTraits[].bindings`
+  - [ ] `AsyncAPI3.components.operationBindings`
 
-## `asyncapi3/validators/reply_addresses_ref_validator.py`
+### `asyncapi3/validators/operation_traits_ref_validator.py`
 
-### ReplyAddressesRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.operations[].reply.address`
-  - [ ] `root.components.replyAddresses`
-
-## `asyncapi3/validators/schemas_ref_validator.py`
-
-### SchemasRefValidator
+#### OperationTraitsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.messages[].headers`
-  - [ ] `root.messages[].payload`
-  - [ ] `root.messageTraits[].headers`
-  - [ ] `root.components.schemas`
+  - [ ] `AsyncAPI3.operations[].traits`
+  - [ ] `AsyncAPI3.components.operationTraits`
+
+### `asyncapi3/validators/operations_ref_validator.py`
+
+#### OperationsRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.operations`
+  - [ ] `AsyncAPI3.components.operations`
+
+### `asyncapi3/validators/parameters_ref_validator.py`
+
+#### ParametersRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.channels[].parameters`
+  - [ ] `AsyncAPI3.components.parameters`
+
+### `asyncapi3/validators/replies_ref_validator.py`
+
+#### RepliesRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.operations[].reply`
+  - [ ] `AsyncAPI3.components.replies`
+
+### `asyncapi3/validators/reply_addresses_ref_validator.py`
+
+#### ReplyAddressesRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.operations[].reply.address`
+  - [ ] `AsyncAPI3.components.replyAddresses`
+
+### `asyncapi3/validators/schemas_ref_validator.py`
+
+#### SchemasRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.messages[].headers`
+  - [ ] `AsyncAPI3.messages[].payload`
+  - [ ] `AsyncAPI3.messageTraits[].headers`
+  - [ ] `AsyncAPI3.components.schemas`
   - [ ] `bindings.http.operation.query`
   - [ ] `bindings.http.message.headers`
   - [ ] `bindings.mqtt.server.session_expiry_interval`
@@ -598,44 +596,44 @@ Example:
   - [ ] `bindings.solace.operation.time_to_live`
   - [ ] `bindings.solace.operation.priority`
 
-## `asyncapi3/validators/security_schemes_ref_validator.py`
+### `asyncapi3/validators/security_schemes_ref_validator.py`
 
-### SecuritySchemesRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.servers[].security`
-  - [ ] `root.operations[].security`
-  - [ ] `root.operationTraits[].security`
-  - [ ] `root.components.securitySchemes`
-
-## `asyncapi3/validators/server_bindings_ref_validator.py`
-
-### ServerBindingsRefValidator
+#### SecuritySchemesRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.servers[].bindings`
-  - [ ] `root.components.serverBindings`
+  - [ ] `AsyncAPI3.servers[].security`
+  - [ ] `AsyncAPI3.operations[].security`
+  - [ ] `AsyncAPI3.operationTraits[].security`
+  - [ ] `AsyncAPI3.components.securitySchemes`
 
-## `asyncapi3/validators/server_variables_ref_validator.py`
+### `asyncapi3/validators/server_bindings_ref_validator.py`
 
-### ServerVariablesRefValidator
-
-- [ ] Verified fields:
-  - [ ] `root.servers[].variables`
-  - [ ] `root.components.serverVariables`
-
-## `asyncapi3/validators/servers_ref_validator.py`
-
-### ServersRefValidator
+#### ServerBindingsRefValidator
 
 - [ ] Verified fields:
-  - [ ] `root.servers`
-  - [ ] `root.channels[].servers`
-  - [ ] `root.components.servers`
+  - [ ] `AsyncAPI3.servers[].bindings`
+  - [ ] `AsyncAPI3.components.serverBindings`
 
-## `asyncapi3/validators/tags_ref_validator.py`
+### `asyncapi3/validators/server_variables_ref_validator.py`
 
-### TagsRefValidator
+#### ServerVariablesRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.servers[].variables`
+  - [ ] `AsyncAPI3.components.serverVariables`
+
+### `asyncapi3/validators/servers_ref_validator.py`
+
+#### ServersRefValidator
+
+- [ ] Verified fields:
+  - [ ] `AsyncAPI3.servers`
+  - [ ] `AsyncAPI3.channels[].servers`
+  - [ ] `AsyncAPI3.components.servers`
+
+### `asyncapi3/validators/tags_ref_validator.py`
+
+#### TagsRefValidator
 
 - [x] Allowed values:
   - [x] External values with warning
