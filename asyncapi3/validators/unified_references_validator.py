@@ -11,6 +11,8 @@ import re
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Any, get_args
 
+from pydantic import BaseModel
+
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tag
 from asyncapi3.models.bindings import (
     ChannelBindingsObject,
@@ -234,7 +236,7 @@ class UnifiedReferencesValidator(ProcessorProtocol):
                 )
                 return
 
-            if self._is_model_instance(obj=obj):
+            if isinstance(obj, BaseModel):
                 self._validate_model_references(
                     spec=spec,
                     model=obj,
@@ -353,10 +355,6 @@ class UnifiedReferencesValidator(ProcessorProtocol):
                 validated_refs=validated_refs,
                 visited_objects=visited_objects,
             )
-
-    def _is_model_instance(self, obj: Any) -> bool:
-        """Return True when object looks like a Pydantic model instance."""
-        return hasattr(obj, "__class__") and hasattr(obj.__class__, "model_fields")
 
     def _get_expected_type_for_path(self, ref_path: str) -> Any:
         """
