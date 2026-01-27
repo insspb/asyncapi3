@@ -18,6 +18,7 @@ __all__ = [
     "ServerVariablesRefValidator",
     "ServersRefValidator",
     "TagsRefValidator",
+    "UnifiedReferencesValidator",
 ]
 
 from asyncapi3.validators.channel_bindings_ref_validator import (
@@ -59,3 +60,4 @@ from asyncapi3.validators.server_variables_ref_validator import (
 )
 from asyncapi3.validators.servers_ref_validator import ServersRefValidator
 from asyncapi3.validators.tags_ref_validator import TagsRefValidator
+from asyncapi3.validators.unified_references_validator import UnifiedReferencesValidator

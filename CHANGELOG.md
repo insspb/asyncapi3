@@ -17,6 +17,9 @@
 - #16: Stub files for future validators
 - #16: Complete docs for extra validators
 - #18: `ExternalDocsRefValidator` for external documentation reference validation
+- #20: `UnifiedReferencesValidator` for validation of all reference objects in AsyncAPI
+  3.0 specification, including checks for existence, type compatibility, and circular
+  references
 
 ### CHANGED
 
