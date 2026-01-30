@@ -15,15 +15,14 @@ from pydantic import (
 )
 from pydantic.json_schema import SkipJsonSchema
 
-# TODO:
-# from asyncapi3.managers import (
-#     ChannelMessagesManager,
-#     ChannelParametersManager,
-#     ChannelsManager,
-#     OperationsManager,
-#     ServersManager,
-#     TagsManager,
-# )
+from asyncapi3.managers import (
+    ChannelMessagesManager,
+    ChannelParametersManager,
+    ChannelsManager,
+    OperationsManager,
+    ServersManager,
+    TagsManager,
+)
 from asyncapi3.models.base import ExternalDocumentation, Reference, Tags
 from asyncapi3.models.base_models import ExtendableBaseModel
 from asyncapi3.models.channel import Channels, Parameters
@@ -233,15 +232,14 @@ class AsyncAPI3(ExtendableBaseModel):
             "operations": Operations({}),
             "components": components,
             "extra_converters": [
-                # TODO:
                 # Safe to merge values
-                # TagsManager,  # Only name has meaning
+                TagsManager,  # Only name has meaning
                 # Values defined with names (core objects (L1))
-                # ServersManager,
-                # ChannelsManager,
-                # OperationsManager,
-                # ChannelMessagesManager,
-                # ChannelParametersManager,
+                ServersManager,
+                ChannelsManager,
+                OperationsManager,
+                ChannelMessagesManager,
+                ChannelParametersManager,
             ],
             "extra_validators": [
                 UnifiedReferencesValidator,

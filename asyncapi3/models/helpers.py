@@ -1,11 +1,20 @@
-__all__ = ["EmailStr", "is_null", "validate_patterned_key"]
+__all__ = [
+    "EmailStr",
+    "is_null",
+    "update_object_attributes",
+    "validate_patterned_key",
+]
 
 import re
 
-from typing import Any
+from types import EllipsisType
+from typing import Any, TypeVar
 
 from pydantic import GetCoreSchemaHandler, GetJsonSchemaHandler
 from pydantic_core import CoreSchema, core_schema
+
+UNSET = EllipsisType()
+T = TypeVar("T")
 
 
 def is_null(value: Any) -> bool:
@@ -40,6 +49,29 @@ def validate_patterned_key(key: str | Any, object_name: str = "object") -> None:
         raise TypeError(
             f"Key '{key}' must be a string, got {type(key).__name__}"
         ) from error
+
+
+def update_object_attributes(obj: T, **kwargs: Any) -> T:
+    """
+    Update object attributes conditionally, skipping UNSET values.
+
+    This utility function updates attributes of any Python object by setting
+    only those attributes whose values are not equal to the UNSET sentinel value.
+    This allows distinguishing between "not provided" and "explicitly set to None"
+    in builder patterns and update operations.
+
+    Args:
+        obj: The object to update (any Python object).
+        **kwargs: Attribute name-value pairs to update. Values equal to UNSET
+            are ignored, while other values (including None) are set on the object.
+
+    Returns:
+        The same object with updated attributes.
+    """
+    for field_name, value in kwargs.items():
+        if value is not UNSET:
+            setattr(obj, field_name, value)
+    return obj
 
 
 class EmailStr(str):
